@@ -1,4 +1,5 @@
 # Daz Package Mananger
+NOTE: Currently this program break save file because daz will overrite original material location with virtual folder location.
 
 ## Introduction
 This program is intended to solve the problem of super slow character load when a large number of morphs are installed. 
