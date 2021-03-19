@@ -1,5 +1,6 @@
 # Daz Package Mananger
-NOTE: Currently this program break save file because daz will overrite original material location with virtual folder location.
+
+## * Warning: If you save scene after removing the virtual folder that contains texture files the scene currently points to it, daz will save it as absolute path. This will make the scene only able to load correctly when the virtual folder is added as a base directory. The file will become non portable. This issue can be avoided by not saving the file while the virtual folder is removed. 
 
 ## Introduction
 This program is intended to solve the problem of super slow character load when a large number of morphs are installed. 
@@ -23,6 +24,7 @@ The algorithi:
 
 
 ## Limitations
+* Please see the issue with saving while virtual folder is not added as a base directory.
 
 * Only run on Windows 10.
 
