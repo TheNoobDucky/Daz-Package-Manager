@@ -46,6 +46,10 @@ namespace Daz_Package_Manager
             public List<InstalledCharacter> characters = new List<InstalledCharacter>();
             public List<InstalledCharacter> Characters { get => characters; set { characters = value; CharactersViewSource.Source = characters; } }
             public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
+
+            public List<InstalledPose> poses = new List<InstalledPose>();
+            public List<InstalledPose> Poses { get => poses; set { poses = value; PosesViewSource.Source = poses; } }
+            public CollectionViewSource PosesViewSource { get; set; } = new CollectionViewSource();
         }
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
@@ -72,7 +76,7 @@ namespace Daz_Package_Manager
             {
                 using var packageJsonFile = File.OpenText(packagesFile);
                 model.Packages = JsonSerializer.Deserialize<List<InstalledPackage>>(packageJsonFile.ReadToEnd());
-                model.Characters = ProcessInstallManifestFolder.GenerateItemLists(model.Packages);
+                (model.Characters, model.Poses) = ProcessInstallManifestFolder.GenerateItemLists(model.Packages);
             }
             catch (FileNotFoundException)
             {

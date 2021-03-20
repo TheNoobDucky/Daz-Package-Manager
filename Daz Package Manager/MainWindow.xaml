@@ -125,6 +125,31 @@
 
                 </DataGrid>
             </TabItem>
+
+            <TabItem Header="Poses">
+                <DataGrid Name="PosesDisplay" ItemsSource="{Binding PosesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Height="150" Source="{Binding Image}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+
+                </DataGrid>
+            </TabItem>
             
             <TabItem Header="Log Output">
                 <Grid>

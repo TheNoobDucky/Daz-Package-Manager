@@ -14,5 +14,9 @@ namespace DazPackage
         public InstalledCharacter() { }
 
         public GenerationEnum Generation { get; set; }
+        public static new bool ContentTypeMatches(string sourceContentType) 
+        {
+            return sourceContentType == "Actor/Character";
+        }
     }
 }

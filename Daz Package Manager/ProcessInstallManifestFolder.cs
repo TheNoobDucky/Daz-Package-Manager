@@ -20,35 +20,65 @@ namespace Daz_Package_Manager
 
             var installedPackages = files.Select(x => new InstalledPackage(new FileInfo(x))).ToList();
 
-            var figures = GenerateItemLists(installedPackages);
+            var (figures, poses) = GenerateItemLists(installedPackages);
 
             return (installedPackages, figures);
         }
 
-        public static List<InstalledCharacter> GenerateItemLists (IEnumerable<InstalledPackage> installedPackages)
+        public static (List<InstalledCharacter> figures, List<InstalledPose> poses) GenerateItemLists (IEnumerable<InstalledPackage> installedPackages)
         {
             var figures = new List<InstalledCharacter>();
+            var poses = new List<InstalledPose>();
+
             foreach (var package in installedPackages)
             {
                 foreach (var asset in package.Assets)
                 {
-                    if (asset.ContentType == "Actor/Character")
+                    if (InstalledCharacter.ContentTypeMatches(asset.ContentType))
                     {
-                        var figureLocation = Path.Combine(package.InstalledLocation,asset.Name);
-                        var figureImage = Path.ChangeExtension(figureLocation, ".tip.png");
-                        if (!File.Exists(figureImage))
+                        var figureLocation = Path.Combine(package.InstalledLocation, asset.Name);
+                        var figureImage = FindImage(figureLocation);
+                        figures.Add(new InstalledCharacter(package)
                         {
-                            figureImage = Path.ChangeExtension(figureLocation, ".png");
-                        }
-                        figures.Add(new InstalledCharacter(package) {
                             Path = asset.Name,
                             Image = figureImage,
-                        }); ;
-                        Output.Write("Character found: " + asset.Name);
+                        });
+                        //Output.Write("Character found: " + asset.Name);
+                    }
+                    else if (InstalledPose.ContentTypeMatches(asset.ContentType))
+                    {
+                        var figureLocation = Path.Combine(package.InstalledLocation, asset.Name);
+                        var figureImage = FindImage(figureLocation);
+                        poses.Add(new InstalledPose(package)
+                        {
+                            Path = asset.Name,
+                            Image = figureImage,
+                        });
+                        Output.Write("Pose found: " + asset.Name);
+                    }
+                    else if (InstalledMaterial.ContentTypeMatches(asset.ContentType))
+                    {
+
+                    }
+                    else
+                    {
+                        Output.Write(asset.ContentType, Brushes.Red);
                     }
                 }
             }
-            return figures;
+            return (figures, poses);
+        }
+
+
+        private static string FindImage (string assetPath)
+        {
+            var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
+            if (!File.Exists(figureImage))
+            {
+                figureImage = Path.ChangeExtension(assetPath, ".png");
+            }
+
+            return figureImage;
         }
     }
 }

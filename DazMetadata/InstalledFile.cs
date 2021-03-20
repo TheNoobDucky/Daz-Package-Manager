@@ -4,8 +4,13 @@ using System.Text;
 
 namespace DazPackage
 {
+    public interface IContenType 
+    {
+        public static bool ContentTypeMatches (string sourceContentType) => throw new NotImplementedException();
+    }
+
     [Serializable]
-    public class InstalledFile
+    public class InstalledFile : IContenType
     {
         public InstalledFile(InstalledPackage package)
         {
@@ -20,6 +25,7 @@ namespace DazPackage
         public bool Selected { get { return Package.Selected; } set { Package.Selected = value; } }
 
         public InstalledPackage Package { get; private set; }
+        public static bool ContentTypeMatches(string sourceContentType) => false;
 
     }
 }
