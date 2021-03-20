@@ -22,13 +22,14 @@ namespace DazPackage
         {
             Package = package;
             Package.PropertyChanged += Package_PropertyChanged;
+            ProductName = Package.ProductName;
         }
 
         public InstalledFile() { }
 
         public string Image { get; set; }
         public string Path { get; set; }
-        public string ProductName { get { return Package.ProductName; } }
+        public string ProductName { get; set; }
         public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
 
         public InstalledPackage Package { get; private set; }

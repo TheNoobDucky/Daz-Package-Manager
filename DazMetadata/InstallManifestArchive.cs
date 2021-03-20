@@ -1,31 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Helpers;
-using System.Windows.Media;
 using System.IO;
-using DazPackage;
 using System.Linq;
-using System.Collections.ObjectModel;
 
-namespace Daz_Package_Manager
+using System.Windows.Media;
+
+namespace DazPackage
 {
-    class ProcessInstallManifestFolder
+    [Serializable]
+    public class InstallManifestArchive
     {
-        public static (List<InstalledPackage>, List<InstalledCharacter>) Scan ()
+        public List<InstalledPackage> Packages = new List<InstalledPackage>();
+        public List<InstalledCharacter> Characters = new List<InstalledCharacter>();
+        public List<InstalledPose> Poses = new List<InstalledPose>();
+        public static InstallManifestArchive Scan(string folder)
         {
-            var folder = Properties.Settings.Default.InstallManifestFolder;
+            var archive = new InstallManifestArchive();
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
             var files = Directory.EnumerateFiles(folder);
 
-            var installedPackages = files.Select(x => new InstalledPackage(new FileInfo(x))).ToList();
+            archive.Packages = files.Select(x => new InstalledPackage(new FileInfo(x))).ToList();
 
-            var (figures, poses) = GenerateItemLists(installedPackages);
+            (archive.Characters, archive.Poses) = GenerateItemLists(archive.Packages);
 
-            return (installedPackages, figures);
+            return archive;
         }
 
-        public static (List<InstalledCharacter> figures, List<InstalledPose> poses) GenerateItemLists (IEnumerable<InstalledPackage> installedPackages)
+        public static (List<InstalledCharacter> figures, List<InstalledPose> poses) GenerateItemLists(IEnumerable<InstalledPackage> installedPackages)
         {
             var figures = new List<InstalledCharacter>();
             var poses = new List<InstalledPose>();
@@ -69,8 +71,7 @@ namespace Daz_Package_Manager
             return (figures, poses);
         }
 
-
-        private static string FindImage (string assetPath)
+        private static string FindImage(string assetPath)
         {
             var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
             if (!File.Exists(figureImage))

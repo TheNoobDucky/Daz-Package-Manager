@@ -1,43 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DazPackage;
-using Helpers;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows;
 using System.ComponentModel;
 
 namespace Daz_Package_Manager
 {
-    class VirtualInstall
-    {
-        public static void InstallPackages (IEnumerable<InstalledPackage> packages, string destination)
-        {
-            Directory.CreateDirectory(destination);
-
-            foreach (var package in packages)
-            {
-                var basePath = package.InstalledLocation;
-                Output.Write("Installing: " + package.ProductName);
-                foreach (var file in package.Files)
-                {
-                    var sourcePath = Path.GetFullPath(Path.Combine(basePath, file));
-                    var destinationPath = Path.GetFullPath(Path.Combine(destination, file));
-                    Directory.CreateDirectory(Directory.GetParent(destinationPath).FullName);
-                    var errorCode = SymLinker.CreateSymlink(sourcePath, destinationPath, SymLinker.SymbolicLink.File);
-                    if (errorCode != 0)
-                    {
-                        var error = new Win32Exception(errorCode).Message;
-                        MessageBox.Show("Failed to create symlink. Aborting. Win32 Error message:" + error);
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    class SymLinker
+    public class SymLinker
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, UInt32 dwFlags);
@@ -67,6 +34,11 @@ namespace Daz_Package_Manager
             AllowUnprevileged = 0x2,
             File = (0x0| AllowUnprevileged),
             Directory = (0x1|AllowUnprevileged),
+        }
+
+        public static string DecodeErrorCode (int errorCode)
+        {
+            return new Win32Exception(errorCode).Message;
         }
     }
 }
