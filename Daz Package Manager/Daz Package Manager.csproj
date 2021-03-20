@@ -10,6 +10,7 @@
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<PackageId>DazPackageManager</PackageId>
+	<Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
