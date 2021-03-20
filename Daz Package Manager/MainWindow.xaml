@@ -86,7 +86,7 @@
 
         <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <TabItem Header="Packages">
-                <DataGrid Name="PackageDisplay" IsReadOnly="False" AutoGenerateColumns="False">
+                <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CanUserSort="True">
                             <DataGridTemplateColumn.CellTemplate>
@@ -102,7 +102,7 @@
             </TabItem>
             
             <TabItem Header="Figures">
-                <DataGrid Name="CharactersDisplay" IsReadOnly="False" AutoGenerateColumns="False">
+                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding CharactersViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>

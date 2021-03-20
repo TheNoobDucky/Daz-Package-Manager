@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.IO;
 using System.Linq;
+using System.Xml;
 
 namespace DazPackage
 {
@@ -15,37 +16,42 @@ namespace DazPackage
     {
         public InstallManifestFile (FileInfo file)
         {
-            using var filestream = file.OpenRead();
-            var content = XElement.Load(filestream);
-
-            GlobalID = content.Element("GlobalID").Attribute("VALUE").Value;
-            var metadataGUIDElement = content.Element("MetadataGlobalID");
-            if (metadataGUIDElement != null)
+            try
             {
-                MetadataGlobalID = metadataGUIDElement.Attribute("VALUE").Value;
-            }
+                using var filestream = file.OpenRead();
+                var content = XElement.Load(filestream);
 
-            ProductName = content.Element("ProductName").Attribute("VALUE").Value;
-            ProductStoreID = content.Element("ProductStoreIDX").Attribute("VALUE").Value;
-            var userInstallPathElement = content.Element("UserInstallPath");
-            if (userInstallPathElement != null)
-            {
-                UserInstallPath = userInstallPathElement.Attribute("VALUE").Value;
-            }
+                GlobalID = content.Element("GlobalID").Attribute("VALUE").Value;
+                var metadataGUIDElement = content.Element("MetadataGlobalID");
+                if (metadataGUIDElement != null)
+                {
+                    MetadataGlobalID = metadataGUIDElement.Attribute("VALUE").Value;
+                }
 
-            var fileEntries = content.Elements("File").Attributes("VALUE");
-            Files = content.Elements("File").Select(x =>
-            { // Trim "content/" from the path since DIM will skip top level folder.
+                ProductName = content.Element("ProductName").Attribute("VALUE").Value;
+                ProductStoreID = content.Element("ProductStoreIDX").Attribute("VALUE").Value;
+                var userInstallPathElement = content.Element("UserInstallPath");
+                if (userInstallPathElement != null)
+                {
+                    UserInstallPath = userInstallPathElement.Attribute("VALUE").Value;
+                }
+
+                var fileEntries = content.Elements("File").Attributes("VALUE");
+                Files = content.Elements("File").Select(x =>
+                { // Trim "content/" from the path since DIM will skip top level folder.
                 var path = x.Attribute("VALUE").Value;
-                var target = x.Attribute("TARGET").Value.Length + 1; // +1 for "/" at the of path
+                    var target = x.Attribute("TARGET").Value.Length + 1; // +1 for "/" at the of path
                 return path[target..];
-            }).ToList();
-                //.Attributes("VALUE").Select(x => 
-                //x.Value).ToList();
-            MetadataFiles = Files.Where(x => {
-                var y = x.ToLower();
-                return y.StartsWith("runtime/support/") && y.EndsWith(".dsx");
-            }).ToList();
+                }).ToList();
+
+                MetadataFiles = Files.Where(x =>
+                {
+                    var y = x.ToLower();
+                    return y.StartsWith("runtime/support/") && y.EndsWith(".dsx");
+                }).ToList();
+            } catch (XmlException)
+            {
+            }
         }
 
         public InstallManifestFile() { }

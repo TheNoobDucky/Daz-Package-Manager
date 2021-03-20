@@ -6,6 +6,8 @@ using DazPackage;
 using System.Linq;
 using System.IO;
 using System.Text.Json;
+using System.ComponentModel;
+using System.Windows.Data;
 
 namespace Daz_Package_Manager
 {
@@ -33,8 +35,17 @@ namespace Daz_Package_Manager
 
         public class WindowModel
         {
-            public List<InstalledPackage> Packages { get; set; } = new List<InstalledPackage>();
-            public List<InstalledCharacter> Characters { get; set; } = new List<InstalledCharacter>();
+            public WindowModel()
+            {
+            }
+
+            private List<InstalledPackage> packages = new List<InstalledPackage>();
+            public List<InstalledPackage> Packages { get => packages; set { packages = value; PackagesViewSource.Source = packages; } }
+            public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
+
+            public List<InstalledCharacter> characters = new List<InstalledCharacter>();
+            public List<InstalledCharacter> Characters { get => characters; set { characters = value; CharactersViewSource.Source = characters; } }
+            public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
         }
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
@@ -52,8 +63,6 @@ namespace Daz_Package_Manager
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
             (model.Packages, model.Characters) = ProcessInstallManifestFolder.Scan();
-            UpdateDisplay();
-            SaveCache();
         }
 
         private void LoadCache()
@@ -63,7 +72,6 @@ namespace Daz_Package_Manager
                 using var packageJsonFile = File.OpenText(packagesFile);
                 model.Packages = JsonSerializer.Deserialize<List<InstalledPackage>>(packageJsonFile.ReadToEnd());
                 model.Characters = ProcessInstallManifestFolder.GenerateItemLists(model.Packages);
-                UpdateDisplay();
             }
             catch (FileNotFoundException)
             {
@@ -79,18 +87,18 @@ namespace Daz_Package_Manager
             File.WriteAllText(packagesFile, JsonSerializer.Serialize(model.Packages, option));
         }
 
-        private void UpdateDisplay()
-        {
-            PackageDisplay.ItemsSource = model.Packages;
-            CharactersDisplay.ItemsSource = model.Characters;
-        }
-
         private string packagesFile
         {
             get
             {
                 return Path.Combine(Properties.Settings.Default.CacheLocation, "Packages.json");
             }
+        }
+
+        private void RefreshAllDisplay()
+        {
+            PackageDisplay.Items.Refresh();
+            CharactersDisplay.Items.Refresh();
         }
 
         // Below are boring functions.
@@ -153,6 +161,7 @@ namespace Daz_Package_Manager
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
             model.Packages.ForEach(x => x.Selected = false);
+            RefreshAllDisplay();
         }
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
