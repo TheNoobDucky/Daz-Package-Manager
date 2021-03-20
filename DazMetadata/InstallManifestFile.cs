@@ -16,6 +16,7 @@ namespace DazPackage
         public InstallManifestFile (FileInfo file)
         {
             using var filestream = file.OpenRead();
+            
             var content = XElement.Load(filestream);
 
             GlobalID = content.Element("GlobalID").Attribute("VALUE").Value;
