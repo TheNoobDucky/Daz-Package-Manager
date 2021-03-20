@@ -13,7 +13,11 @@ namespace DazPackage
 
         public static new bool ContentTypeMatches(string sourceContentType)
         {
-            return sourceContentType == "Preset/Pose";
+            if (sourceContentType!=null)
+            {
+                return sourceContentType.StartsWith("Preset/Pose");
+            }
+            return false;
         }
     }
 }//Preset/Pose

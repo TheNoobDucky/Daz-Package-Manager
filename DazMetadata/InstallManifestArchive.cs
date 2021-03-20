@@ -17,27 +17,20 @@ namespace DazPackage
             var archive = new InstallManifestArchive();
             var files = Directory.EnumerateFiles(folder);
 
-            archive.Packages = files.Select(x => new InstalledPackage(new FileInfo(x))).ToList();
-
-            (archive.Characters, archive.Poses) = GenerateItemLists(archive.Packages);
-
-            return archive;
-        }
-
-        public static (List<InstalledCharacter> figures, List<InstalledPose> poses) GenerateItemLists(IEnumerable<InstalledPackage> installedPackages)
-        {
-            var figures = new List<InstalledCharacter>();
-            var poses = new List<InstalledPose>();
-
-            foreach (var package in installedPackages)
+            foreach (var file in files)
             {
+                var package = new InstalledPackage(new FileInfo(file));
+                archive.Packages.Add(package);
+
+                Output.Write("Processing:" + package.ProductName, Brushes.Gray);
+
                 foreach (var asset in package.Assets)
                 {
                     if (InstalledCharacter.ContentTypeMatches(asset.ContentType))
                     {
                         var figureLocation = Path.Combine(package.InstalledLocation, asset.Name);
                         var figureImage = FindImage(figureLocation);
-                        figures.Add(new InstalledCharacter(package)
+                        archive.Characters.Add(new InstalledCharacter(package)
                         {
                             Path = asset.Name,
                             Image = figureImage,
@@ -48,7 +41,7 @@ namespace DazPackage
                     {
                         var figureLocation = Path.Combine(package.InstalledLocation, asset.Name);
                         var figureImage = FindImage(figureLocation);
-                        poses.Add(new InstalledPose(package)
+                        archive.Poses.Add(new InstalledPose(package)
                         {
                             Path = asset.Name,
                             Image = figureImage,
@@ -59,13 +52,17 @@ namespace DazPackage
                     {
 
                     }
+                    else if (InstalledFileSkipped.ContentTypeMatches(asset.ContentType))
+                    {
+
+                    }
                     else
                     {
                         Output.Write(asset.ContentType, Brushes.Red);
                     }
                 }
             }
-            return (figures, poses);
+            return archive;
         }
 
         private static string FindImage(string assetPath)

@@ -8,7 +8,19 @@ namespace DazPackage
     {
         public static new bool ContentTypeMatches(string sourceContentType)
         {
-            return sourceContentType == "Preset/Materials";
+            if (sourceContentType != null)
+            {
+                if (sourceContentType.StartsWith("Preset/Materials") || sourceContentType.StartsWith("Preset/Shader"))
+                {
+                    return true;
+                }
+                return sourceContentType switch
+                {
+                    "Preset/Shader" => true,
+                    _ => false,
+                };
+            }
+            return false;
         }
     }
 }

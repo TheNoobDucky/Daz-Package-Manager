@@ -131,7 +131,7 @@ namespace Daz_Package_Manager
             foreach (var package in packagesToSave)
             {
                 var basePath = package.InstalledLocation;
-                Output.Write("Installing: " + package.ProductName);
+                Output.Write("Installing: " + package.ProductName, Brushes.Gray);
                 foreach (var file in package.Files)
                 {
                     var sourcePath = Path.GetFullPath(Path.Combine(basePath, file));
@@ -146,6 +146,7 @@ namespace Daz_Package_Manager
                     }
                 }
             }
+            Output.Write("Install to virtual folder complete.");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
