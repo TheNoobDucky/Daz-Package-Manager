@@ -14,7 +14,7 @@ namespace DazPackage
         public GenerationEnum Generation { get; set; }
         public static new bool ContentTypeMatches(string sourceContentType) 
         {
-            return sourceContentType == "Actor/Character";
+            return sourceContentType == "Actor/Character" || sourceContentType == "Preset/Character";
         }
     }
 }

@@ -51,7 +51,6 @@ namespace Daz_Package_Manager
             if (!model.Working)
             {   
                 model.Scan();
-                model.SaveCache(Properties.Settings.Default.CacheLocation);
             }
         }
 
