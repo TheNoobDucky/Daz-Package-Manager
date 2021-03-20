@@ -6,20 +6,13 @@ namespace DazPackage
     /// Represents a character that has been installed (ie have an install manifest).
     /// </summary>
     [Serializable]
-    public class InstalledCharacter
+    public class InstalledCharacter : InstalledFile
     {
-        public InstalledCharacter(InstalledPackage package)
+        public InstalledCharacter(InstalledPackage package) : base(package)
         {
-            Package = package;
         }
         public InstalledCharacter() { }
 
-        public string CharacterName { get; set; }
-        
-        public string ProductName { get { return Package.ProductName; } }
-        public string CharacterImage { get; set; }
         public GenerationEnum Generation { get; set; }
-        public InstalledPackage Package { get; private set; }
-        public bool Selected { get { return Package.Selected; } set { Package.Selected = value; } }
     }
 }

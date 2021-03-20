@@ -41,8 +41,8 @@ namespace Daz_Package_Manager
                             figureImage = Path.ChangeExtension(figureLocation, ".png");
                         }
                         figures.Add(new InstalledCharacter(package) {
-                            CharacterName = asset.Name,
-                            CharacterImage = figureImage,
+                            Path = asset.Name,
+                            Image = figureImage,
                         }); ;
                         Output.Write("Character found: " + asset.Name);
                     }
