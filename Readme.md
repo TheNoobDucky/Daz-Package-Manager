@@ -40,8 +40,15 @@ Program probabaly only work when used in the intended way.
 
 * Character detection depend on default metadata.
 
+## Download Link
+
+https://github.com/TheNoobDucky/Daz-Package-Manager/releases/
+May also need to download ".NET Desktop Runtime 5.0.4" at [https://dotnet.microsoft.com/download/dotnet/5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
+
+
 ## How to Use
 A prebuild program is saved in Release folder, not sure if it is build correctly.
+
 
 Step 0: Set Windows to developer mode or run as admin.
 
