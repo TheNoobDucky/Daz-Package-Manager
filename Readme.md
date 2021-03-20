@@ -28,7 +28,7 @@ The algorithm:
 
 * Only run on Windows 10.
 
-* Require .net 5
+* Require .NET Desktop Runtime 5.0.4 at [https://dotnet.microsoft.com/download/dotnet/5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
 
 * Need to run with developer mode or admin privilege. 
 [Due to the permission required to create symbolic link](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinka)
