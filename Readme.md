@@ -28,7 +28,7 @@ The algorithi:
 
 * Only run on Windows 10.
 
-* Require .net 3.1
+* Require .net core 3.1
 
 * Need to run with developer mode or admin privilege. 
 [Due to the permission required to create symbolic link](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinka)
