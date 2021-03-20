@@ -52,6 +52,7 @@ namespace Daz_Package_Manager
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             Archive = (InstallManifestArchive) e.Result;
+            SaveCache(Properties.Settings.Default.CacheLocation);
             Output.Write("Finished scaning install archive folder.", Brushes.Blue);
             Working = false;
         }

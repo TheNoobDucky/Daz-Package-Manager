@@ -10,7 +10,7 @@ namespace DazPackage
     {
         public static new bool ContentTypeMatches(string sourceContentType)
         {
-            if (sourceContentType == null)
+            if (sourceContentType == null || sourceContentType == "")
             {
                 return true;
             } 
@@ -35,7 +35,7 @@ namespace DazPackage
 
             return sourceContentType switch
             {
-                "Support" or
+                "Support" or "Preset/Simulation-Settings" or 
                 "Preset/Layered-Image" or
                 "Preset/Visibility" or "Preset/Light" or "Preset/Camera" or "Preset/Render-Settings" => true,
                 "Preset/Deformer" or "Preset/Properties" or "Preset/Puppeteer" or
