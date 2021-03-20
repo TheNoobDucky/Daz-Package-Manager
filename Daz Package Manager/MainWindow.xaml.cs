@@ -100,12 +100,6 @@ namespace Daz_Package_Manager
             }
         }
 
-        private void RefreshAllDisplay()
-        {
-            PackageDisplay.Items.Refresh();
-            CharactersDisplay.Items.Refresh();
-        }
-
         // Below are boring functions.
         private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
         {
@@ -166,7 +160,6 @@ namespace Daz_Package_Manager
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
             model.Packages.ForEach(x => x.Selected = false);
-            RefreshAllDisplay();
         }
 
         private void CallLoadCache(object sender, RoutedEventArgs e)

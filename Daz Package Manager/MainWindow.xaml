@@ -8,6 +8,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1200" Width="1500">
     <Window.Resources >
+        <DataTemplate x:Key="SelectCheckbox">
+            <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -91,7 +94,7 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CanUserSort="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
+                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -107,7 +110,7 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn> 
@@ -132,7 +135,7 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
