@@ -8,13 +8,15 @@
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<PackageId>DazPackageManager</PackageId>
-	<Version>1.0.1</Version>
+	<Version>1.1.0</Version>
 	<Configurations>Debug;Release;Shipping</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
