@@ -63,6 +63,7 @@ namespace Daz_Package_Manager
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
             (model.Packages, model.Characters) = ProcessInstallManifestFolder.Scan();
+            SaveCache();
         }
 
         private void LoadCache()
