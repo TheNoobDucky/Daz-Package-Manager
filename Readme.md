@@ -15,7 +15,7 @@ It is also possible to manually select packages to install.
 Also serve as a product manager that allow you to view all items with much bigger image than shown in daz.
 
 
-The algorithi:
+The algorithm:
 
 1. Scan daz install manifest archive to find all installed packages.
 2. Scan a scene file to find all the files it need. 
@@ -28,7 +28,7 @@ The algorithi:
 
 * Only run on Windows 10.
 
-* Require .net core 3.1
+* Require .net 5
 
 * Need to run with developer mode or admin privilege. 
 [Due to the permission required to create symbolic link](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinka)
@@ -69,14 +69,26 @@ Remove base folders that contains contents you dont want daz to see.
 ## Planned Features
 
 1. Detect character generation.
-2. Handle experssions.
-3. Handle poses. 
+2. Handle experssions (they are considered as pose?).
+3. Filter poses based on generation. 
 4. Handle clothings.
 5. Handle other item.
 6. Implement some sort of search functionality.
 7. Detect character gender.
 8. Implement filtering.
 9. Make scaning install archive async.
+10. Make image resizable.
+
+## Version Log
+
+Recommand V1.1.0
+
+V1.0.0
+Basic Functionality.
+V1.1.0
+Bug fix.
+Able to find poses.
+Improved Performance
 
 ## License
 [GPL 2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)

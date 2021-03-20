@@ -1,11 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>Daz_Package_Manager</RootNamespace>
     <UseWPF>true</UseWPF>
-	<UseWindowsForms>true</UseWindowsForms>
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -22,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DazMetadata\DazPackage.csproj" />
     <ProjectReference Include="..\Helper\Helpers.csproj" />
+    <ProjectReference Include="..\OsHelper\OsHelper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using Helpers;
-using DazPackage;
-using System.Linq;
 using System.IO;
-using System.Text.Json;
+using OsHelper;
+using System.Windows.Controls;
 using System.ComponentModel;
-using System.Windows.Data;
 
 namespace Daz_Package_Manager
 {
@@ -28,25 +25,12 @@ namespace Daz_Package_Manager
             Output.RegisterDebugField(DebugText);
             Output.WriteDebug = true;
             DataContext = model;
-            LoadCache();
+            model.PropertyChanged += ScanCompleted;
+            model.LoadCache(Properties.Settings.Default.CacheLocation);
         }
 
-        readonly WindowModel model = new WindowModel();
+        readonly ProcessModel model = new ProcessModel();
 
-        public class WindowModel
-        {
-            public WindowModel()
-            {
-            }
-
-            private List<InstalledPackage> packages = new List<InstalledPackage>();
-            public List<InstalledPackage> Packages { get => packages; set { packages = value; PackagesViewSource.Source = packages; } }
-            public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
-
-            public List<InstalledCharacter> characters = new List<InstalledCharacter>();
-            public List<InstalledCharacter> Characters { get => characters; set { characters = value; CharactersViewSource.Source = characters; } }
-            public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
-        }
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
@@ -57,61 +41,44 @@ namespace Daz_Package_Manager
                 Directory.CreateDirectory(destination);
                 Output.Write(destination);
             }
-            VirtualInstall.InstallPackages(model.Packages.Where(x => x.Selected), destination);
+            model.GenerateVirtualInstallFolder(destination);
         }
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            (model.Packages, model.Characters) = ProcessInstallManifestFolder.Scan();
-        }
-
-        private void LoadCache()
-        {
-            try
-            {
-                using var packageJsonFile = File.OpenText(packagesFile);
-                model.Packages = JsonSerializer.Deserialize<List<InstalledPackage>>(packageJsonFile.ReadToEnd());
-                model.Characters = ProcessInstallManifestFolder.GenerateItemLists(model.Packages);
-            }
-            catch (FileNotFoundException)
-            {
+            var button = (Button)sender;
+            
+            if (!model.Working)
+            {   
+                model.Scan();
+                model.SaveCache(Properties.Settings.Default.CacheLocation);
             }
         }
 
-        private void SaveCache()
-        {
-            var option = new JsonSerializerOptions
+        private void ScanCompleted (object sender, PropertyChangedEventArgs e)
+        { 
+            if (e.PropertyName == "Working")
             {
-                WriteIndented = true
-            };
-            File.WriteAllText(packagesFile, JsonSerializer.Serialize(model.Packages, option));
-        }
-
-        private string packagesFile
-        {
-            get
-            {
-                return Path.Combine(Properties.Settings.Default.CacheLocation, "Packages.json");
+                var model = (ProcessModel)sender;
+                if (model.Working)
+                {
+                    ScanInstallManifestFolderButton.Content = "Waiting For Scan To Complete.";
+                } else
+                {
+                    ScanInstallManifestFolderButton.Content = "Scan Install Manifest Archive."; // TODO improve this.
+                }
             }
         }
 
-        private void RefreshAllDisplay()
+        private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
         {
-            PackageDisplay.Items.Refresh();
-            CharactersDisplay.Items.Refresh();
+            model.SelectFigureBasedOnScene();
         }
 
         // Below are boring functions.
-        private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
-        {
-            var sceneLocation = new FileInfo(Properties.Settings.Default.SceneFile);
-            var packagesInScene = SceneFile.PackageInScene(sceneLocation, model.Packages);
-            packagesInScene.ToList().ForEach(x => x.Selected = true);
-        }
-
         private void SelectOutputFolder(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFolderLocation();
+            var (success, location) = SelectFolder.AskForLocation();
 
             if (success)
             {
@@ -122,7 +89,7 @@ namespace Daz_Package_Manager
 
         private void SelectInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFolderLocation();
+            var (success, location) = SelectFolder.AskForLocation();
 
             if (success)
             {
@@ -138,7 +105,7 @@ namespace Daz_Package_Manager
 
         private void SelectSceneFile(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFile();
+            var (success, location) = SelectFile.AskForLocation();
             if (success)
             {
                 Properties.Settings.Default.SceneFile = location;
@@ -148,7 +115,7 @@ namespace Daz_Package_Manager
 
         private void SelectCacheLocation(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFolderLocation();
+            var (success, location) = SelectFolder.AskForLocation();
 
             if (success)
             {
@@ -160,18 +127,16 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            model.Packages.ForEach(x => x.Selected = false);
-            RefreshAllDisplay();
+            model.UnselectAll();
         }
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            LoadCache();
+            model.LoadCache(Properties.Settings.Default.CacheLocation);
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
         {
-            //Properties.Settings.Default.UseSceneSubfolder = !Properties.Settings.Default.UseSceneSubfolder;
             Properties.Settings.Default.Save();
         }
     }

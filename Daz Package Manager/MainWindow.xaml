@@ -8,6 +8,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="1200" Width="1500">
     <Window.Resources >
+        <DataTemplate x:Key="SelectCheckbox">
+            <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
+        </DataTemplate>
+        <DataTemplate x:Key="ImageBox">
+            <Image Height="150" Source="{Binding Image}" />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -41,7 +47,7 @@
             <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" DataContext="{x:Static properties:Settings.Default}" Text="{Binding InstallManifestFolder}" IsReadOnly="True" Margin="5 5"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="5 5"/>
-            <Button Grid.Row="1" Grid.Column="1" Click="ScanInstallManifestFolder" Margin="5 5">Scan Install Manifest Archive</Button>
+            <Button Grid.Row="1" Grid.Column="1" Name="ScanInstallManifestFolderButton" Click="ScanInstallManifestFolder" Margin="5 5" Content="Scan Install Manifest Archive"/>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="5 5"/>
             <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="5 5">Select Scene File(Optional)</Button>
@@ -49,15 +55,15 @@
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="5 5"/>
             <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,2">Select Package Based On Scene (Optional)</Button>
-            
-             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5"/>
             <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="5 5">Select Output Folder Location</Button>
-            <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" DataContext="{x:Static properties:Settings.Default}" Text="{Binding OutputFolder}" IsReadOnly="True" Margin="5 5"/>    
-            
+            <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" DataContext="{x:Static properties:Settings.Default}" Text="{Binding OutputFolder}" IsReadOnly="True" Margin="5 5"/>
+
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="5 5"/>
             <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="5 5">Generate Virtual Install Folder</Button>
         </Grid>
-        
+
         <Grid Grid.Row="0" Grid.Column="1" Margin="5 5">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -88,44 +94,37 @@
             <TabItem Header="Packages">
                 <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CanUserSort="True">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
                         <DataGridTextColumn Header="Package Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Installed Location" Binding="{Binding InstalledLocation}" IsReadOnly="True"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            
+
             <TabItem Header="Figures">
                 <DataGrid Name="CharactersDisplay" ItemsSource="{Binding CharactersViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn> 
-                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Image Height="150" Source="{Binding CharacterImage}" />
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Figure Location" Binding="{Binding CharacterName}" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
+                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True" CellTemplate="{StaticResource ImageBox}"/>
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True"/>
                     </DataGrid.Columns>
-
                 </DataGrid>
             </TabItem>
-            
+
+            <TabItem Header="Poses">
+                <DataGrid Name="PosesDisplay" ItemsSource="{Binding PosesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
+                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True" CellTemplate="{StaticResource ImageBox}"/>
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
             <TabItem Header="Log Output">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -152,7 +151,7 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-
+            
         </TabControl>
         
     </Grid>
