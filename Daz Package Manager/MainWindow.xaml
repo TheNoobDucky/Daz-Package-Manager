@@ -47,7 +47,7 @@
             <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" DataContext="{x:Static properties:Settings.Default}" Text="{Binding InstallManifestFolder}" IsReadOnly="True" Margin="5 5"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="5 5"/>
-            <Button Grid.Row="1" Grid.Column="1" Click="ScanInstallManifestFolder" Margin="5 5">Scan Install Manifest Archive</Button>
+            <Button Grid.Row="1" Grid.Column="1" Name="ScanInstallManifestFolderButton" Click="ScanInstallManifestFolder" Margin="5 5" Content="Scan Install Manifest Archive"/>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="5 5"/>
             <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="5 5">Select Scene File(Optional)</Button>

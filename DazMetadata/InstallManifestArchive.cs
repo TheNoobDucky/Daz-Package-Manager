@@ -15,7 +15,6 @@ namespace DazPackage
         public static InstallManifestArchive Scan(string folder)
         {
             var archive = new InstallManifestArchive();
-            Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
             var files = Directory.EnumerateFiles(folder);
 
             archive.Packages = files.Select(x => new InstalledPackage(new FileInfo(x))).ToList();
@@ -54,7 +53,7 @@ namespace DazPackage
                             Path = asset.Name,
                             Image = figureImage,
                         });
-                        Output.Write("Pose found: " + asset.Name);
+                        //Output.Write("Pose found: " + asset.Name);
                     }
                     else if (InstalledMaterial.ContentTypeMatches(asset.ContentType))
                     {

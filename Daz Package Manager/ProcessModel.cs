@@ -11,10 +11,12 @@ using System.Text.Json;
 using System.Windows;
 using OsHelper;
 using System.Text.Json.Serialization;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Daz_Package_Manager
 {
-    class ProcessModel
+    class ProcessModel: INotifyPropertyChanged
     {
         private InstallManifestArchive archive = new InstallManifestArchive();
 
@@ -34,11 +36,48 @@ namespace Daz_Package_Manager
         public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
         public CollectionViewSource PosesViewSource { get; set; } = new CollectionViewSource();
 
-        public static InstallManifestArchive Scan ()
+        public ProcessModel ()
+        {
+            worker.DoWork += DoWork;
+            worker.RunWorkerCompleted += RunWorkerCompleted;
+        }
+
+        private void DoWork(object sender, DoWorkEventArgs e)
         {
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
-            return InstallManifestArchive.Scan(folder);
+            e.Result = InstallManifestArchive.Scan(folder);
+        }
+
+        private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Archive = (InstallManifestArchive) e.Result;
+            Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+            Working = false;
+        }
+
+        private bool working = false;
+
+        public bool Working
+        {
+            get => working; private set
+            {
+                working = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private readonly BackgroundWorker worker = new BackgroundWorker();
+
+
+
+        public void Scan ()
+        {
+            if (Working = !Working)
+            {
+                Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
+                worker.RunWorkerAsync();
+            }
         }
 
         public void UnselectAll ()
@@ -72,6 +111,7 @@ namespace Daz_Package_Manager
             {
             }
         }
+
         private string SaveFileLocation(string savePath)
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
@@ -108,5 +148,10 @@ namespace Daz_Package_Manager
             }
         }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }

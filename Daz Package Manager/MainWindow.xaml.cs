@@ -3,6 +3,8 @@ using System.Windows;
 using Helpers;
 using System.IO;
 using OsHelper;
+using System.Windows.Controls;
+using System.ComponentModel;
 
 namespace Daz_Package_Manager
 {
@@ -23,6 +25,7 @@ namespace Daz_Package_Manager
             Output.RegisterDebugField(DebugText);
             Output.WriteDebug = true;
             DataContext = model;
+            model.PropertyChanged += ScanCompleted;
             model.LoadCache(Properties.Settings.Default.CacheLocation);
         }
 
@@ -43,8 +46,28 @@ namespace Daz_Package_Manager
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            model.Archive = ProcessModel.Scan();
-            model.SaveCache(Properties.Settings.Default.CacheLocation);
+            var button = (Button)sender;
+            
+            if (!model.Working)
+            {   
+                model.Scan();
+                model.SaveCache(Properties.Settings.Default.CacheLocation);
+            }
+        }
+
+        private void ScanCompleted (object sender, PropertyChangedEventArgs e)
+        { 
+            if (e.PropertyName == "Working")
+            {
+                var model = (ProcessModel)sender;
+                if (model.Working)
+                {
+                    ScanInstallManifestFolderButton.Content = "Waiting For Scan To Complete.";
+                } else
+                {
+                    ScanInstallManifestFolderButton.Content = "Scan Install Manifest Archive."; // TODO improve this.
+                }
+            }
         }
 
         private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
