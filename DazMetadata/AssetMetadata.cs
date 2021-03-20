@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
 using System.Linq;
 
 namespace DazPackage
 {
-    [Serializable]
     public class AssetMetadata
     {
         public AssetMetadata (XElement asset)

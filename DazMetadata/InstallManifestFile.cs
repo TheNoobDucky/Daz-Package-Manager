@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Linq;
 using System.IO;
 using System.Linq;
@@ -11,7 +10,6 @@ namespace DazPackage
     /// Represent the install manifest file.
     /// File format spec see:http://docs.daz3d.com/doku.php/public/software/install_manager/referenceguide/tech_articles/install_manifest/start
     /// </summary>
-    [Serializable]
     public class InstallManifestFile
     {
         public InstallManifestFile (FileInfo file)

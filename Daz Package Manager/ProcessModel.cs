@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Text.Json;
 using System.Windows;
 using OsHelper;
+using System.Text.Json.Serialization;
 
 namespace Daz_Package_Manager
 {
@@ -49,17 +50,23 @@ namespace Daz_Package_Manager
         {
             var option = new JsonSerializerOptions
             {
+                ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
-            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(Archive, option));
+            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(archive, option));
         }
 
         public void LoadCache(string savePath)
         {
             try
             {
+                var option = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    WriteIndented = true
+                };
                 using var packageJsonFile = File.OpenText(SaveFileLocation(savePath));
-                Archive = JsonSerializer.Deserialize<InstallManifestArchive>(packageJsonFile.ReadToEnd());
+                Archive = JsonSerializer.Deserialize<InstallManifestArchive>(packageJsonFile.ReadToEnd(), option);
             }
             catch (FileNotFoundException)
             {

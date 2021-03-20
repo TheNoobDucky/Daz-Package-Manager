@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Helpers;
 using System.IO;
 using System.Linq;
@@ -8,12 +7,11 @@ using System.Windows.Media;
 
 namespace DazPackage
 {
-    [Serializable]
     public class InstallManifestArchive
     {
-        public List<InstalledPackage> Packages = new List<InstalledPackage>();
-        public List<InstalledCharacter> Characters = new List<InstalledCharacter>();
-        public List<InstalledPose> Poses = new List<InstalledPose>();
+        public List<InstalledPackage> Packages { get; set; } = new List<InstalledPackage>();
+        public List<InstalledCharacter> Characters { get; set; } = new List<InstalledCharacter>();
+        public List<InstalledPose> Poses { get; set; } = new List<InstalledPose>();
         public static InstallManifestArchive Scan(string folder)
         {
             var archive = new InstallManifestArchive();

@@ -4,25 +4,21 @@ using System.Text;
 
 namespace DazPackage
 {
-    [Serializable]
     public enum GenerationEnum
     {
         Unknown,V4,Genesis,Genesis2,Genesis3,Genesis8
     }
 
-    [Serializable]
     public enum GenderEnum
     {
         Unknwon, Female, Male
     }
 
-    [Serializable]
     public enum AssetTypeEnum
     {
         character, morph, expression, pose, clothing, material, shape
     }
 
-    [Serializable]
     public class PackageType
     {
         public CharacterContentFlags CharacterContent { get; set; } = new CharacterContentFlags();
@@ -34,7 +30,6 @@ namespace DazPackage
         public bool MissingDirectory { get; set; } = true;
     }
 
-    [Serializable]
     public class CharacterContentFlags
     {
         public bool Character { get; set; } = false;
@@ -51,7 +46,6 @@ namespace DazPackage
         public bool Unknown { get; set; } = false;
     }
 
-    [Serializable]
     public class OtherContentFlags
     {
         public bool Props { get; set; } = false;
@@ -68,7 +62,6 @@ namespace DazPackage
         public bool Cameras { get; set; } = false;
     }
 
-    [Serializable]
     public class GenerationFlag
     {
         public bool Genesis1 { get; set; } = false;
@@ -77,7 +70,6 @@ namespace DazPackage
         public bool Genesis8 { get; set; } = false;
     }
 
-    [Serializable]
     public class GenderFlag
     {
         public bool Female { get; set; } = false;

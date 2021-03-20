@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.ComponentModel;
@@ -10,7 +9,6 @@ namespace DazPackage
     /// <summary>
     /// Represent a zip package installed (ie have an install manifest).
     /// </summary>
-    [Serializable]
     public class InstalledPackage : INotifyPropertyChanged
     {
         public InstalledPackage (FileInfo fileInfo)

@@ -4,7 +4,6 @@ using System.Text;
 
 namespace DazPackage
 {
-    [Serializable]
     public class InstalledPose : InstalledFile
     {
         public InstalledPose(InstalledPackage package) : base(package)

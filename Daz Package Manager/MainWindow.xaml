@@ -80,7 +80,7 @@
             <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="100" Name="CacheLocation" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" IsReadOnly="True" Margin="5 5"/>
 
             <Button Grid.Row="1" Grid.Column="0" Click="ClearPackageSelection" Margin="5 5">Clear Package Selection</Button>
-            <Button Grid.Row="1" Grid.Column="1" Click="CallLoadCache" Margin="5 5" Visibility="Hidden">Reload Cache</Button>
+            <Button Grid.Row="1" Grid.Column="1" Click="CallLoadCache" Margin="5 5" Visibility="Visible">Reload Cache</Button>
             <Button Grid.Row="1" Grid.Column="2" Click="ClearDebugLogHandler" Margin="5 5">Clear Log</Button>
 
             <CheckBox Grid.Row="2" Grid.Column="0" Margin="5 5" Checked ="SaveUserSetting" Unchecked="SaveUserSetting"
