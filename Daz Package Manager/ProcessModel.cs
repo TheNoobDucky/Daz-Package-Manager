@@ -9,6 +9,7 @@ using System.Linq;
 using System.Windows.Data;
 using System.Text.Json;
 using System.Windows;
+using OsHelper;
 
 namespace Daz_Package_Manager
 {

@@ -2,6 +2,8 @@
 using System.Windows;
 using Helpers;
 using System.IO;
+using OsHelper;
+
 namespace Daz_Package_Manager
 {
     /// <summary>
@@ -53,7 +55,7 @@ namespace Daz_Package_Manager
         // Below are boring functions.
         private void SelectOutputFolder(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFolderLocation();
+            var (success, location) = SelectFolder.AskForLocation();
 
             if (success)
             {
@@ -64,7 +66,7 @@ namespace Daz_Package_Manager
 
         private void SelectInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFolderLocation();
+            var (success, location) = SelectFolder.AskForLocation();
 
             if (success)
             {
@@ -80,7 +82,7 @@ namespace Daz_Package_Manager
 
         private void SelectSceneFile(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFile();
+            var (success, location) = SelectFile.AskForLocation();
             if (success)
             {
                 Properties.Settings.Default.SceneFile = location;
@@ -90,7 +92,7 @@ namespace Daz_Package_Manager
 
         private void SelectCacheLocation(object sender, RoutedEventArgs e)
         {
-            var (success, location) = Helper.AskForFolderLocation();
+            var (success, location) = SelectFolder.AskForLocation();
 
             if (success)
             {

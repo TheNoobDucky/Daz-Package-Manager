@@ -8,7 +8,6 @@ using System.Security.Cryptography;
 using System.Windows.Media;
 using System.IO.Compression;
 using System.Text.Json;
-using System.Windows.Forms;
 
 namespace Helpers
 {
@@ -71,31 +70,5 @@ namespace Helpers
             using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
             return JsonDocument.Parse(scene);
         }
-
-        public static (bool, string) AskForFolderLocation ()
-        {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            DialogResult result = dialog.ShowDialog();
-
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                return (true, dialog.SelectedPath);
-            }
-            return (false, null);
-        }
-
-        public static (bool success, string location) AskForFile()
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            DialogResult result = dialog.ShowDialog();
-
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                return (true, dialog.FileName);
-            }
-            return (false, null);
-        }
     }
-
-
 }

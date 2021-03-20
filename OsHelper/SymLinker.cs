@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 
-namespace Daz_Package_Manager
+namespace OsHelper
 {
     public class SymLinker
     {
