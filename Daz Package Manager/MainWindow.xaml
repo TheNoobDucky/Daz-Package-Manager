@@ -81,13 +81,18 @@
             <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5">Clear Package Selection</Button>
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden">Reload Cache</Button>
 
-            <StackPanel Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Orientation="Horizontal" Margin="5 5">
-                <TextBlock Text="Image Size:" />
-                <Slider Name="Slider" Margin="10, 0, 0, 0" Width="500" Orientation="Horizontal"
-                        HorizontalAlignment="Left" Value="{Binding ImageSize}" Minimum="0" Maximum="500"
+            <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Image Size:" />
+                <Slider Grid.Column="1" Margin="10, 0, 0, 0" Orientation="Horizontal"
+                        Value="{Binding ImageSize}" Minimum="0" Maximum="500"
                         SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
-                <CheckBox Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}" Content="Show Images" />
-            </StackPanel>
+                <CheckBox Grid.Column="2" Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}" Content="Show Images" />
+            </Grid>
             
             <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
