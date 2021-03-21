@@ -10,7 +10,8 @@
             <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
         </DataTemplate>
         <DataTemplate x:Key="ImageBox">
-            <Image Height="150" Source="{Binding Image}" />
+            <Image Name="Image"
+                    Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},Path=DataContext.ImageSize}" Source="{Binding Image}" />
         </DataTemplate>
     </Window.Resources>
 
@@ -20,7 +21,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="0" Margin="5 5">
+        <Grid Grid.Row="0" Grid.Column="0" Margin="5 5" >
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -72,19 +73,27 @@
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="5 5">Select Where To Save Cache File</Button>
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
                     Margin="5 5" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" />
-
+            
             <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5">Clear Package Selection</Button>
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden">Reload Cache</Button>
 
-            <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
-                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
-                    Content="Create Subfolder based on Scene Name" />
+            <StackPanel Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Orientation="Horizontal">
+                <TextBlock Text="Image Size:" />
+                <Slider Name="Slider" Margin="10, 0, 0, 0" Width="100" Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Value="{Binding ImageSize}" Minimum="0" Maximum="300" SmallChange="50"
+                        LargeChange="100" TickPlacement="BottomRight" TickFrequency="50" />
+            </StackPanel>
+
+            <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5" Checked="SaveUserSetting"
+                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
+                    IsChecked="{Binding UseSceneSubfolder}" Content="Create Subfolder based on Scene Name" />
         </Grid>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" >
-            <TabItem Header="Packages" >
+        <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            <TabItem Header="Packages">
                 <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False"
-                        AutoGenerateColumns="False" >
+                        AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />

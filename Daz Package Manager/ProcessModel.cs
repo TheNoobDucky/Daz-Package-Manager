@@ -68,6 +68,17 @@ namespace Daz_Package_Manager
             }
         }
 
+        private double imageSize = 20;
+        public double ImageSize
+        {
+            get => imageSize;
+            set
+            {
+                imageSize = value;
+                OnPropertyChanged();
+            }
+        }
+
         private readonly BackgroundWorker worker = new BackgroundWorker();
 
 
