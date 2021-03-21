@@ -41,7 +41,7 @@ namespace DazPackage
                     {
                         var figureLocation = Path.Combine(package.InstalledLocation, asset.Name);
                         var figureImage = FindImage(figureLocation);
-                        archive.Poses.Add(new InstalledPose(package)
+                        archive.Poses.Add(new InstalledPose(package, asset.Compatibilities)
                         {
                             Path = asset.Name,
                             Image = figureImage,

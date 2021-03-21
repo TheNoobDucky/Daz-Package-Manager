@@ -6,10 +6,16 @@ namespace DazPackage
 {
     public class InstalledPose : InstalledFile
     {
-        public InstalledPose(InstalledPackage package) : base(package)
+        public InstalledPose(InstalledPackage package, IEnumerable<string> compatibilities) : base(package)
         {
+            foreach (var compatibility in compatibilities)
+            {
+                Generation |= GetGeneration(compatibility);
+            }
         }
         public InstalledPose() { }
+
+        public Generation Generation { get; set; } = Generation.None;
 
         public static new bool ContentTypeMatches(string sourceContentType)
         {
@@ -20,4 +26,4 @@ namespace DazPackage
             return false;
         }
     }
-}//Preset/Pose
+}
