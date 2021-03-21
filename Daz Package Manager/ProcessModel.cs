@@ -18,17 +18,16 @@ namespace Daz_Package_Manager
 {
     class ProcessModel: INotifyPropertyChanged
     {
-        private InstallManifestArchive archive = new InstallManifestArchive();
-
-        public InstallManifestArchive Archive
+        private List<InstalledPackage> packages = new List<InstalledPackage>();
+        public List<InstalledPackage> Packages
         {
-            get => archive;
+            get => packages;
             set
             {
-                archive = value;
-                PackagesViewSource.Source = archive.Packages;
-                CharactersViewSource.Source = archive.Characters;
-                PosesViewSource.Source = archive.Poses;
+                packages = value;
+                PackagesViewSource.Source = packages;
+                CharactersViewSource.Source = packages.SelectMany(x => x.Characters);
+                PosesViewSource.Source = packages.SelectMany(x => x.Poses);
             }
         }
 
@@ -48,19 +47,22 @@ namespace Daz_Package_Manager
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
 
-            var archive = new InstallManifestArchive();
+            var Packages = new List<InstalledPackage>();
             var files = Directory.EnumerateFiles(folder);
             //files.Count();
             foreach (var file in files)
             {
-                archive.AddPackage(file);
+                var package = new InstalledPackage(new FileInfo(file));
+                Packages.Add(package);
+                Output.Write("Processing:" + package.ProductName, Brushes.Gray);
+
             }
-            e.Result = archive;
+            e.Result = Packages;
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Archive = (InstallManifestArchive) e.Result;
+            Packages = (List<InstalledPackage>) e.Result;
             SaveCache(Properties.Settings.Default.CacheLocation);
             Output.Write("Finished scaning install archive folder.", Brushes.Blue);
             Working = false;
@@ -110,9 +112,7 @@ namespace Daz_Package_Manager
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
-                Archive.Characters.Clear();
-                Archive.Poses.Clear();
-                Archive.Packages.Clear();
+                Packages.Clear();
                 worker.RunWorkerAsync();
             }
         }
@@ -124,7 +124,7 @@ namespace Daz_Package_Manager
 
         public void UnselectAll ()
         {
-            Archive.Packages.ForEach(x => x.Selected = false);
+            Packages.ForEach(x => x.Selected = false);
         }
 
         public void SaveCache(string savePath)
@@ -134,7 +134,7 @@ namespace Daz_Package_Manager
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
-            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(archive, option));
+            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(Packages, option));
         }
 
         public void LoadCache(string savePath)
@@ -146,8 +146,17 @@ namespace Daz_Package_Manager
                     ReferenceHandler = ReferenceHandler.Preserve,
                     WriteIndented = true
                 };
-                using var packageJsonFile = File.OpenText(SaveFileLocation(savePath));
-                Archive = JsonSerializer.Deserialize<InstallManifestArchive>(packageJsonFile.ReadToEnd(), option);
+                var saveFileLocation = SaveFileLocation(savePath);
+                using var packageJsonFile = File.OpenText(saveFileLocation);
+                try
+                {
+                    Packages = JsonSerializer.Deserialize<List<InstalledPackage>>(packageJsonFile.ReadToEnd(), option);
+                } catch (JsonException)
+                {
+                    Output.Write("Unable to load cache file. Clearing Cache.");
+                    packageJsonFile.Dispose();
+                    File.Delete(saveFileLocation);
+                }
             }
             catch (FileNotFoundException)
             {
@@ -162,13 +171,13 @@ namespace Daz_Package_Manager
         public void SelectFigureBasedOnScene()
         {
             var sceneLocation = new FileInfo(Properties.Settings.Default.SceneFile);
-            var packagesInScene = SceneFile.PackageInScene(sceneLocation, Archive.Packages);
+            var packagesInScene = SceneFile.PackageInScene(sceneLocation, Packages);
             packagesInScene.ToList().ForEach(x => x.Selected = true);
         }
 
         public void GenerateVirtualInstallFolder(string destination)
         {
-            var packagesToSave = Archive.Packages.Where(x => x.Selected);
+            var packagesToSave = Packages.Where(x => x.Selected);
 
             foreach (var package in packagesToSave)
             {
