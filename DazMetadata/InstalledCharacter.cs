@@ -7,19 +7,13 @@ namespace DazPackage
     /// </summary>
     public class InstalledCharacter : InstalledFile
     {
-        public InstalledCharacter(InstalledPackage package, IEnumerable<string> compatibilities) : base(package)
+        public InstalledCharacter(InstalledPackage package, IEnumerable<string> compatibilities) : base(package, compatibilities)
         {
-            foreach (var compatibility in compatibilities)
-            {
-                Generation |= GetGeneration(compatibility);
-            }
             package.AssetTypes |= AssetTypes.Character;
-            package.Generation |= Generation;
         }
 
         public InstalledCharacter() { }
 
-        public Generation Generation { get; set; } = Generation.None;
         public static new bool ContentTypeMatches(string sourceContentType) 
         {
             return sourceContentType == "Actor/Character" || sourceContentType == "Preset/Character";

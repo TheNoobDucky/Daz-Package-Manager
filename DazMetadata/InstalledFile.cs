@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
+
 using Helpers;
 
 namespace DazPackage
@@ -13,10 +15,15 @@ namespace DazPackage
 
     public class InstalledFile : IContenType, INotifyPropertyChanged
     {
-        public InstalledFile(InstalledPackage package)
+        public InstalledFile(InstalledPackage package, IEnumerable<string> compatibilities)
         {
             Package = package;
             ProductName = Package.ProductName;
+            foreach (var compatibility in compatibilities)
+            {
+                Generation |= GetGeneration(compatibility);
+            }
+            package.Generation |= Generation;
         }
 
         public InstalledFile() { }
@@ -24,6 +31,8 @@ namespace DazPackage
         public string Image { get; set; }
         public string Path { get; set; }
         public string ProductName { get; set; }
+        public Generation Generation { get; set; } = Generation.None;
+
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
         private InstalledPackage package = new InstalledPackage();
         public InstalledPackage Package
