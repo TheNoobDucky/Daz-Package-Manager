@@ -14,6 +14,7 @@
                     Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},Path=DataContext.ImageSize}"
                     Source="{Binding Image}" />
         </DataTemplate>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
     <Grid>
@@ -85,10 +86,13 @@
                 <Slider Name="Slider" Margin="10, 0, 0, 0" Width="500" Orientation="Horizontal"
                         HorizontalAlignment="Left" Value="{Binding ImageSize}" Minimum="0" Maximum="500"
                         SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
+                <CheckBox Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}" Content="Show Images" />
             </StackPanel>
+            
             <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create Subfolder based on Scene Name" />
+            
         </Grid>
 
         <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
@@ -113,6 +117,7 @@
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
                                 Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -129,6 +134,7 @@
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
                                 Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />

@@ -81,6 +81,17 @@ namespace Daz_Package_Manager
             }
         }
 
+        private bool imageVisible = true;
+        public bool ImageVisible
+        {
+            get => imageVisible;
+            set
+            {
+                imageVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
         private readonly BackgroundWorker worker = new BackgroundWorker();
 
 
