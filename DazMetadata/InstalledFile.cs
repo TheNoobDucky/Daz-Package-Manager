@@ -66,7 +66,7 @@ namespace DazPackage
         {
             return compatibility switch
             {
-                string s when s.StartsWith("/Genesis 8/") => Generation.Genesis_8,
+                string s when s.StartsWith("/Genesis 8/") || s.StartsWith("/Genesis 8.1/")=> Generation.Genesis_8,
                 string s when s.StartsWith("/Genesis 3/") => Generation.Genesis_3,
                 string s when s.StartsWith("/Genesis 2/") => Generation.Genesis_2,
                 "/Genesis" => Generation.Genesis_1,
