@@ -76,12 +76,16 @@ namespace DazPackage
         public List<InstalledPose> Poses { get; set; } = new List<InstalledPose>();
 
         private bool selected = false;
-        private static string FindImage(string assetPath)
+        private static string FindImage (string assetPath)
         {
             var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
             if (!File.Exists(figureImage))
             {
                 figureImage = Path.ChangeExtension(assetPath, ".png");
+                if (!File.Exists(figureImage))
+                {
+                    figureImage = null;
+                }
             }
 
             return figureImage;
