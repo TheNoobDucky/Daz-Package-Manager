@@ -44,9 +44,18 @@ namespace Daz_Package_Manager
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+            BackgroundWorker worker = sender as BackgroundWorker;
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
-            e.Result = InstallManifestArchive.Scan(folder);
+
+            var archive = new InstallManifestArchive();
+            var files = Directory.EnumerateFiles(folder);
+            //files.Count();
+            foreach (var file in files)
+            {
+                archive.AddPackage(file);
+            }
+            e.Result = archive;
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -101,8 +110,16 @@ namespace Daz_Package_Manager
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
+                Archive.Characters.Clear();
+                Archive.Poses.Clear();
+                Archive.Packages.Clear();
                 worker.RunWorkerAsync();
             }
+        }
+
+        public void Cancel ()
+        {
+            this.worker.CancelAsync();
         }
 
         public void UnselectAll ()

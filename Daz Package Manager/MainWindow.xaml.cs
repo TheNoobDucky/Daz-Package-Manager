@@ -51,6 +51,9 @@ namespace Daz_Package_Manager
             if (!model.Working)
             {   
                 model.Scan();
+            } else
+            {
+                model.Cancel();
             }
         }
 
