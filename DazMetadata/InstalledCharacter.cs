@@ -13,6 +13,8 @@ namespace DazPackage
             {
                 Generation |= GetGeneration(compatibility);
             }
+            package.AssetTypes |= AssetTypes.Character;
+            package.Generation |= Generation;
         }
 
         public InstalledCharacter() { }

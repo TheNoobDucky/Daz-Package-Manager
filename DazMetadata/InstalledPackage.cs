@@ -29,6 +29,8 @@ namespace DazPackage
         public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
         public List<string> Files { get { return installedManifest.Files; } }
         public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
+        public AssetTypes AssetTypes { get; set; } = AssetTypes.None;
+        public Generation Generation { get; set; } = Generation.None;
 
         private bool selected = false;
 

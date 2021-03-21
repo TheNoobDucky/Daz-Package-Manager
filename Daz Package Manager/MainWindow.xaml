@@ -110,6 +110,8 @@
                         <DataGridTextColumn Header="Package Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Installed Location" Binding="{Binding InstalledLocation}"
                                 IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Types" Binding="{Binding AssetTypes}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generations" Binding="{Binding Generation}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
