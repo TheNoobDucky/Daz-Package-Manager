@@ -10,9 +10,13 @@ namespace DazPackage
     {
         public static new bool ContentTypeMatches(string sourceContentType)
         {
+            if (sourceContentType == null)
+            {
+                return true;
+            }
             return sourceContentType switch
             {
-                string s when s== null || s == "" => true,
+                string s when s == null || s == "" => true,
                 string s when s.StartsWith("Follower/") || s.StartsWith("Script") || s == "Preset/Wearables" => true,
                 string s when s == "Preset / Wearables" => true,
                 string s when s.StartsWith("Prop/") || s == "Prop" => true,
