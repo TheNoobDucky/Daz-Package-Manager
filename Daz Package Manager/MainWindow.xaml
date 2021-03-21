@@ -94,7 +94,7 @@
             <TabItem Header="Packages">
                 <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected"/>
                         <DataGridTextColumn Header="Package Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Installed Location" Binding="{Binding InstalledLocation}" IsReadOnly="True"/>
                     </DataGrid.Columns>
@@ -104,7 +104,7 @@
             <TabItem Header="Figures">
                 <DataGrid Name="CharactersDisplay" ItemsSource="{Binding CharactersViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True" CellTemplate="{StaticResource ImageBox}"/>
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
@@ -116,7 +116,7 @@
             <TabItem Header="Poses">
                 <DataGrid Name="PosesDisplay" ItemsSource="{Binding PosesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True" CellTemplate="{StaticResource ImageBox}"/>
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
@@ -151,8 +151,8 @@
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            
+
         </TabControl>
-        
+
     </Grid>
 </Window>
