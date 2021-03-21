@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using Helpers;
 
 namespace DazPackage
 {
@@ -50,6 +51,20 @@ namespace DazPackage
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        protected static Generation GetGeneration(string compatibility)
+        {
+            Output.Write(compatibility);
+            return compatibility switch
+            {
+                string s when s.StartsWith("/Genesis 8/") => Generation.Genesis_8,
+                string s when s.StartsWith("/Genesis 3/") => Generation.Genesis_3,
+                string s when s.StartsWith("/Genesis 2/") => Generation.Genesis_2,
+                "/Genesis" => Generation.Genesis_1,
+                string s when s.StartsWith("/Generation4") => Generation.Gen4,
+                _ => Generation.None,
+            };
         }
     }
 }

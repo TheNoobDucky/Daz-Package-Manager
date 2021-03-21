@@ -83,7 +83,6 @@ Remove base folders that contains contents you dont want daz to see.
 6. Implement some sort of search functionality.
 7. Detect character gender.
 8. Implement filtering.
-9. Make image resizable.
 
 ## Version Log
 

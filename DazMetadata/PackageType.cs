@@ -4,20 +4,39 @@ using System.Text;
 
 namespace DazPackage
 {
-    public enum GenerationEnum
+    [Flags]
+    public enum Generation
     {
-        Unknown,V4,Genesis,Genesis2,Genesis3,Genesis8
+        None = 0,
+        Gen4 = 1 << 0,
+        Genesis_1 = 1 << 1,
+        Genesis_2 = 1 << 2,
+        Genesis_3 = 1 << 3,
+        Genesis_8 = 1 << 4,
     }
 
-    public enum GenderEnum
+    [Flags]
+    public enum Gender
     {
-        Unknwon, Female, Male
+        None = 0,
+        Female = 1 << 0,
+        Male = 1 << 1,
+        Both = Female | Male
     }
 
-    public enum AssetTypeEnum
+    [Flags]
+    public enum AssetTypes
     {
-        character, morph, expression, pose, clothing, material, shape
+        None = 0,
+        Character = 1 << 0,
+        Morph = 1 << 1,
+        Expression = 1 << 2,
+        Pose = 1 << 3,
+        Clothing = 1 << 4,
+        Material = 1 << 5,
+        Shape = 1 << 6
     }
+
 
     public class PackageType
     {
