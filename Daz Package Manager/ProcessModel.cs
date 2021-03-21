@@ -13,6 +13,8 @@ using OsHelper;
 using System.Text.Json.Serialization;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace Daz_Package_Manager
 {
@@ -47,17 +49,18 @@ namespace Daz_Package_Manager
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
 
-            var Packages = new List<InstalledPackage>();
+            var Packages = new ConcurrentBag<InstalledPackage>();
             var files = Directory.EnumerateFiles(folder);
-            //files.Count();
-            foreach (var file in files)
-            {
-                var package = new InstalledPackage(new FileInfo(file));
-                Packages.Add(package);
-                Output.Write("Processing:" + package.ProductName, Brushes.Gray);
+            Parallel.ForEach(files, x => Packages.Add(ProcessPackage(x)));
 
-            }
-            e.Result = Packages;
+            e.Result = Packages.ToList();
+        }
+
+        private static InstalledPackage ProcessPackage(string path)
+        {
+            var package = new InstalledPackage(new FileInfo(path));
+            Output.Write("Processed:" + package.ProductName, Brushes.Gray);
+            return package;
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -104,6 +107,7 @@ namespace Daz_Package_Manager
         }
 
         private readonly BackgroundWorker worker = new BackgroundWorker();
+
 
 
 
