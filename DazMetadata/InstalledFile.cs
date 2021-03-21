@@ -55,7 +55,6 @@ namespace DazPackage
 
         protected static Generation GetGeneration(string compatibility)
         {
-            Output.Write(compatibility);
             return compatibility switch
             {
                 string s when s.StartsWith("/Genesis 8/") => Generation.Genesis_8,
