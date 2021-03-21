@@ -68,13 +68,15 @@ namespace Daz_Package_Manager
             }
         }
 
-        private double imageSize = 20;
+        private double imageSize = Properties.Settings.Default.ImageSize;
         public double ImageSize
         {
             get => imageSize;
             set
             {
-                imageSize = value;
+                Properties.Settings.Default.ImageSize = value;
+                Properties.Settings.Default.Save();
+                imageSize = Properties.Settings.Default.ImageSize;
                 OnPropertyChanged();
             }
         }

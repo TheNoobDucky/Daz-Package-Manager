@@ -11,7 +11,8 @@
         </DataTemplate>
         <DataTemplate x:Key="ImageBox">
             <Image Name="Image"
-                    Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},Path=DataContext.ImageSize}" Source="{Binding Image}" />
+                    Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},Path=DataContext.ImageSize}"
+                    Source="{Binding Image}" />
         </DataTemplate>
     </Window.Resources>
 
@@ -21,7 +22,9 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Grid.Column="0" Margin="5 5" >
+        <FrameworkElement x:Name="DummyContext" Width="{Binding ImageSize}" Visibility="Collapsed" />
+
+        <Grid Grid.Row="0" Grid.Column="0" Margin="5 5">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -73,18 +76,16 @@
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="5 5">Select Where To Save Cache File</Button>
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
                     Margin="5 5" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" />
-            
+
             <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5">Clear Package Selection</Button>
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden">Reload Cache</Button>
 
-            <StackPanel Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Orientation="Horizontal">
+            <StackPanel Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Orientation="Horizontal" Margin="5 5">
                 <TextBlock Text="Image Size:" />
-                <Slider Name="Slider" Margin="10, 0, 0, 0" Width="100" Orientation="Horizontal"
-                        HorizontalAlignment="Left"
-                        Value="{Binding ImageSize}" Minimum="0" Maximum="300" SmallChange="50"
-                        LargeChange="100" TickPlacement="BottomRight" TickFrequency="50" />
+                <Slider Name="Slider" Margin="10, 0, 0, 0" Width="500" Orientation="Horizontal"
+                        HorizontalAlignment="Left" Value="{Binding ImageSize}" Minimum="0" Maximum="500"
+                        SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
             </StackPanel>
-
             <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create Subfolder based on Scene Name" />
@@ -110,7 +111,8 @@
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
-                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True"
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -125,7 +127,8 @@
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
-                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True"
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
