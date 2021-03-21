@@ -8,7 +8,7 @@ namespace DazPackage
     {
         public InstalledPose(InstalledPackage package, IEnumerable<string> compatibilities) : base(package, compatibilities)
         {
-            package.AssetTypes |= AssetTypes.Character;
+            package.AssetTypes |= AssetTypes.Pose;
         }
         public InstalledPose() { }
 
