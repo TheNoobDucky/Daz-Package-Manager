@@ -134,7 +134,7 @@
                         <DataGridTextColumn Header="Installed Location" Binding="{Binding InstalledLocation}"
                                 IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Types" Binding="{Binding AssetTypes}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Generations" Binding="{Binding Generation}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generations" Binding="{Binding Generations}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
@@ -151,7 +151,7 @@
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
@@ -168,7 +168,7 @@
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
-                        <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>

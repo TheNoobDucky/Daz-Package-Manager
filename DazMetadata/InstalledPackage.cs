@@ -59,6 +59,15 @@ namespace DazPackage
                     }
                 }
             }
+            if ((Generations ^ Generation.Unknown) != Generation.None)
+            {
+                Generations ^= Generation.Unknown;
+            }
+
+            if ((AssetTypes ^ AssetTypes.Unknown) != AssetTypes.None)
+            {
+                AssetTypes ^= AssetTypes.Unknown;
+            }
         }
         public InstalledPackage() { }
 
@@ -70,7 +79,7 @@ namespace DazPackage
         public List<string> Files { get { return installedManifest.Files; } }
         public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
-        public Generation Generation { get; set; } = Generation.Unknown;
+        public Generation Generations { get; set; } = Generation.Unknown;
 
         public List<InstalledCharacter> Characters { get; set; } = new List<InstalledCharacter>();
         public List<InstalledPose> Poses { get; set; } = new List<InstalledPose>();

@@ -21,15 +21,15 @@ namespace DazPackage
             ProductName = Package.ProductName;
             foreach (var compatibility in compatibilities)
             {
-                Generation |= GetGeneration(compatibility);
+                Generations |= GetGeneration(compatibility);
             }
 
             // Unset Unknown flag if any other generation is flagged. 
-            if ((package.Generation ^ Generation.Unknown) != Generation.None) 
+            if ((Generations ^ Generation.Unknown) != Generation.None) 
             {
-                package.Generation ^= Generation.Unknown;
+                Generations ^= Generation.Unknown;
             }
-            package.Generation |= Generation;
+            package.Generations |= Generations;
         }
 
         public InstalledFile() { }
@@ -37,8 +37,8 @@ namespace DazPackage
         public string Image { get; set; }
         public string Path { get; set; }
         public string ProductName { get; set; }
-        public Generation Generation { get; set; } = Generation.Unknown;
-        public Gender Gender { get; set; } = Gender.Unknown;
+        public Generation Generations { get; set; } = Generation.Unknown;
+        public Gender Genders { get; set; } = Gender.Unknown;
 
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
         private InstalledPackage package = new InstalledPackage();

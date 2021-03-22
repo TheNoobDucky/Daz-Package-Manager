@@ -48,7 +48,7 @@ namespace Daz_Package_Manager
             {
                 if (args.Item is InstalledCharacter item)
                 {
-                    args.Accepted = ((item.Generation & showingGeneration) != Generation.None) && ((item.Gender & showingGender) != Gender.None);
+                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
             };
 
@@ -56,7 +56,7 @@ namespace Daz_Package_Manager
             {
                 if (args.Item is InstalledPose item)
                 {
-                    args.Accepted = ((item.Generation & showingGeneration) != Generation.None) && ((item.Gender & showingGender) != Gender.None);
+                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
             };
         }
