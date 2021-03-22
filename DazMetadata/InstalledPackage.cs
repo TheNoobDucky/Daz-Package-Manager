@@ -17,11 +17,14 @@ namespace DazPackage
     {
         public InstalledPackage (FileInfo fileInfo)
         {
-            InstalledManifest = new InstallManifestFile(fileInfo);
+            var installManifest = new InstallManifestFile(fileInfo);
+            ProductName = installManifest.ProductName;
+            InstalledLocation = installManifest.UserInstallPath;
+            Files = installManifest.Files;
 
-            foreach (var metadataFileLocation in InstalledManifest.MetadataFiles)
+            foreach (var metadataFileLocation in installManifest.MetadataFiles)
             {
-                var metadataFilePath = new FileInfo(Path.Combine(InstalledManifest.UserInstallPath, metadataFileLocation));
+                var metadataFilePath = new FileInfo(Path.Combine(installManifest.UserInstallPath, metadataFileLocation));
                 var Assets = new PackageMetadata(metadataFilePath).Assets.Select(x => new AssetMetadata(x)).ToList();
 
                 foreach (var asset in Assets)
@@ -67,12 +70,10 @@ namespace DazPackage
         }
         public InstalledPackage() { }
 
-        public InstallManifestFile InstalledManifest { get; set; }
-
-        public string ProductName { get { return InstalledManifest.ProductName; }}
-        public string InstalledLocation { get { return InstalledManifest.UserInstallPath; } }
+        public string ProductName { get; set; }
+        public string InstalledLocation { get; set; }
         //public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
-        public List<string> Files { get { return InstalledManifest.Files; } }
+        public List<string> Files { get; set; }
         public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
         public Generation Generations { get; set; } = Generation.Unknown;

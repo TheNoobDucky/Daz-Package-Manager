@@ -85,14 +85,16 @@ namespace Daz_Package_Manager
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+            var totalTime = new Stopwatch();
+            totalTime.Start();
             BackgroundWorker worker = sender as BackgroundWorker;
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
 
             var files = Directory.EnumerateFiles(folder).ToList();
-            var numberOfFiles = 500;
-            // var numberOfFiles = files.Count;
-            var batchSize = 1000;
+
+            var numberOfFiles = files.Count;
+            var batchSize = 200;
             var end = 0;
             var sanityCheck = 0;
             var wip = new ConcurrentBag<InstalledPackage>();
@@ -105,26 +107,20 @@ namespace Daz_Package_Manager
                 end = Math.Min(start + batchSize, numberOfFiles);
                 var count = end - start;
 
-                Parallel.For(start, end, x => wip.Add(ProcessPackage(files[x])));
+                Parallel.For(start, end, x => wip.Add(new InstalledPackage(new FileInfo(files[x]))));
                 sanityCheck += count;
 
                 var progress = sanityCheck * 100 / numberOfFiles;
                 if (timer.Elapsed.TotalSeconds > 1)
                 {
-                    worker.ReportProgress(progress, wip);
+                    worker.ReportProgress(progress, null);
                     timer.Restart();
                 }
             }
             Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
-
+            totalTime.Stop();
+            Output.Write(totalTime.Elapsed.TotalSeconds.ToString());
             e.Result = wip.ToList();
-        }
-
-        private static InstalledPackage ProcessPackage(string path)
-        {
-            var package = new InstalledPackage(new FileInfo(path));
-            Output.Write("Processed:" + package.ProductName, Brushes.Gray);
-            return package;
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -137,8 +133,6 @@ namespace Daz_Package_Manager
 
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            var wip = e.UserState as ConcurrentBag<InstalledPackage>;
-            Packages = wip.ToList();
             Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Brushes.Blue);
         }
 
@@ -336,7 +330,6 @@ namespace Daz_Package_Manager
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
-                Packages.Clear();
                 worker.RunWorkerAsync();
             }
         }

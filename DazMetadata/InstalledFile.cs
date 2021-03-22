@@ -355,7 +355,7 @@ namespace DazPackage
             "Follower/Attachment/Head/Forehead/Eyebrows" => AssetTypes.Eyebrow,
             "Follower/Attachment/Head/Face/Eyelashes" => AssetTypes.Eyebrow,
             "Follower/Attachment/Head/Face/Tears" => AssetTypes.Tear,
-
+            "Preset/Simulation-Settings" => AssetTypes.Skipped,
             _ => AssetTypes.None
             #endregion
         };
