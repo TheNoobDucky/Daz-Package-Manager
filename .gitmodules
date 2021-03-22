@@ -1,0 +1,3 @@
+[submodule "Algorithmia"]
+	path = Algorithmia
+	url = https://github.com/SolutionsDesign/Algorithmia.git
