@@ -17,7 +17,7 @@ namespace DazPackage
         Genesis_3 = 1 << 7,
         Genesis_8 = 1 << 8,
 
-        All = ~None
+        All = ~None,
     }
 
     public static class GenerationExtension
@@ -32,28 +32,28 @@ namespace DazPackage
     public enum Gender
     {
         None = 0,
-        Female = 1 << 0,
-        Male = 1 << 1,
+        Unknown = 1 << 0,
+        Female = 1 << 1,
+        Male = 1 << 2,
         Both = Female | Male,
 
-        Unknown = 1 << 30,
-        All = ~None
+        All = ~None,
     }
 
     [Flags]
     public enum AssetTypes
     {
         None = 0,
-        Character = 1 << 0,
-        Morph = 1 << 1,
-        Expression = 1 << 2,
-        Pose = 1 << 3,
-        Clothing = 1 << 4,
-        Material = 1 << 5,
-        Shape = 1 << 6,
+        Unknown = 1 << 0,
+        Character = 1 << 1,
+        Morph = 1 << 2,
+        Expression = 1 << 3,
+        Pose = 1 << 4,
+        Clothing = 1 << 5,
+        Material = 1 << 6,
+        Shape = 1 << 7,
 
-        Unknown = 1 << 30,
-        All = ~None
+        All = ~None,
     }
 
 
