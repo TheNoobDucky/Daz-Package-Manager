@@ -6,7 +6,7 @@ namespace DazPackage
 {
     public class InstalledPose : InstalledFile
     {
-        public InstalledPose(InstalledPackage package, IEnumerable<string> compatibilities) : base(package, compatibilities)
+        public InstalledPose(InstalledPackage package, AssetMetadata asset) : base(package, asset)
         {
             package.AssetTypes |= AssetTypes.Pose;
         }

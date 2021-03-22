@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using Helpers;
+using System;
 
 namespace DazPackage
 {
@@ -15,47 +16,50 @@ namespace DazPackage
     {
         public InstalledPackage (FileInfo fileInfo)
         {
-            installedManifest = new InstallManifestFile(fileInfo);
-            foreach (var metadataFileLocation in installedManifest.MetadataFiles)
+            InstalledManifest = new InstallManifestFile(fileInfo);
+            foreach (var metadataFileLocation in InstalledManifest.MetadataFiles)
             {
-                var metadataFilePath = new FileInfo(Path.Combine(installedManifest.UserInstallPath, metadataFileLocation));
+                var metadataFilePath = new FileInfo(Path.Combine(InstalledManifest.UserInstallPath, metadataFileLocation));
                 Assets.AddRange(new PackageMetadata(metadataFilePath).Assets.Select(x => new AssetMetadata(x)).ToList());
 
                 foreach (var asset in Assets)
                 {
-                    if (InstalledCharacter.ContentTypeMatches(asset.ContentType))
+                    var assetType = InstalledFile.MatchContentType(asset.ContentType);
+                    if ((assetType & AssetTypes.Handled) != AssetTypes.None)
                     {
                         var figureLocation = Path.Combine(this.InstalledLocation, asset.Name);
                         var figureImage = FindImage(figureLocation);
-                        Characters.Add(new InstalledCharacter(this, asset.Compatibilities)
+                        var item = new InstalledFile(this, asset)
                         {
                             Path = asset.Name,
                             Image = figureImage,
-                        });
-                        //Output.Write("Character found: " + asset.Name);
-                    }
-                    else if (InstalledPose.ContentTypeMatches(asset.ContentType))
-                    {
-                        var figureLocation = Path.Combine(this.InstalledLocation, asset.Name);
-                        var figureImage = FindImage(figureLocation);
-                        Poses.Add(new InstalledPose(this, asset.Compatibilities)
+                        };
+
+                        if (assetType == AssetTypes.Character)
                         {
-                            Path = asset.Name,
-                            Image = figureImage,
-                        });
-                        //Output.Write("Pose found: " + asset.Name);
-                    }
-                    else if (InstalledMaterial.ContentTypeMatches(asset.ContentType))
-                    {
+                            Characters.Add(item);
+                        } else if (assetType == AssetTypes.Pose)
+                        {
+                            Poses.Add(item);
+                        }
+                        else if (assetType == AssetTypes.Clothing)
+                        {
+                            Clothings.Add(item);
+                        }
+                        else
+                        {
+                            Others.Add(item);
+                        }
 
-                    }
-                    else if (InstalledFileSkipped.ContentTypeMatches(asset.ContentType))
+                    } 
+                    else if ((assetType & AssetTypes.Skipped) == AssetTypes.None)
                     {
+                        Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
+                    }
+                    else if (assetType == AssetTypes.None)
+                    {
+                        Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
 
-                    }
-                    else
-                    {
-                        Output.Write(asset.ContentType, Brushes.Red);
                     }
                 }
             }
@@ -71,18 +75,20 @@ namespace DazPackage
         }
         public InstalledPackage() { }
 
-        public InstallManifestFile installedManifest { get; set; }
+        public InstallManifestFile InstalledManifest { get; set; }
 
-        public string ProductName { get { return installedManifest.ProductName; }}
-        public string InstalledLocation { get { return installedManifest.UserInstallPath; } }
+        public string ProductName { get { return InstalledManifest.ProductName; }}
+        public string InstalledLocation { get { return InstalledManifest.UserInstallPath; } }
         public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
-        public List<string> Files { get { return installedManifest.Files; } }
+        public List<string> Files { get { return InstalledManifest.Files; } }
         public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
         public Generation Generations { get; set; } = Generation.Unknown;
 
-        public List<InstalledCharacter> Characters { get; set; } = new List<InstalledCharacter>();
-        public List<InstalledPose> Poses { get; set; } = new List<InstalledPose>();
+        public List<InstalledFile> Characters { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
 
         private bool selected = false;
         private static string FindImage (string assetPath)

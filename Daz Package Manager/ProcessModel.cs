@@ -33,6 +33,8 @@ namespace Daz_Package_Manager
                 PackagesViewSource.Source = packages;
                 CharactersViewSource.Source = packages.SelectMany(x => x.Characters);
                 PosesViewSource.Source = packages.SelectMany(x => x.Poses);
+                ClothingViewSource.Source = packages.SelectMany(x => x.Clothings);
+                OthersViewSource.Source = packages.SelectMany(x => x.Others);
             }
         }
 
@@ -40,6 +42,8 @@ namespace Daz_Package_Manager
 
         public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
         public CollectionViewSource PosesViewSource { get; set; } = new CollectionViewSource();
+        public CollectionViewSource ClothingViewSource { get; set; } = new CollectionViewSource();
+        public CollectionViewSource OthersViewSource { get; set; } = new CollectionViewSource();
 
         public ProcessModel()
         {
@@ -50,7 +54,7 @@ namespace Daz_Package_Manager
 
             CharactersViewSource.Filter += (sender, args) =>
             {
-                if (args.Item is InstalledCharacter item)
+                if (args.Item is InstalledFile item)
                 {
                     args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
@@ -58,7 +62,7 @@ namespace Daz_Package_Manager
 
             PosesViewSource.Filter += (sender, args) =>
             {
-                if (args.Item is InstalledPose item)
+                if (args.Item is InstalledFile item)
                 {
                     args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
@@ -72,8 +76,8 @@ namespace Daz_Package_Manager
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
 
             var files = Directory.EnumerateFiles(folder).ToList();
-
-            var numberOfFiles = files.Count;
+            var numberOfFiles = 500;
+            // var numberOfFiles = files.Count;
             var batchSize = 1000;
             var end = 0;
             var sanityCheck = 0;

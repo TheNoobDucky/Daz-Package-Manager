@@ -45,17 +45,55 @@ namespace DazPackage
     {
         None = 0,
         Unknown = 1 << 0,
-        Character = 1 << 1,
-        Morph = 1 << 2,
-        Expression = 1 << 3,
-        Pose = 1 << 4,
-        Clothing = 1 << 5,
-        Material = 1 << 6,
-        Shape = 1 << 7,
+        Accessory = 1 << 1,
+        Attachment = 1 << 2,
+        Character = 1 << 3,
+        Clothing = 1 << 4,
+        Eyebrow = 1 << 5,
+        Hair = 1 << 6,
+        Expression = 1 << 7,
+        Material = 1 << 8,
+        Morph = 1 << 9,
+        Pose = 1 << 10,
+        Shape = 1 << 11,
+        Prop = 1 << 12,
 
+        Tear = 1 << 13,
+        Missing = 1 << 30,
+        Handled = Accessory | Attachment | Character | Clothing | Hair | Expression | Pose ,
+        Skipped = Shape | Morph | Prop | Material | Unknown | Missing | Eyebrow | Tear,
+        Generation = Character | Clothing | Hair | Pose,
         All = ~None,
     }
+    public enum BodyLocation
+    {
+        None,
+        Unknown,
+        Arm,
+        Head,
+        Leg,
+        Neck,
+        Waist,
+        Torso,
+    }
 
+    public enum ClothingType
+    {
+        None,
+        Unknown,
+        Dress,
+        Outfit,
+        Footware,
+        Glove,
+        HeadWear,
+        Outerwear,
+        Pant,
+        Shirt,
+        Shoe,
+        Skirt,
+        Sock,
+        Underwear,
+    }
 
     public class PackageType
     {
