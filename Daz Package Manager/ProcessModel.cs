@@ -31,19 +31,37 @@ namespace Daz_Package_Manager
             {
                 packages = value;
                 PackagesViewSource.Source = packages;
-                CharactersViewSource.Source = packages.SelectMany(x => x.Characters);
-                PosesViewSource.Source = packages.SelectMany(x => x.Poses);
-                ClothingViewSource.Source = packages.SelectMany(x => x.Clothings);
-                OthersViewSource.Source = packages.SelectMany(x => x.Others);
+                var a = packages.SelectMany(x =>
+                { 
+                    var y = x.Items.GetValues(AssetTypes.Clothing, false);
+                    return y ?? new HashSet<InstalledFile>();
+                }
+                );
+                Accessories.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Accessory, true));
+                Attachments.Source = packages.SelectMany(x =>  x.Items.GetValues(AssetTypes.Attachment, true));
+                Characters.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Character, true));
+                Clothings.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Clothing, true));
+                Hairs.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Hair, true));
+                Morphs.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Morph, true));
+                Props.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Prop, true));
+                Poses.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Pose, true));
+                Others.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Other, true));
+                TODO.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.TODO, true));
+
             }
         }
 
         public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
-
-        public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
-        public CollectionViewSource PosesViewSource { get; set; } = new CollectionViewSource();
-        public CollectionViewSource ClothingViewSource { get; set; } = new CollectionViewSource();
-        public CollectionViewSource OthersViewSource { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Accessories { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Attachments { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Characters { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Clothings { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Hairs { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Morphs { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Props { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Poses { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Others { get; set; } = new CollectionViewSource();
+        public CollectionViewSource TODO { get; set; } = new CollectionViewSource();
 
         public ProcessModel()
         {
@@ -51,22 +69,16 @@ namespace Daz_Package_Manager
             worker.RunWorkerCompleted += RunWorkerCompleted;
             worker.ProgressChanged += ProgressChanged;
             worker.WorkerReportsProgress = true;
-
-            CharactersViewSource.Filter += (sender, args) =>
+            void generationFIlter(object sender, FilterEventArgs args)
             {
                 if (args.Item is InstalledFile item)
                 {
                     args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
-            };
+            }
 
-            PosesViewSource.Filter += (sender, args) =>
-            {
-                if (args.Item is InstalledFile item)
-                {
-                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
-                }
-            };
+            Characters.Filter += generationFIlter;
+            Poses.Filter += generationFIlter;
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
@@ -303,8 +315,8 @@ namespace Daz_Package_Manager
 
         private void RefreshDisplay()
         {
-            CharactersViewSource.View.Refresh();
-            PosesViewSource.View.Refresh();
+            Characters.View.Refresh();
+            Poses.View.Refresh();
         }
 
         private readonly BackgroundWorker worker = new BackgroundWorker();

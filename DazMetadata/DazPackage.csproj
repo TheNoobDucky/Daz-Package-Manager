@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Algorithmia\SD.Tools.Algorithmia\SD.Tools.Algorithmia.csproj" />
     <ProjectReference Include="..\Helper\Helpers.csproj" />
   </ItemGroup>
 

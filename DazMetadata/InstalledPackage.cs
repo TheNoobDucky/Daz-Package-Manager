@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using Helpers;
 using System;
+using SD.Tools.Algorithmia.GeneralDataStructures;
 
 namespace DazPackage
 {
@@ -17,10 +18,11 @@ namespace DazPackage
         public InstalledPackage (FileInfo fileInfo)
         {
             InstalledManifest = new InstallManifestFile(fileInfo);
+
             foreach (var metadataFileLocation in InstalledManifest.MetadataFiles)
             {
                 var metadataFilePath = new FileInfo(Path.Combine(InstalledManifest.UserInstallPath, metadataFileLocation));
-                Assets.AddRange(new PackageMetadata(metadataFilePath).Assets.Select(x => new AssetMetadata(x)).ToList());
+                var Assets = new PackageMetadata(metadataFilePath).Assets.Select(x => new AssetMetadata(x)).ToList();
 
                 foreach (var asset in Assets)
                 {
@@ -34,32 +36,22 @@ namespace DazPackage
                             Path = asset.Name,
                             Image = figureImage,
                         };
-
-                        if (assetType == AssetTypes.Character)
+                        if ((assetType & AssetTypes.Shown) != AssetTypes.None)
                         {
-                            Characters.Add(item);
-                        } else if (assetType == AssetTypes.Pose)
-                        {
-                            Poses.Add(item);
-                        }
-                        else if (assetType == AssetTypes.Clothing)
-                        {
-                            Clothings.Add(item);
+                            Items.Add(assetType, item);
                         }
                         else
                         {
-                            Others.Add(item);
+                            Items.Add(AssetTypes.Other, item);
                         }
-
-                    } 
-                    else if ((assetType & AssetTypes.Skipped) == AssetTypes.None)
-                    {
-                        Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
                     }
-                    else if (assetType == AssetTypes.None)
+                    else if ((assetType & AssetTypes.NotProcessed) != AssetTypes.None)
+                    {
+
+                    }
+                    else 
                     {
                         Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
-
                     }
                 }
             }
@@ -79,7 +71,7 @@ namespace DazPackage
 
         public string ProductName { get { return InstalledManifest.ProductName; }}
         public string InstalledLocation { get { return InstalledManifest.UserInstallPath; } }
-        public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
+        //public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
         public List<string> Files { get { return InstalledManifest.Files; } }
         public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
@@ -89,6 +81,8 @@ namespace DazPackage
         public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
         public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
         public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
+
+        public MultiValueDictionary<AssetTypes, InstalledFile> Items { get; set; } = new MultiValueDictionary<AssetTypes, InstalledFile>();
 
         private bool selected = false;
         private static string FindImage (string assetPath)

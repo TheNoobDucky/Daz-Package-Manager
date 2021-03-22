@@ -139,8 +139,27 @@
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="Figures">
-                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding CharactersViewSource.View}" IsReadOnly="False"
+            <TabItem Header="Accessories">
+                <DataGrid Name="AccessoriesDisplay" ItemsSource="{Binding Accessories.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            
+            <TabItem Header="Attachments">
+                <DataGrid Name="AttachmentsDisplay" ItemsSource="{Binding Attachments.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -158,8 +177,8 @@
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="Poses">
-                <DataGrid Name="PosesDisplay" ItemsSource="{Binding PosesViewSource.View}" IsReadOnly="False"
+            <TabItem Header="Characters">
+                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding Characters.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -178,7 +197,83 @@
             </TabItem>
 
             <TabItem Header="Chothings">
-                <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding ClothingViewSource.View}" IsReadOnly="False"
+                <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding Clothings.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Hairs">
+                <DataGrid Name="HairsDisplay" ItemsSource="{Binding Hairs.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            
+            <TabItem Header="Morphs">
+                <DataGrid Name="MorphsDisplay" ItemsSource="{Binding Morphs.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            
+            <TabItem Header="Props">
+                <DataGrid Name="PropsDisplay" ItemsSource="{Binding Props.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Poses">
+                <DataGrid Name="PosesDisplay" ItemsSource="{Binding Poses.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -197,7 +292,7 @@
             </TabItem>
 
             <TabItem Header="Others">
-                <DataGrid Name="OthersDisplay" ItemsSource="{Binding OthersViewSource.View}" IsReadOnly="False"
+                <DataGrid Name="OthersDisplay" ItemsSource="{Binding Others.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -215,6 +310,25 @@
                 </DataGrid>
             </TabItem>
 
+            <TabItem Header="TODO">
+                <DataGrid Name="TODODisplay" ItemsSource="{Binding TODO.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            
             <TabItem Header="Log Output">
                 <Grid>
                     <Grid.RowDefinitions>
