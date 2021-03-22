@@ -88,14 +88,15 @@
             <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Image Size:" />
-                <Slider Grid.Column="1" Margin="10, 0, 0, 0" Orientation="Horizontal"
+                <CheckBox Grid.Column="0" Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}"
+                        Content="Show Images" />
+                <TextBlock Grid.Column="1" Margin="5, 5" Text="Image Size:" />
+                <Slider Grid.Column="2" Margin="0, 5" Orientation="Horizontal"
                         Value="{Binding ImageSize}" Minimum="0" Maximum="500"
                         SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
-                <CheckBox Grid.Column="2" Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}" Content="Show Images" />
             </Grid>
 
             <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
@@ -114,9 +115,7 @@
             </StackPanel>
 
             <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding SelectGeneration}" Content="Create Subfolder based on Scene Name" />
-
+                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}" Content="Create Subfolder based on Scene Name" />
 
         </Grid>
 
