@@ -31,7 +31,8 @@ namespace DazPackage
         public string Image { get; set; }
         public string Path { get; set; }
         public string ProductName { get; set; }
-        public Generation Generation { get; set; } = Generation.None;
+        public Generation Generation { get; set; } = Generation.Unknown;
+        public Gender Gender { get; set; } = Gender.Unknown;
 
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
         private InstalledPackage package = new InstalledPackage();
@@ -71,7 +72,7 @@ namespace DazPackage
                 string s when s.StartsWith("/Genesis 2/") => Generation.Genesis_2,
                 "/Genesis" => Generation.Genesis_1,
                 string s when s.StartsWith("/Generation4") => Generation.Gen4,
-                _ => Generation.None,
+                _ => Generation.Unknown,
             };
         }
     }

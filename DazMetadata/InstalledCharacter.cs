@@ -9,10 +9,6 @@ namespace DazPackage
     {
         public InstalledCharacter(InstalledPackage package, IEnumerable<string> compatibilities) : base(package, compatibilities)
         {
-            if (Generation == Generation.None)
-            {
-                var a = 1;
-            }
             package.AssetTypes |= AssetTypes.Character;
         }
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Windows.Data;
 
 namespace DazPackage
 {
@@ -8,11 +10,22 @@ namespace DazPackage
     public enum Generation
     {
         None = 0,
-        Gen4 = 1 << 0,
-        Genesis_1 = 1 << 1,
-        Genesis_2 = 1 << 2,
-        Genesis_3 = 1 << 3,
-        Genesis_8 = 1 << 4,
+        Unknown = 1 << 0,
+        Gen4 = 1 << 4,
+        Genesis_1 = 1 << 5,
+        Genesis_2 = 1 << 6,
+        Genesis_3 = 1 << 7,
+        Genesis_8 = 1 << 8,
+
+        All = ~None
+    }
+
+    public static class GenerationExtension
+    {
+        public static string PrettyString(this Generation generation)
+        {
+            return generation.ToString().Replace('_', ' ');
+        }
     }
 
     [Flags]
@@ -21,7 +34,10 @@ namespace DazPackage
         None = 0,
         Female = 1 << 0,
         Male = 1 << 1,
-        Both = Female | Male
+        Both = Female | Male,
+
+        Unknown = 1 << 30,
+        All = ~None
     }
 
     [Flags]
@@ -34,7 +50,10 @@ namespace DazPackage
         Pose = 1 << 3,
         Clothing = 1 << 4,
         Material = 1 << 5,
-        Shape = 1 << 6
+        Shape = 1 << 6,
+
+        Unknown = 1 << 30,
+        All = ~None
     }
 
 

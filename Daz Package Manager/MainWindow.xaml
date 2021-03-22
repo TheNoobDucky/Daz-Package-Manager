@@ -2,7 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:Daz_Package_Manager" 
+        xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
+        xmlns:Helper="clr-namespace:Helpers;assembly=Helpers"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties" mc:Ignorable="d" Title="MainWindow"
         Height="1200" Width="1500">
     <Window.Resources>
@@ -17,6 +20,7 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
+                        
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -93,11 +97,27 @@
                         SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
                 <CheckBox Grid.Column="2" Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}" Content="Show Images" />
             </Grid>
-            
-            <CheckBox Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5" Checked="SaveUserSetting"
+
+            <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen0}" Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen4}" Content="Gen 4" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen5}" Content="Genesis 1" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen6}" Content="Genesis 2" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen7}" Content="Genesis 3" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen8}" Content="Genesis 8" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="100">
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleUnknownGender}" Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleFemale}" Content="Female" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleMale}" Content="Male" />
+            </StackPanel>
+
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding UseSceneSubfolder}" Content="Create Subfolder based on Scene Name" />
-            
+                    IsChecked="{Binding SelectGeneration}" Content="Create Subfolder based on Scene Name" />
+
+
         </Grid>
 
         <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
