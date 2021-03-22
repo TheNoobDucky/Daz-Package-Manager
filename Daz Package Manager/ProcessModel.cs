@@ -99,18 +99,8 @@ namespace Daz_Package_Manager
             }
             Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
 
-
-            if (timer.Elapsed.TotalSeconds>10)
-            {
-
-            }
-
             e.Result = wip.ToList();
-            timer.Stop();
-            Output.Write(timer.Elapsed.ToString());
         }
-
-
 
         private static InstalledPackage ProcessPackage(string path)
         {
@@ -127,7 +117,7 @@ namespace Daz_Package_Manager
             Working = false;
         }
 
-        private void ProgressChanged (object sender, ProgressChangedEventArgs e)
+        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             var wip = e.UserState as ConcurrentBag<InstalledPackage>;
             Packages = wip.ToList();
@@ -371,7 +361,6 @@ namespace Daz_Package_Manager
             {
             }
         }
-
         private string SaveFileLocation(string savePath)
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
