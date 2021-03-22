@@ -23,6 +23,13 @@ namespace DazPackage
             {
                 Generation |= GetGeneration(compatibility);
             }
+
+            // Unset Unknown flag if any other generation is flagged. 
+            if ((package.Generation ^ Generation.Unknown) != Generation.None) 
+            {
+                package.Generation ^= Generation.Unknown;
+            }
+
             package.Generation |= Generation;
         }
 
