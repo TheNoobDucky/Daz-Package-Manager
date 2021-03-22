@@ -24,7 +24,7 @@ namespace Helpers
             if (WriteDebug) // debugField == null error handling not implemented
             {
                 //debugField.Text += debugText + '\n';
-                debugField.Dispatcher.Invoke(new Action(() =>
+                debugField.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     var paragraph = new Paragraph()
                     {

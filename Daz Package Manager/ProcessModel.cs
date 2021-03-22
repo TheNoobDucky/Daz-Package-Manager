@@ -16,6 +16,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Timers;
 
 namespace Daz_Package_Manager
 {
@@ -43,6 +45,8 @@ namespace Daz_Package_Manager
         {
             worker.DoWork += DoWork;
             worker.RunWorkerCompleted += RunWorkerCompleted;
+            worker.ProgressChanged += ProgressChanged;
+            worker.WorkerReportsProgress = true;
 
             CharactersViewSource.Filter += (sender, args) =>
             {
@@ -67,12 +71,46 @@ namespace Daz_Package_Manager
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
 
-            var Packages = new ConcurrentBag<InstalledPackage>();
-            var files = Directory.EnumerateFiles(folder);
-            Parallel.ForEach(files, x => Packages.Add(ProcessPackage(x)));
+            var files = Directory.EnumerateFiles(folder).ToList();
 
-            e.Result = Packages.ToList();
+            var numberOfFiles = files.Count;
+            var batchSize = 1000;
+            var end = 0;
+            var sanityCheck = 0;
+            var wip = new ConcurrentBag<InstalledPackage>();
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            for (var start = 0; start < numberOfFiles; start = end)
+            {
+                end = Math.Min(start + batchSize, numberOfFiles);
+                var count = end - start;
+
+                Parallel.For(start, end, x => wip.Add(ProcessPackage(files[x])));
+                sanityCheck += count;
+
+                var progress = sanityCheck * 100 / numberOfFiles;
+                if (timer.Elapsed.TotalSeconds > 1)
+                {
+                    worker.ReportProgress(progress, wip);
+                    timer.Restart();
+                }
+            }
+            Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
+
+
+            if (timer.Elapsed.TotalSeconds>10)
+            {
+
+            }
+
+            e.Result = wip.ToList();
+            timer.Stop();
+            Output.Write(timer.Elapsed.ToString());
         }
+
+
 
         private static InstalledPackage ProcessPackage(string path)
         {
@@ -87,6 +125,13 @@ namespace Daz_Package_Manager
             SaveCache(Properties.Settings.Default.CacheLocation);
             Output.Write("Finished scaning install archive folder.", Brushes.Blue);
             Working = false;
+        }
+
+        private void ProgressChanged (object sender, ProgressChangedEventArgs e)
+        {
+            var wip = e.UserState as ConcurrentBag<InstalledPackage>;
+            Packages = wip.ToList();
+            Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Brushes.Blue);
         }
 
         private bool working = false;
