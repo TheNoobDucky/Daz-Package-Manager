@@ -2,10 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Daz_Package_Manager" 
-        xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
-        xmlns:Helper="clr-namespace:Helpers;assembly=Helpers"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
+        xmlns:Helper="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties" mc:Ignorable="d" Title="MainWindow"
         Height="1200" Width="1500">
     <Window.Resources>
@@ -20,10 +18,10 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
 
-                        
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
@@ -31,13 +29,14 @@
 
         <Grid Grid.Row="0" Grid.Column="0" Margin="5 5">
             <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="15" />
+
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -66,7 +65,7 @@
                     DataContext="{x:Static properties:Settings.Default}" Text="{Binding SceneFile}" />
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="5 5" />
-            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,2"
+            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,1"
                     Content="Select Package Based On Scene (Optional)" />
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5" />
@@ -76,46 +75,51 @@
                     DataContext="{x:Static properties:Settings.Default}" Text="{Binding OutputFolder}" />
 
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="5 5" />
-            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="5 5">Generate Virtual Install Folder</Button>
+            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="5 5"
+                    Content="Generate Virtual Install Folder" />
 
-            <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="5 5">Select Where To Save Cache File</Button>
+            <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="5 5"
+                    Content="Select Where To Save Cache File" />
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
                     Margin="5 5" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" />
 
-            <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5">Clear Package Selection</Button>
-            <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden">Reload Cache</Button>
+            <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5"
+                    Content="Clear Package Selection" />
+            <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden"
+                    Content="Reload Cache" />
 
-            <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Margin="5 5">
+            <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Grid.RowSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Margin="5 5" IsChecked="{Binding ImageVisible, Mode=TwoWay}"
+                <CheckBox Grid.Column="0" Margin="5 0" IsChecked="{Binding ImageVisible, Mode=TwoWay}"
                         Content="Show Images" />
-                <TextBlock Grid.Column="1" Margin="5, 5" Text="Image Size:" />
-                <Slider Grid.Column="2" Margin="0, 5" Orientation="Horizontal"
-                        Value="{Binding ImageSize}" Minimum="0" Maximum="500"
-                        SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
+                <TextBlock Grid.Column="1" Margin="5, 0" Text="Image Size:" />
+                <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding ImageSize}" Minimum="0"
+                        Maximum="500" SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
             </Grid>
 
             <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen0}" Content="Unknown" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen4}" Content="Gen 4" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen5}" Content="Genesis 1" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen6}" Content="Genesis 2" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen7}" Content="Genesis 3" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleGen8}" Content="Genesis 8" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen0}" Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen4}" Content="Gen 4" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen5}" Content="Genesis 1" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen6}" Content="Genesis 2" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen7}" Content="Genesis 3" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen8}" Content="Genesis 8" />
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="100">
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleUnknownGender}" Content="Unknown" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleFemale}" Content="Female" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" IsChecked="{Binding ToggleMale}" Content="Male" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleUnknownGender}"
+                        Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleFemale}" Content="Female" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleMale}" Content="Male" />
             </StackPanel>
 
-            <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}" Content="Create Subfolder based on Scene Name" />
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
+                    Content="Create Subfolder based on Scene Name" />
 
         </Grid>
 

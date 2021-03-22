@@ -29,7 +29,6 @@ namespace DazPackage
             {
                 package.Generation ^= Generation.Unknown;
             }
-
             package.Generation |= Generation;
         }
 
