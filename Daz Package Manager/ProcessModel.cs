@@ -79,6 +79,8 @@ namespace Daz_Package_Manager
 
             Characters.Filter += generationFIlter;
             Poses.Filter += generationFIlter;
+            Clothings.Filter += generationFIlter;
+            Hairs.Filter += generationFIlter;
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
@@ -315,8 +317,16 @@ namespace Daz_Package_Manager
 
         private void RefreshDisplay()
         {
+            Accessories.View.Refresh();
+            Attachments.View.Refresh();
             Characters.View.Refresh();
+            Clothings.View.Refresh();
+            Hairs.View.Refresh();
+            Morphs.View.Refresh();
+            Props.View.Refresh();
             Poses.View.Refresh();
+            Others.View.Refresh();
+            TODO.View.Refresh();
         }
 
         private readonly BackgroundWorker worker = new BackgroundWorker();
