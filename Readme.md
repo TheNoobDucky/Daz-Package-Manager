@@ -75,25 +75,38 @@ Remove base folders that contains contents you dont want daz to see.
 
 ## Planned Features
 
-1. Detect character generation.
-2. Handle experssions (they are considered as pose?).
-3. Filter poses based on generation. 
-4. Handle clothings.
-5. Handle other item.
-6. Implement some sort of search functionality.
-7. Detect character gender.
-8. Implement filtering.
+1. Handle experssions (they are considered as pose?).
+2. Handle clothings.
+3. Handle other item.
+4. Implement some sort of search functionality.
+5. Detect character gender.
 
 ## Version Log
 
-Recommand V1.1.0
+Recommand V1.2.0
+
+V1.2.0
+New Features:
+* Images are not resizable.
+* Hide Image. This improve UI speed.
+* Detect asset compatibility with Daz figure generation.
+* Able to sort by figure generation.
+* Show package content types (for content types that are implemented).
+* Performance improvement.
+
+WIP:
+* Character gender detection not implemented.
+
+V1.1.0
+Bug fix.
+* Able to find poses.
+* Improved Performance
 
 V1.0.0
 Basic Functionality.
-V1.1.0
-Bug fix.
-Able to find poses.
-Improved Performance
+
+Bugfix:
+* Sort by selected.
 
 ## License
 [GPL 2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
