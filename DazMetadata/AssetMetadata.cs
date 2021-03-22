@@ -23,7 +23,7 @@ namespace DazPackage
                 .ToList();
             Compatibilities = asset
                 .Elements("Compatibilities")
-                .Elements("Category")
+                .Elements("Compatibility")
                 .Attributes("VALUE")
                 .Select(x => x.Value)
                 .ToList();

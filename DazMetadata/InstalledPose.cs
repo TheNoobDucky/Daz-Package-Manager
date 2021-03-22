@@ -6,8 +6,9 @@ namespace DazPackage
 {
     public class InstalledPose : InstalledFile
     {
-        public InstalledPose(InstalledPackage package) : base(package)
+        public InstalledPose(InstalledPackage package, IEnumerable<string> compatibilities) : base(package, compatibilities)
         {
+            package.AssetTypes |= AssetTypes.Pose;
         }
         public InstalledPose() { }
 
@@ -20,4 +21,4 @@ namespace DazPackage
             return false;
         }
     }
-}//Preset/Pose
+}

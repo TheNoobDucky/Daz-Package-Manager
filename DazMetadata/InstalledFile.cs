@@ -2,6 +2,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.Collections.Generic;
+
+using Helpers;
 
 namespace DazPackage
 {
@@ -12,10 +15,21 @@ namespace DazPackage
 
     public class InstalledFile : IContenType, INotifyPropertyChanged
     {
-        public InstalledFile(InstalledPackage package)
+        public InstalledFile(InstalledPackage package, IEnumerable<string> compatibilities)
         {
             Package = package;
             ProductName = Package.ProductName;
+            foreach (var compatibility in compatibilities)
+            {
+                Generations |= GetGeneration(compatibility);
+            }
+
+            // Unset Unknown flag if any other generation is flagged. 
+            if ((Generations ^ Generation.Unknown) != Generation.None) 
+            {
+                Generations ^= Generation.Unknown;
+            }
+            package.Generations |= Generations;
         }
 
         public InstalledFile() { }
@@ -23,6 +37,9 @@ namespace DazPackage
         public string Image { get; set; }
         public string Path { get; set; }
         public string ProductName { get; set; }
+        public Generation Generations { get; set; } = Generation.Unknown;
+        public Gender Genders { get; set; } = Gender.Unknown;
+
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
         private InstalledPackage package = new InstalledPackage();
         public InstalledPackage Package
@@ -50,6 +67,19 @@ namespace DazPackage
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        protected static Generation GetGeneration(string compatibility)
+        {
+            return compatibility switch
+            {
+                string s when s.StartsWith("/Genesis 8/") || s.StartsWith("/Genesis 8.1/")=> Generation.Genesis_8,
+                string s when s.StartsWith("/Genesis 3/") => Generation.Genesis_3,
+                string s when s.StartsWith("/Genesis 2/") => Generation.Genesis_2,
+                "/Genesis" => Generation.Genesis_1,
+                string s when s.StartsWith("/Generation4") => Generation.Gen4,
+                _ => Generation.Unknown,
+            };
         }
     }
 }

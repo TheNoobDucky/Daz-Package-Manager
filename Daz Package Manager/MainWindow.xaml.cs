@@ -31,7 +31,6 @@ namespace Daz_Package_Manager
 
         readonly ProcessModel model = new ProcessModel();
 
-
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
             var destination = Properties.Settings.Default.OutputFolder;
@@ -51,6 +50,9 @@ namespace Daz_Package_Manager
             if (!model.Working)
             {   
                 model.Scan();
+            } else
+            {
+                model.Cancel();
             }
         }
 

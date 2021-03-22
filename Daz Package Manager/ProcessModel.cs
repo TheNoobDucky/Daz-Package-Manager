@@ -13,48 +13,115 @@ using OsHelper;
 using System.Text.Json.Serialization;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Timers;
 
 namespace Daz_Package_Manager
 {
-    class ProcessModel: INotifyPropertyChanged
+    class ProcessModel : INotifyPropertyChanged
     {
-        private InstallManifestArchive archive = new InstallManifestArchive();
-
-        public InstallManifestArchive Archive
+        private List<InstalledPackage> packages = new List<InstalledPackage>();
+        public List<InstalledPackage> Packages
         {
-            get => archive;
+            get => packages;
             set
             {
-                archive = value;
-                PackagesViewSource.Source = archive.Packages;
-                CharactersViewSource.Source = archive.Characters;
-                PosesViewSource.Source = archive.Poses;
+                packages = value;
+                PackagesViewSource.Source = packages;
+                CharactersViewSource.Source = packages.SelectMany(x => x.Characters);
+                PosesViewSource.Source = packages.SelectMany(x => x.Poses);
             }
         }
 
         public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
+
         public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
         public CollectionViewSource PosesViewSource { get; set; } = new CollectionViewSource();
 
-        public ProcessModel ()
+        public ProcessModel()
         {
             worker.DoWork += DoWork;
             worker.RunWorkerCompleted += RunWorkerCompleted;
+            worker.ProgressChanged += ProgressChanged;
+            worker.WorkerReportsProgress = true;
+
+            CharactersViewSource.Filter += (sender, args) =>
+            {
+                if (args.Item is InstalledCharacter item)
+                {
+                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
+                }
+            };
+
+            PosesViewSource.Filter += (sender, args) =>
+            {
+                if (args.Item is InstalledPose item)
+                {
+                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
+                }
+            };
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+            BackgroundWorker worker = sender as BackgroundWorker;
             var folder = Properties.Settings.Default.InstallManifestFolder;
             Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
-            e.Result = InstallManifestArchive.Scan(folder);
+
+            var files = Directory.EnumerateFiles(folder).ToList();
+
+            var numberOfFiles = files.Count;
+            var batchSize = 1000;
+            var end = 0;
+            var sanityCheck = 0;
+            var wip = new ConcurrentBag<InstalledPackage>();
+
+            var timer = new Stopwatch();
+            timer.Start();
+
+            for (var start = 0; start < numberOfFiles; start = end)
+            {
+                end = Math.Min(start + batchSize, numberOfFiles);
+                var count = end - start;
+
+                Parallel.For(start, end, x => wip.Add(ProcessPackage(files[x])));
+                sanityCheck += count;
+
+                var progress = sanityCheck * 100 / numberOfFiles;
+                if (timer.Elapsed.TotalSeconds > 1)
+                {
+                    worker.ReportProgress(progress, wip);
+                    timer.Restart();
+                }
+            }
+            Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
+
+            e.Result = wip.ToList();
+        }
+
+        private static InstalledPackage ProcessPackage(string path)
+        {
+            var package = new InstalledPackage(new FileInfo(path));
+            Output.Write("Processed:" + package.ProductName, Brushes.Gray);
+            return package;
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Archive = (InstallManifestArchive) e.Result;
+            Packages = (List<InstalledPackage>)e.Result;
             SaveCache(Properties.Settings.Default.CacheLocation);
             Output.Write("Finished scaning install archive folder.", Brushes.Blue);
             Working = false;
+        }
+
+        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            var wip = e.UserState as ConcurrentBag<InstalledPackage>;
+            Packages = wip.ToList();
+            Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Brushes.Blue);
         }
 
         private bool working = false;
@@ -68,22 +135,194 @@ namespace Daz_Package_Manager
             }
         }
 
+        private double imageSize = Properties.Settings.Default.ImageSize;
+        public double ImageSize
+        {
+            get => imageSize;
+            set
+            {
+                Properties.Settings.Default.ImageSize = value;
+                Properties.Settings.Default.Save();
+                imageSize = Properties.Settings.Default.ImageSize;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool imageVisible = true;
+        public bool ImageVisible
+        {
+            get => imageVisible;
+            set
+            {
+                imageVisible = value;
+                OnPropertyChanged();
+            }
+        }
+
+        #region Select Generation
+        private Generation showingGeneration = Generation.All;
+        public Generation ToggleGeneration
+        {
+            get => showingGeneration;
+            set
+            {
+                showingGeneration ^= value;
+                RefreshDisplay();
+                OnPropertyChanged();
+            }
+        }
+
+        public bool ToggleGen0
+        {
+            get
+            {
+                return ToggleGeneration.HasFlag(Generation.Unknown);
+            }
+            set
+            {
+                ToggleGeneration = Generation.Unknown;
+            }
+        }
+
+        public bool ToggleGen4
+        {
+            get
+            {
+                return ToggleGeneration.HasFlag(Generation.Gen4);
+            }
+            set
+            {
+                ToggleGeneration = Generation.Gen4;
+            }
+        }
+
+        public bool ToggleGen5
+        {
+            get
+            {
+                return ToggleGeneration.HasFlag(Generation.Genesis_1);
+            }
+            set
+            {
+                ToggleGeneration = Generation.Genesis_1;
+            }
+        }
+
+        public bool ToggleGen6
+        {
+            get
+            {
+                return ToggleGeneration.HasFlag(Generation.Genesis_2);
+            }
+            set
+            {
+                ToggleGeneration = Generation.Genesis_2;
+            }
+        }
+
+        public bool ToggleGen7
+        {
+            get
+            {
+                return ToggleGeneration.HasFlag(Generation.Genesis_3);
+            }
+            set
+            {
+                ToggleGeneration = Generation.Genesis_3;
+            }
+        }
+
+        public bool ToggleGen8
+        {
+            get
+            {
+                return ToggleGeneration.HasFlag(Generation.Genesis_8);
+            }
+            set
+            {
+                ToggleGeneration = Generation.Genesis_8;
+            }
+        }
+        #endregion
+
+        #region Select Gender
+        private Gender showingGender = Gender.All;
+        public Gender ToggleGender
+        {
+            get => showingGender;
+            set
+            {
+
+                showingGender ^= value;
+                RefreshDisplay();
+                OnPropertyChanged();
+
+            }
+        }
+
+        public bool ToggleMale
+        {
+            get
+            {
+                return ToggleGender.HasFlag(Gender.Male);
+            }
+            set
+            {
+                ToggleGender = Gender.Male;
+            }
+        }
+
+        public bool ToggleFemale
+        {
+            get
+            {
+                return ToggleGender.HasFlag(Gender.Female);
+            }
+            set
+            {
+                ToggleGender = Gender.Female;
+            }
+        }
+
+        public bool ToggleUnknownGender
+        {
+            get
+            {
+                return ToggleGender.HasFlag(Gender.Unknown);
+            }
+            set
+            {
+                ToggleGender = Gender.Unknown;
+            }
+        }
+        #endregion
+
+        private void RefreshDisplay()
+        {
+            CharactersViewSource.View.Refresh();
+            PosesViewSource.View.Refresh();
+        }
+
         private readonly BackgroundWorker worker = new BackgroundWorker();
 
-
-
-        public void Scan ()
+        public void Scan()
         {
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
+                Packages.Clear();
                 worker.RunWorkerAsync();
             }
         }
 
-        public void UnselectAll ()
+        public void Cancel()
         {
-            Archive.Packages.ForEach(x => x.Selected = false);
+            this.worker.CancelAsync();
+        }
+
+        public void UnselectAll()
+        {
+            Packages.ForEach(x => x.Selected = false);
         }
 
         public void SaveCache(string savePath)
@@ -93,7 +332,7 @@ namespace Daz_Package_Manager
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
-            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(archive, option));
+            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(Packages, option));
         }
 
         public void LoadCache(string savePath)
@@ -105,14 +344,23 @@ namespace Daz_Package_Manager
                     ReferenceHandler = ReferenceHandler.Preserve,
                     WriteIndented = true
                 };
-                using var packageJsonFile = File.OpenText(SaveFileLocation(savePath));
-                Archive = JsonSerializer.Deserialize<InstallManifestArchive>(packageJsonFile.ReadToEnd(), option);
+                var saveFileLocation = SaveFileLocation(savePath);
+                using var packageJsonFile = File.OpenText(saveFileLocation);
+                try
+                {
+                    Packages = JsonSerializer.Deserialize<List<InstalledPackage>>(packageJsonFile.ReadToEnd(), option);
+                }
+                catch (JsonException)
+                {
+                    Output.Write("Unable to load cache file. Clearing Cache.");
+                    packageJsonFile.Dispose();
+                    File.Delete(saveFileLocation);
+                }
             }
             catch (FileNotFoundException)
             {
             }
         }
-
         private string SaveFileLocation(string savePath)
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
@@ -121,13 +369,13 @@ namespace Daz_Package_Manager
         public void SelectFigureBasedOnScene()
         {
             var sceneLocation = new FileInfo(Properties.Settings.Default.SceneFile);
-            var packagesInScene = SceneFile.PackageInScene(sceneLocation, Archive.Packages);
+            var packagesInScene = SceneFile.PackageInScene(sceneLocation, Packages);
             packagesInScene.ToList().ForEach(x => x.Selected = true);
         }
 
         public void GenerateVirtualInstallFolder(string destination)
         {
-            var packagesToSave = Archive.Packages.Where(x => x.Selected);
+            var packagesToSave = Packages.Where(x => x.Selected);
 
             foreach (var package in packagesToSave)
             {

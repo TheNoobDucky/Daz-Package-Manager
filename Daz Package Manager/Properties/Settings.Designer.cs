@@ -82,5 +82,17 @@ namespace Daz_Package_Manager.Properties {
                 this["UseSceneSubfolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public double ImageSize {
+            get {
+                return ((double)(this["ImageSize"]));
+            }
+            set {
+                this["ImageSize"] = value;
+            }
+        }
     }
 }

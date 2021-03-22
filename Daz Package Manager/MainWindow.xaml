@@ -1,126 +1,174 @@
-﻿<Window x:Class="Daz_Package_Manager.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window x:Class="Daz_Package_Manager.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:system="clr-namespace:System;assembly=mscorlib"
-        xmlns:properties="clr-namespace:Daz_Package_Manager.Properties"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="1200" Width="1500">
-    <Window.Resources >
+        xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
+        xmlns:Helper="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:properties="clr-namespace:Daz_Package_Manager.Properties" mc:Ignorable="d" Title="MainWindow"
+        Height="1200" Width="1500">
+    <Window.Resources>
         <DataTemplate x:Key="SelectCheckbox">
             <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
         </DataTemplate>
         <DataTemplate x:Key="ImageBox">
-            <Image Height="150" Source="{Binding Image}" />
+            <Image Name="Image"
+                    Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},Path=DataContext.ImageSize}"
+                    Source="{Binding Image}" />
         </DataTemplate>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
+
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+
+        <FrameworkElement x:Name="DummyContext" Width="{Binding ImageSize}" Visibility="Collapsed" />
+
         <Grid Grid.Row="0" Grid.Column="0" Margin="5 5">
             <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="15" />
+
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="5 5"/>
-            <Button Grid.Row="0" Grid.Column="1" Click="SelectInstallManifestFolder" Margin="5 5">Select Install Manifest Archive Folder</Button>
-            <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" DataContext="{x:Static properties:Settings.Default}" Text="{Binding InstallManifestFolder}" IsReadOnly="True" Margin="5 5"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="5 5" />
+            <Button Grid.Row="0" Grid.Column="1" Click="SelectInstallManifestFolder" Margin="5 5"
+                    Content="Select Install Manifest Archive Folder" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" IsReadOnly="True" Margin="5 5"
+                    DataContext="{x:Static properties:Settings.Default}" Text="{Binding InstallManifestFolder}" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="5 5"/>
-            <Button Grid.Row="1" Grid.Column="1" Name="ScanInstallManifestFolderButton" Click="ScanInstallManifestFolder" Margin="5 5" Content="Scan Install Manifest Archive"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="5 5" />
+            <Button Grid.Row="1" Grid.Column="1" Name="ScanInstallManifestFolderButton"
+                    Click="ScanInstallManifestFolder" Margin="5 5" Content="Scan Install Manifest Archive" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="5 5"/>
-            <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="5 5">Select Scene File(Optional)</Button>
-            <TextBox Grid.Row="2" Grid.Column="2" Name="SceneFileLocation" DataContext="{x:Static properties:Settings.Default}" Text="{Binding SceneFile}" IsReadOnly="True" Margin="5 5"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="5 5" />
+            <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="5 5"
+                    Content="Select Scene File(Optional)" />
+            <TextBox Grid.Row="2" Grid.Column="2" Name="SceneFileLocation" IsReadOnly="True" Margin="5 5"
+                    DataContext="{x:Static properties:Settings.Default}" Text="{Binding SceneFile}" />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="5 5"/>
-            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,2">Select Package Based On Scene (Optional)</Button>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="5 5" />
+            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,1"
+                    Content="Select Package Based On Scene (Optional)" />
 
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5"/>
-            <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="5 5">Select Output Folder Location</Button>
-            <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" DataContext="{x:Static properties:Settings.Default}" Text="{Binding OutputFolder}" IsReadOnly="True" Margin="5 5"/>
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5" />
+            <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="5 5"
+                    Content="Select Output Folder Location" />
+            <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" IsReadOnly="True" Margin="5 5"
+                    DataContext="{x:Static properties:Settings.Default}" Text="{Binding OutputFolder}" />
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="5 5"/>
-            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="5 5">Generate Virtual Install Folder</Button>
-        </Grid>
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="5 5" />
+            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="5 5"
+                    Content="Generate Virtual Install Folder" />
 
-        <Grid Grid.Row="0" Grid.Column="1" Margin="5 5">
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="5 5"
+                    Content="Select Where To Save Cache File" />
+            <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
+                    Margin="5 5" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" />
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Row="0" Grid.Column="0" Click="SelectCacheLocation" Margin="5 5">Select Where To Save Cache File</Button>
-            <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="100" Name="CacheLocation" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" IsReadOnly="True" Margin="5 5"/>
+            <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5"
+                    Content="Clear Package Selection" />
+            <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden"
+                    Content="Reload Cache" />
 
-            <Button Grid.Row="1" Grid.Column="0" Click="ClearPackageSelection" Margin="5 5">Clear Package Selection</Button>
-            <Button Grid.Row="1" Grid.Column="1" Click="CallLoadCache" Margin="5 5" Visibility="Hidden">Reload Cache</Button>
-            <Button Grid.Row="1" Grid.Column="2" Click="ClearDebugLogHandler" Margin="5 5">Clear Log</Button>
+            <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Grid.RowSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <CheckBox Grid.Column="0" Margin="5 0" IsChecked="{Binding ImageVisible, Mode=TwoWay}"
+                        Content="Show Images" />
+                <TextBlock Grid.Column="1" Margin="5, 0" Text="Image Size:" />
+                <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding ImageSize}" Minimum="0"
+                        Maximum="500" SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
+            </Grid>
 
-            <CheckBox Grid.Row="2" Grid.Column="0" Margin="5 5" Checked ="SaveUserSetting" Unchecked="SaveUserSetting"
-                      DataContext="{x:Static properties:Settings.Default}" 
-                      IsChecked="{Binding UseSceneSubfolder}">
-                Create Subfolder based on Scene Name
-            </CheckBox>
+            <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen0}" Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen4}" Content="Gen 4" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen5}" Content="Genesis 1" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen6}" Content="Genesis 2" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen7}" Content="Genesis 3" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen8}" Content="Genesis 8" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="100">
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleUnknownGender}"
+                        Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleFemale}" Content="Female" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleMale}" Content="Male" />
+            </StackPanel>
+
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
+                    Content="Create Subfolder based on Scene Name" />
+
         </Grid>
 
         <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <TabItem Header="Packages">
-                <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
+                <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
-                        <DataGridTextColumn Header="Package Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Installed Location" Binding="{Binding InstalledLocation}" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTextColumn Header="Package Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Installed Location" Binding="{Binding InstalledLocation}"
+                                IsReadOnly="True" />
+                        <DataGridTextColumn Header="Content Types" Binding="{Binding AssetTypes}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generations" Binding="{Binding Generations}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
 
             <TabItem Header="Figures">
-                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding CharactersViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
+                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding CharactersViewSource.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
-                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True" CellTemplate="{StaticResource ImageBox}"/>
-                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
 
             <TabItem Header="Poses">
-                <DataGrid Name="PosesDisplay" ItemsSource="{Binding PosesViewSource.View}" IsReadOnly="False" AutoGenerateColumns="False">
+                <DataGrid Name="PosesDisplay" ItemsSource="{Binding PosesViewSource.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True" CellTemplate="{StaticResource SelectCheckbox}"/>
-                        <DataGridTemplateColumn Header="Image" Width="SizeToCells" IsReadOnly="True" CellTemplate="{StaticResource ImageBox}"/>
-                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Generation" Binding="{Binding Generation}" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTemplateColumn Header="Image" IsReadOnly="True"
+                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                CellTemplate="{StaticResource ImageBox}" />
+                        <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
@@ -128,31 +176,28 @@
             <TabItem Header="Log Output">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Logs:" />
-                    <Button Grid.Row="0" Grid.Column="1" Margin="5 5" Click="ClearDebugLogHandler">
-                        Clear Log
-                    </Button>
-                    <ScrollViewer Grid.Row="1" Grid.ColumnSpan="100 "
-                          VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-                        <RichTextBox  Name="DebugRtb"
-					  Background="LightGray"
-                      Grid.Row="1"
-                      ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                    <Button Grid.Row="0" Grid.Column="1" Margin="5 5" Click="ClearDebugLogHandler" Content="Clear Log" />
+                    <ScrollViewer Grid.Row="1" Grid.ColumnSpan="100 " VerticalScrollBarVisibility="Visible"
+                            HorizontalScrollBarVisibility="Visible">
+                        <RichTextBox Name="DebugRtb" Background="LightGray" Grid.Row="1"
+                                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                ScrollViewer.HorizontalScrollBarVisibility="Visible">
                             <FlowDocument Name="DebugText" PageWidth="{Binding ElementName=DebugRtb, Path=ActualWidth}" />
                         </RichTextBox>
                     </ScrollViewer>
                 </Grid>
             </TabItem>
-            
+
         </TabControl>
-        
+
     </Grid>
 </Window>

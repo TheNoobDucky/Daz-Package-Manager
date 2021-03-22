@@ -1,23 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Windows.Data;
 
 namespace DazPackage
 {
-    public enum GenerationEnum
+    [Flags]
+    public enum Generation
     {
-        Unknown,V4,Genesis,Genesis2,Genesis3,Genesis8
+        None = 0,
+        Unknown = 1 << 0,
+        Gen4 = 1 << 4,
+        Genesis_1 = 1 << 5,
+        Genesis_2 = 1 << 6,
+        Genesis_3 = 1 << 7,
+        Genesis_8 = 1 << 8,
+
+        All = ~None
     }
 
-    public enum GenderEnum
+    public static class GenerationExtension
     {
-        Unknwon, Female, Male
+        public static string PrettyString(this Generation generation)
+        {
+            return generation.ToString().Replace('_', ' ');
+        }
     }
 
-    public enum AssetTypeEnum
+    [Flags]
+    public enum Gender
     {
-        character, morph, expression, pose, clothing, material, shape
+        None = 0,
+        Female = 1 << 0,
+        Male = 1 << 1,
+        Both = Female | Male,
+
+        Unknown = 1 << 30,
+        All = ~None
     }
+
+    [Flags]
+    public enum AssetTypes
+    {
+        None = 0,
+        Character = 1 << 0,
+        Morph = 1 << 1,
+        Expression = 1 << 2,
+        Pose = 1 << 3,
+        Clothing = 1 << 4,
+        Material = 1 << 5,
+        Shape = 1 << 6,
+
+        Unknown = 1 << 30,
+        All = ~None
+    }
+
 
     public class PackageType
     {
