@@ -47,7 +47,6 @@ namespace Daz_Package_Manager
                 Poses.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Pose, true));
                 Others.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Other, true));
                 TODO.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.TODO, true));
-
             }
         }
 
@@ -69,18 +68,27 @@ namespace Daz_Package_Manager
             worker.RunWorkerCompleted += RunWorkerCompleted;
             worker.ProgressChanged += ProgressChanged;
             worker.WorkerReportsProgress = true;
-            void generationFIlter(object sender, FilterEventArgs args)
+            void FilterGenerationAndGender(object sender, FilterEventArgs args)
             {
                 if (args.Item is InstalledFile item)
                 {
                     args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
             }
+            PackagesViewSource.Filter += (sender,args) => {
+                if (args.Item is InstalledPackage item)
+                {
+                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None);
+                }
+            };
 
-            Characters.Filter += generationFIlter;
-            Poses.Filter += generationFIlter;
-            Clothings.Filter += generationFIlter;
-            Hairs.Filter += generationFIlter;
+            Accessories.Filter += FilterGenerationAndGender;
+            Attachments.Filter += FilterGenerationAndGender;
+            Characters.Filter += FilterGenerationAndGender;
+            Clothings.Filter += FilterGenerationAndGender;
+            Hairs.Filter += FilterGenerationAndGender;
+            Morphs.Filter += FilterGenerationAndGender;
+            Poses.Filter += FilterGenerationAndGender;
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
@@ -167,7 +175,7 @@ namespace Daz_Package_Manager
             set
             {
                 imageVisible = value;
-                OnPropertyChanged();
+                OnPropertyChanged(); 
             }
         }
 
@@ -179,8 +187,6 @@ namespace Daz_Package_Manager
             set
             {
                 showingGeneration ^= value;
-                RefreshDisplay();
-                OnPropertyChanged();
             }
         }
 
@@ -264,11 +270,7 @@ namespace Daz_Package_Manager
             get => showingGender;
             set
             {
-
                 showingGender ^= value;
-                RefreshDisplay();
-                OnPropertyChanged();
-
             }
         }
 
@@ -308,20 +310,6 @@ namespace Daz_Package_Manager
             }
         }
         #endregion
-
-        private void RefreshDisplay()
-        {
-            Accessories.View.Refresh();
-            Attachments.View.Refresh();
-            Characters.View.Refresh();
-            Clothings.View.Refresh();
-            Hairs.View.Refresh();
-            Morphs.View.Refresh();
-            Props.View.Refresh();
-            Poses.View.Refresh();
-            Others.View.Refresh();
-            TODO.View.Refresh();
-        }
 
         private readonly BackgroundWorker worker = new BackgroundWorker();
 

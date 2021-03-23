@@ -8,6 +8,8 @@ using System.Security.Cryptography;
 using System.Windows.Media;
 using System.IO.Compression;
 using System.Text.Json;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Helpers
 {
@@ -69,6 +71,14 @@ namespace Helpers
             using var sceneStream = file.OpenRead();
             using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
             return JsonDocument.Parse(scene);
+        }
+
+        public static void TriggerFilterRefresh (DataGrid dataGrid)
+        {
+            if (dataGrid != null && dataGrid.ItemsSource != null)
+            {
+                CollectionViewSource.GetDefaultView(dataGrid.ItemsSource).Refresh();
+            }
         }
     }
 }

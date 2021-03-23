@@ -102,19 +102,27 @@
             </Grid>
 
             <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen0}" Content="Unknown" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen4}" Content="Gen 4" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen5}" Content="Genesis 1" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen6}" Content="Genesis 2" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen7}" Content="Genesis 3" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen8}" Content="Genesis 8" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen0}" Content="Unknown"
+                        Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen4}" Content="Gen 4"
+                        Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen5}" Content="Genesis 1"
+                        Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen6}" Content="Genesis 2"
+                        Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen7}" Content="Genesis 3"
+                        Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen8}" Content="Genesis 8"
+                        Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="100">
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleUnknownGender}"
-                        Content="Unknown" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleFemale}" Content="Female" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleMale}" Content="Male" />
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ToggleUnknownGender}" Content="Unknown"
+                        Margin="5 1" Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ToggleFemale}" Content="Female"
+                        Margin="5 1" Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ToggleMale}" Content="Male" 
+                          Margin="5 1" Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
             </StackPanel>
 
             <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
@@ -123,7 +131,8 @@
 
         </Grid>
 
-        <TabControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+        <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                Selector.SelectionChanged="TabChangeHandler">
             <TabItem Header="Packages">
                 <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
@@ -157,7 +166,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            
+
             <TabItem Header="Attachments">
                 <DataGrid Name="AttachmentsDisplay" ItemsSource="{Binding Attachments.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
@@ -233,7 +242,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            
+
             <TabItem Header="Morphs">
                 <DataGrid Name="MorphsDisplay" ItemsSource="{Binding Morphs.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
@@ -252,7 +261,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            
+
             <TabItem Header="Props">
                 <DataGrid Name="PropsDisplay" ItemsSource="{Binding Props.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
@@ -328,7 +337,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </TabItem>
-            
+
             <TabItem Header="Log Output">
                 <Grid>
                     <Grid.RowDefinitions>
