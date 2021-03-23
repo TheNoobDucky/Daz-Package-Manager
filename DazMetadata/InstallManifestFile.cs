@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using Helpers;
 
 namespace DazPackage
 {
@@ -12,7 +13,7 @@ namespace DazPackage
     /// </summary>
     public class InstallManifestFile
     {
-        public InstallManifestFile (FileInfo file)
+        public InstallManifestFile(FileInfo file)
         {
             try
             {
@@ -34,20 +35,26 @@ namespace DazPackage
                     UserInstallPath = userInstallPathElement.Attribute("VALUE").Value;
                 }
 
-                var fileEntries = content.Elements("File").Attributes("VALUE");
-                Files = content.Elements("File").Select(x =>
-                { // Trim "content/" from the path since DIM will skip top level folder.
-                var path = x.Attribute("VALUE").Value;
-                    var target = x.Attribute("TARGET").Value.Length + 1; // +1 for "/" at the of path
-                return path[target..];
-                }).ToList();
-
-                MetadataFiles = Files.Where(x =>
+                // Only handle content packages not plugins.
+                var installedTypes = content.Element("InstallTypes").Attribute("VALUE").Value;
+                if (installedTypes == "Content")
                 {
-                    var y = x.ToLower();
-                    return y.StartsWith("runtime/support/") && y.EndsWith(".dsx");
-                }).ToList();
-            } catch (XmlException)
+                    var fileEntries = content.Elements("File").Attributes("VALUE");
+                    Files = content.Elements("File").Select(x =>
+                    { // Trim "content/" from the path since DIM will skip top level folder.
+                        var path = x.Attribute("VALUE").Value;
+                        var target = x.Attribute("TARGET").Value.Length + 1; // +1 for "/" at the of path
+                        return path[target..]; //TODO this part does not work for plugin type.
+                    }).ToList();
+
+                    MetadataFiles = Files.Where(x =>
+                    {
+                        var y = x.ToLower();
+                        return y.StartsWith("runtime/support/") && y.EndsWith(".dsx");
+                    }).ToList();
+                }
+            }
+            catch (XmlException)
             {
             }
         }
@@ -55,7 +62,7 @@ namespace DazPackage
         public InstallManifestFile() { }
         public string GlobalID { get; set; }
         public string MetadataGlobalID { get; set; }
-        public string ProductName  { get; set; }
+        public string ProductName { get; set; }
         public string ProductStoreID { get; set; }
         public string UserInstallPath { get; set; }
 

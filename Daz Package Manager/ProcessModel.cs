@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Timers;
+using System.Reflection;
 
 namespace Daz_Package_Manager
 {
@@ -112,6 +113,8 @@ namespace Daz_Package_Manager
             var sanityCheck = 0;
             var wip = new ConcurrentBag<InstalledPackage>();
 
+            Output.Write("Processing " + numberOfFiles + " files.", Brushes.Blue);
+
             var timer = new Stopwatch();
             timer.Start();
 
@@ -148,11 +151,20 @@ namespace Daz_Package_Manager
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e.Result is List<InstalledPackage> result)
+            try
             {
-                Packages = result;
-                SaveCache(Properties.Settings.Default.CacheLocation);
-                Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+                if (e.Result is List<InstalledPackage> result)
+                {
+                    Packages = result;
+                    SaveCache(Properties.Settings.Default.CacheLocation);
+                    Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+                }
+            } 
+            catch (TargetInvocationException error)
+            {
+                Output.Write("Error source: " + error.InnerException.Source.ToString(), Brushes.Red);
+                Output.Write("Error error message: " + error.InnerException.Message, Brushes.Red);
+
             }
 
             Working = false;
@@ -343,7 +355,7 @@ namespace Daz_Package_Manager
 
         public void Cancel()
         {
-            this.worker.CancelAsync();
+            //this.worker.CancelAsync();
         }
 
         public void UnselectAll()
