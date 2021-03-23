@@ -31,15 +31,36 @@ namespace Daz_Package_Manager
             {
                 packages = value;
                 PackagesViewSource.Source = packages;
-                CharactersViewSource.Source = packages.SelectMany(x => x.Characters);
-                PosesViewSource.Source = packages.SelectMany(x => x.Poses);
+                var a = packages.SelectMany(x =>
+                { 
+                    var y = x.Items.GetValues(AssetTypes.Clothing, false);
+                    return y ?? new HashSet<InstalledFile>();
+                }
+                );
+                Accessories.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Accessory, true));
+                Attachments.Source = packages.SelectMany(x =>  x.Items.GetValues(AssetTypes.Attachment, true));
+                Characters.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Character, true));
+                Clothings.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Clothing, true));
+                Hairs.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Hair, true));
+                Morphs.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Morph, true));
+                Props.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Prop, true));
+                Poses.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Pose, true));
+                Others.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Other, true));
+                TODO.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.TODO, true));
             }
         }
 
         public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
-
-        public CollectionViewSource CharactersViewSource { get; set; } = new CollectionViewSource();
-        public CollectionViewSource PosesViewSource { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Accessories { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Attachments { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Characters { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Clothings { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Hairs { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Morphs { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Props { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Poses { get; set; } = new CollectionViewSource();
+        public CollectionViewSource Others { get; set; } = new CollectionViewSource();
+        public CollectionViewSource TODO { get; set; } = new CollectionViewSource();
 
         public ProcessModel()
         {
@@ -47,34 +68,46 @@ namespace Daz_Package_Manager
             worker.RunWorkerCompleted += RunWorkerCompleted;
             worker.ProgressChanged += ProgressChanged;
             worker.WorkerReportsProgress = true;
-
-            CharactersViewSource.Filter += (sender, args) =>
+            void FilterGenerationAndGender(object sender, FilterEventArgs args)
             {
-                if (args.Item is InstalledCharacter item)
+                if (args.Item is InstalledFile item)
                 {
                     args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
                 }
-            };
-
-            PosesViewSource.Filter += (sender, args) =>
-            {
-                if (args.Item is InstalledPose item)
+            }
+            PackagesViewSource.Filter += (sender,args) => {
+                if (args.Item is InstalledPackage item)
                 {
-                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
+                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None);
                 }
             };
+
+            Accessories.Filter += FilterGenerationAndGender;
+            Attachments.Filter += FilterGenerationAndGender;
+            Characters.Filter += FilterGenerationAndGender;
+            Clothings.Filter += FilterGenerationAndGender;
+            Hairs.Filter += FilterGenerationAndGender;
+            Morphs.Filter += FilterGenerationAndGender;
+            Poses.Filter += FilterGenerationAndGender;
         }
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+            var totalTime = new Stopwatch();
+            totalTime.Start();
             BackgroundWorker worker = sender as BackgroundWorker;
             var folder = Properties.Settings.Default.InstallManifestFolder;
-            Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
+            if (folder is null or "")
+            {
+                Output.Write("Please set Install Archive folder location", Brushes.Red, 0.0);
+                return;
+            }
 
+            Output.Write("Start processing install archive folder: " + folder, Brushes.Green, 0.0);
             var files = Directory.EnumerateFiles(folder).ToList();
 
             var numberOfFiles = files.Count;
-            var batchSize = 1000;
+            var batchSize = 200;
             var end = 0;
             var sanityCheck = 0;
             var wip = new ConcurrentBag<InstalledPackage>();
@@ -87,40 +120,46 @@ namespace Daz_Package_Manager
                 end = Math.Min(start + batchSize, numberOfFiles);
                 var count = end - start;
 
-                Parallel.For(start, end, x => wip.Add(ProcessPackage(files[x])));
+                Parallel.For(start, end, x =>
+                {
+                    try
+                    {
+                        wip.Add(new InstalledPackage(new FileInfo(files[x])));
+                    } 
+                    catch (DirectoryNotFoundException)
+                    {
+                        Output.Write("Missing files for package: " + files[x], Brushes.Red);
+                    }
+                });
                 sanityCheck += count;
 
                 var progress = sanityCheck * 100 / numberOfFiles;
                 if (timer.Elapsed.TotalSeconds > 1)
                 {
-                    worker.ReportProgress(progress, wip);
+                    worker.ReportProgress(progress, null);
                     timer.Restart();
                 }
             }
             Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
-
+            totalTime.Stop();
+            Output.Write(totalTime.Elapsed.TotalSeconds.ToString());
             e.Result = wip.ToList();
-        }
-
-        private static InstalledPackage ProcessPackage(string path)
-        {
-            var package = new InstalledPackage(new FileInfo(path));
-            Output.Write("Processed:" + package.ProductName, Brushes.Gray);
-            return package;
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Packages = (List<InstalledPackage>)e.Result;
-            SaveCache(Properties.Settings.Default.CacheLocation);
-            Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+            if (e.Result is List<InstalledPackage> result)
+            {
+                Packages = result;
+                SaveCache(Properties.Settings.Default.CacheLocation);
+                Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+            }
+
             Working = false;
         }
 
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            var wip = e.UserState as ConcurrentBag<InstalledPackage>;
-            Packages = wip.ToList();
             Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Brushes.Blue);
         }
 
@@ -155,7 +194,7 @@ namespace Daz_Package_Manager
             set
             {
                 imageVisible = value;
-                OnPropertyChanged();
+                OnPropertyChanged(); 
             }
         }
 
@@ -167,8 +206,6 @@ namespace Daz_Package_Manager
             set
             {
                 showingGeneration ^= value;
-                RefreshDisplay();
-                OnPropertyChanged();
             }
         }
 
@@ -252,11 +289,7 @@ namespace Daz_Package_Manager
             get => showingGender;
             set
             {
-
                 showingGender ^= value;
-                RefreshDisplay();
-                OnPropertyChanged();
-
             }
         }
 
@@ -297,12 +330,6 @@ namespace Daz_Package_Manager
         }
         #endregion
 
-        private void RefreshDisplay()
-        {
-            CharactersViewSource.View.Refresh();
-            PosesViewSource.View.Refresh();
-        }
-
         private readonly BackgroundWorker worker = new BackgroundWorker();
 
         public void Scan()
@@ -310,7 +337,6 @@ namespace Daz_Package_Manager
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
-                Packages.Clear();
                 worker.RunWorkerAsync();
             }
         }
@@ -366,17 +392,53 @@ namespace Daz_Package_Manager
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }
 
-        public void SelectFigureBasedOnScene()
+
+        public void SelectPackageBasedOnFolder (string location)
         {
-            var sceneLocation = new FileInfo(Properties.Settings.Default.SceneFile);
-            var packagesInScene = SceneFile.PackageInScene(sceneLocation, Packages);
-            packagesInScene.ToList().ForEach(x => x.Selected = true);
+            var folder = Path.GetDirectoryName(location);
+            var files = Directory.GetFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
+                
+            foreach (var file in files)
+            {
+                SelectPackageBasedOnScene(file);
+            }
         }
+
+        public void SelectPackageBasedOnScene(string sceneLocation)
+        {
+            try
+            {
+                var sceneFileInfo = new FileInfo(sceneLocation);
+                var packagesInScene = SceneFile.PackageInScene(sceneFileInfo, Packages);
+                Output.Write("Packages Selected:", Brushes.Green);
+                packagesInScene.ToList().ForEach(package=> 
+                {
+                    package.Selected = true;
+                    Output.Write(package.ProductName, Brushes.Gray);
+                });
+
+            } catch (CorruptFileException error)
+            {
+                Output.Write("Invalid scene file: " + error.Message, Brushes.Red);
+            } catch (ArgumentException)
+            {
+                Output.Write("Please select scene file.", Brushes.Red);
+            }
+        }
+
+
 
         public void GenerateVirtualInstallFolder(string destination)
         {
             var packagesToSave = Packages.Where(x => x.Selected);
 
+            if (destination == null || destination == "")
+            {
+                Output.Write("Please select a location to install virtual packages to.", Brushes.Red);
+                return;
+            }
+
+            Output.Write("Installing to virtual folder location: " + destination, Brushes.Green);
             foreach (var package in packagesToSave)
             {
                 var basePath = package.InstalledLocation;
@@ -390,12 +452,14 @@ namespace Daz_Package_Manager
                     if (errorCode != 0)
                     {
                         var error = SymLinker.DecodeErrorCode(errorCode);
-                        MessageBox.Show("Failed to create symlink. Aborting. Win32 Error message:" + error);
+                        MessageBox.Show("Aborting: \n" +
+                            "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
+                            "Win32 Error Message: " + error);
                         return;
                     }
                 }
             }
-            Output.Write("Install to virtual folder complete.");
+            Output.Write("Install to virtual folder complete.", Brushes.Green);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

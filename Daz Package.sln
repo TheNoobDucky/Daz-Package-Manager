@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Daz Package Manager", "Daz 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OsHelper", "OsHelper\OsHelper.csproj", "{0818132E-6175-4ACC-89BA-8A98584DF89A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SD.Tools.Algorithmia", "Algorithmia\SD.Tools.Algorithmia\SD.Tools.Algorithmia.csproj", "{00A079D4-4FED-4501-8EA9-37E702DA8498}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,12 @@ Global
 		{0818132E-6175-4ACC-89BA-8A98584DF89A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0818132E-6175-4ACC-89BA-8A98584DF89A}.Shipping|Any CPU.ActiveCfg = Shipping|Any CPU
 		{0818132E-6175-4ACC-89BA-8A98584DF89A}.Shipping|Any CPU.Build.0 = Shipping|Any CPU
+		{00A079D4-4FED-4501-8EA9-37E702DA8498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00A079D4-4FED-4501-8EA9-37E702DA8498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00A079D4-4FED-4501-8EA9-37E702DA8498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00A079D4-4FED-4501-8EA9-37E702DA8498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00A079D4-4FED-4501-8EA9-37E702DA8498}.Shipping|Any CPU.ActiveCfg = Debug|Any CPU
+		{00A079D4-4FED-4501-8EA9-37E702DA8498}.Shipping|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

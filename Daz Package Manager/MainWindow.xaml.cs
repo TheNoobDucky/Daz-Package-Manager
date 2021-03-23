@@ -5,6 +5,9 @@ using System.IO;
 using OsHelper;
 using System.Windows.Controls;
 using System.ComponentModel;
+using System.Windows.Data;
+using System.Diagnostics;
+using DazPackage;
 
 namespace Daz_Package_Manager
 {
@@ -38,7 +41,6 @@ namespace Daz_Package_Manager
             {
                 destination = Path.Combine(destination, Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile));
                 Directory.CreateDirectory(destination);
-                Output.Write(destination);
             }
             model.GenerateVirtualInstallFolder(destination);
         }
@@ -73,7 +75,14 @@ namespace Daz_Package_Manager
 
         private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
         {
-            model.SelectFigureBasedOnScene();
+            if (Properties.Settings.Default.BatchProcessScene)
+            {
+                model.SelectPackageBasedOnFolder(Properties.Settings.Default.SceneFile);
+            }
+            else
+            {
+                model.SelectPackageBasedOnScene(Properties.Settings.Default.SceneFile);
+            }
         }
 
         // Below are boring functions.
@@ -130,6 +139,7 @@ namespace Daz_Package_Manager
         {
             model.UnselectAll();
         }
+        private static TraceSource ts = new TraceSource("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
@@ -139,6 +149,23 @@ namespace Daz_Package_Manager
         private void SaveUserSetting(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
+        }
+
+        private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
+        {
+            var tabControl = e.OriginalSource as TabControl;
+
+            if (tabControl != null)
+            {
+                var tabItem = e.AddedItems[0] as TabItem;
+                Helper.TriggerFilterRefresh(tabItem.Content as DataGrid);
+            }
+        }
+
+        private void UpdateDisplayHandler(object sender, RoutedEventArgs e)
+        {
+            var tabItem = DisplayTab.SelectedItem as TabItem;
+            Helper.TriggerFilterRefresh(tabItem.Content as DataGrid);
         }
     }
 }

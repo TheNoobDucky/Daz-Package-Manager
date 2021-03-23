@@ -26,6 +26,7 @@ namespace OsHelper
                 {
                     return 0;
                 }
+                return errorCode;
             }
             return 0;
         }
