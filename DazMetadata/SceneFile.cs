@@ -20,11 +20,10 @@ namespace DazPackage
                     var imageLibrary = root.GetProperty("image_library").EnumerateArray();
                     var imageMaps = imageLibrary.SelectMany(x => x.GetProperty("map").EnumerateArray());
                     ReferencedFile.UnionWith(imageMaps.Select(x => x.GetProperty("url").ToString()));
-                } catch (KeyNotFoundException)
+                } 
+                catch (KeyNotFoundException)
                 {
                 }
-
-
 
                 var scene = root.GetProperty("scene");
                 try
@@ -47,6 +46,7 @@ namespace DazPackage
 
                 /// TODO materials.
 
+                ReferencedFile.Remove("");
                 // unscape url and remove leading '/'
                 ReferencedFile = ReferencedFile.Select(x=> Uri.UnescapeDataString(x)[1..]).ToHashSet();
 

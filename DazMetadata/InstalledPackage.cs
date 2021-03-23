@@ -24,37 +24,44 @@ namespace DazPackage
             foreach (var metadataFileLocation in installManifest.MetadataFiles)
             {
                 var metadataFilePath = new FileInfo(Path.Combine(installManifest.UserInstallPath, metadataFileLocation));
-                var Assets = new PackageMetadata(metadataFilePath).Assets.Select(x => new AssetMetadata(x)).ToList();
-
-                foreach (var asset in Assets)
+                try
                 {
-                    var assetType = InstalledFile.MatchContentType(asset.ContentType);
-                    if ((assetType & AssetTypes.Handled) != AssetTypes.None)
+                    var Assets = new PackageMetadata(metadataFilePath).Assets.Select(x => new AssetMetadata(x)).ToList();
+
+                    foreach (var asset in Assets)
                     {
-                        var figureLocation = Path.Combine(this.InstalledLocation, asset.Name);
-                        var figureImage = FindImage(figureLocation);
-                        var item = new InstalledFile(this, asset)
+                        var assetType = InstalledFile.MatchContentType(asset.ContentType);
+                        if ((assetType & AssetTypes.Handled) != AssetTypes.None)
                         {
-                            Path = asset.Name,
-                            Image = figureImage,
-                        };
-                        if ((assetType & AssetTypes.Shown) != AssetTypes.None)
+                            var figureLocation = Path.Combine(this.InstalledLocation, asset.Name);
+                            var figureImage = FindImage(figureLocation);
+                            var item = new InstalledFile(this, asset)
+                            {
+                                Path = asset.Name,
+                                Image = figureImage,
+                            };
+                            if ((assetType & AssetTypes.Shown) != AssetTypes.None)
+                            {
+                                Items.Add(assetType, item);
+                            }
+                            else
+                            {
+                                Items.Add(AssetTypes.Other, item);
+                            }
+                        }
+                        else if ((assetType & AssetTypes.NotProcessed) != AssetTypes.None)
                         {
-                            Items.Add(assetType, item);
+
                         }
                         else
                         {
-                            Items.Add(AssetTypes.Other, item);
+                            Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
                         }
                     }
-                    else if ((assetType & AssetTypes.NotProcessed) != AssetTypes.None)
-                    {
-
-                    }
-                    else 
-                    {
-                        Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
-                    }
+                } 
+                catch (FileNotFoundException)
+                {
+                    Output.Write("Missing metadatafile: " + metadataFilePath, Brushes.Red);
                 }
             }
             if ((Generations ^ Generation.Unknown) != Generation.None)

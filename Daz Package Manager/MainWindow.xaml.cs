@@ -75,7 +75,14 @@ namespace Daz_Package_Manager
 
         private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
         {
-            model.SelectFigureBasedOnScene();
+            if (Properties.Settings.Default.BatchProcessScene)
+            {
+                model.SelectPackageBasedOnFolder(Properties.Settings.Default.SceneFile);
+            }
+            else
+            {
+                model.SelectPackageBasedOnScene(Properties.Settings.Default.SceneFile);
+            }
         }
 
         // Below are boring functions.
@@ -130,8 +137,6 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            string s = null;
-            s.Trim();
             model.UnselectAll();
         }
         private static TraceSource ts = new TraceSource("TraceTest");

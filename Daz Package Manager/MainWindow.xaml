@@ -35,7 +35,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="15" />
+                <RowDefinition Height="*" />
 
             </Grid.RowDefinitions>
 
@@ -67,7 +67,11 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="5 5" />
             <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,1"
                     Content="Select Package Based On Scene (Optional)" />
-
+            
+            <CheckBox Grid.Row="3" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding BatchProcessScene}"
+                    Content="Batch select packages all scenes in the same folder" />
+            
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5" />
             <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="5 5"
                     Content="Select Output Folder Location" />
@@ -127,7 +131,7 @@
 
             <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
-                    Content="Create Subfolder based on Scene Name" />
+                    Content="Create subfolder based on scene name" />
 
         </Grid>
 

@@ -94,5 +94,17 @@ namespace Daz_Package_Manager.Properties {
                 this["ImageSize"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool BatchProcessScene {
+            get {
+                return ((bool)(this["BatchProcessScene"]));
+            }
+            set {
+                this["BatchProcessScene"] = value;
+            }
+        }
     }
 }

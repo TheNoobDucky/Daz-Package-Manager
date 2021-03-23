@@ -120,7 +120,17 @@ namespace Daz_Package_Manager
                 end = Math.Min(start + batchSize, numberOfFiles);
                 var count = end - start;
 
-                Parallel.For(start, end, x => wip.Add(new InstalledPackage(new FileInfo(files[x]))));
+                Parallel.For(start, end, x =>
+                {
+                    try
+                    {
+                        wip.Add(new InstalledPackage(new FileInfo(files[x])));
+                    } 
+                    catch (DirectoryNotFoundException)
+                    {
+                        Output.Write("Missing files for package: " + files[x], Brushes.Red);
+                    }
+                });
                 sanityCheck += count;
 
                 var progress = sanityCheck * 100 / numberOfFiles;
@@ -382,9 +392,20 @@ namespace Daz_Package_Manager
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }
 
-        public void SelectFigureBasedOnScene()
+
+        public void SelectPackageBasedOnFolder (string location)
         {
-            var sceneLocation = Properties.Settings.Default.SceneFile;
+            var folder = Path.GetDirectoryName(location);
+            var files = Directory.GetFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
+                
+            foreach (var file in files)
+            {
+                SelectPackageBasedOnScene(file);
+            }
+        }
+
+        public void SelectPackageBasedOnScene(string sceneLocation)
+        {
             try
             {
                 var sceneFileInfo = new FileInfo(sceneLocation);
@@ -404,6 +425,8 @@ namespace Daz_Package_Manager
                 Output.Write("Please select scene file.", Brushes.Red);
             }
         }
+
+
 
         public void GenerateVirtualInstallFolder(string destination)
         {
