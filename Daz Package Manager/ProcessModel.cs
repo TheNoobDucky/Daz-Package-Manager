@@ -112,6 +112,8 @@ namespace Daz_Package_Manager
             var sanityCheck = 0;
             var wip = new ConcurrentBag<InstalledPackage>();
 
+            Output.Write("Processing " + numberOfFiles + "files.", Brushes.Green);
+
             var timer = new Stopwatch();
             timer.Start();
 
@@ -343,7 +345,7 @@ namespace Daz_Package_Manager
 
         public void Cancel()
         {
-            this.worker.CancelAsync();
+           // this.worker.CancelAsync();
         }
 
         public void UnselectAll()
