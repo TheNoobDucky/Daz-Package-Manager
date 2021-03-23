@@ -6,6 +6,8 @@ using OsHelper;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Diagnostics;
+using DazPackage;
 
 namespace Daz_Package_Manager
 {
@@ -128,8 +130,11 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
+            string s = null;
+            s.Trim();
             model.UnselectAll();
         }
+        private static TraceSource ts = new TraceSource("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
