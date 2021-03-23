@@ -76,14 +76,20 @@ Remove base folders that contains contents you dont want daz to see.
 ## Planned Features
 
 1. Handle experssions (they are considered as pose?).
-2. Handle clothings.
-3. Handle other item.
-4. Implement some sort of search functionality.
-5. Detect character gender.
+2. Implement some sort of search functionality.
+3. Detect character gender.
+4. Image grid
 
 ## Version Log
 
-Recommand V1.2.0
+Recommand V1.3.0
+
+V1.3.0
+New Features:
+* Can browse accessories, attachments, characters, clothings, hairs, morpsh, props, poses
+* Performance Improvements including more efficient processing and filtering contents.
+* More robust error handling.
+*  Better error reporting.
 
 V1.2.0
 New Features:
