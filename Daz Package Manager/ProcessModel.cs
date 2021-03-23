@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Helpers;
-using System.Windows.Media;
 using System.IO;
 using DazPackage;
 using System.Linq;
-using System.Windows.Data;
 using System.Text.Json;
 using System.Windows;
 using OsHelper;
@@ -15,9 +12,8 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Timers;
+using System.Windows.Data;
 
 namespace Daz_Package_Manager
 {
@@ -99,11 +95,11 @@ namespace Daz_Package_Manager
             var folder = Properties.Settings.Default.InstallManifestFolder;
             if (folder is null or "")
             {
-                Output.Write("Please set Install Archive folder location", Brushes.Red, 0.0);
+                Output.Write("Please set install archive folder location", Output.Level.Error);
                 return;
             }
 
-            Output.Write("Start processing install archive folder: " + folder, Brushes.Green, 0.0);
+            Output.Write("Start processing install archive folder: " + folder, Output.Level.Status);
             var files = Directory.EnumerateFiles(folder).ToList();
 
             var numberOfFiles = files.Count;
@@ -128,7 +124,7 @@ namespace Daz_Package_Manager
                     } 
                     catch (DirectoryNotFoundException)
                     {
-                        Output.Write("Missing files for package: " + files[x], Brushes.Red);
+                        Output.Write("Missing files for package: " + files[x], Output.Level.Error);
                     }
                 });
                 sanityCheck += count;
@@ -142,7 +138,7 @@ namespace Daz_Package_Manager
             }
             Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
             totalTime.Stop();
-            Output.Write(totalTime.Elapsed.TotalSeconds.ToString());
+            Output.Write(totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
             e.Result = wip.ToList();
         }
 
@@ -152,7 +148,7 @@ namespace Daz_Package_Manager
             {
                 Packages = result;
                 SaveCache(Properties.Settings.Default.CacheLocation);
-                Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+                Output.Write("Finished scaning install archive folder.", Output.Level.Status);
             }
 
             Working = false;
@@ -160,7 +156,7 @@ namespace Daz_Package_Manager
 
         private void ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Brushes.Blue);
+            Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Output.Level.Alert);
         }
 
         private bool working = false;
@@ -203,82 +199,43 @@ namespace Daz_Package_Manager
         public Generation ToggleGeneration
         {
             get => showingGeneration;
-            set
-            {
-                showingGeneration ^= value;
-            }
+            set => showingGeneration ^= value;
         }
 
         public bool ToggleGen0
         {
-            get
-            {
-                return ToggleGeneration.HasFlag(Generation.Unknown);
-            }
-            set
-            {
-                ToggleGeneration = Generation.Unknown;
-            }
+            get => ToggleGeneration.HasFlag(Generation.Unknown);
+            set => ToggleGeneration = Generation.Unknown;
         }
 
         public bool ToggleGen4
         {
-            get
-            {
-                return ToggleGeneration.HasFlag(Generation.Gen4);
-            }
-            set
-            {
-                ToggleGeneration = Generation.Gen4;
-            }
+            get => ToggleGeneration.HasFlag(Generation.Gen4);
+            set => ToggleGeneration = Generation.Gen4;
         }
 
         public bool ToggleGen5
         {
-            get
-            {
-                return ToggleGeneration.HasFlag(Generation.Genesis_1);
-            }
-            set
-            {
-                ToggleGeneration = Generation.Genesis_1;
-            }
+            get => ToggleGeneration.HasFlag(Generation.Genesis_1);
+            set => ToggleGeneration = Generation.Genesis_1;
         }
 
         public bool ToggleGen6
         {
-            get
-            {
-                return ToggleGeneration.HasFlag(Generation.Genesis_2);
-            }
-            set
-            {
-                ToggleGeneration = Generation.Genesis_2;
-            }
+            get => ToggleGeneration.HasFlag(Generation.Genesis_2);
+            set => ToggleGeneration = Generation.Genesis_2;
         }
 
         public bool ToggleGen7
         {
-            get
-            {
-                return ToggleGeneration.HasFlag(Generation.Genesis_3);
-            }
-            set
-            {
-                ToggleGeneration = Generation.Genesis_3;
-            }
+            get => ToggleGeneration.HasFlag(Generation.Genesis_3);
+            set => ToggleGeneration = Generation.Genesis_3;
         }
 
         public bool ToggleGen8
         {
-            get
-            {
-                return ToggleGeneration.HasFlag(Generation.Genesis_8);
-            }
-            set
-            {
-                ToggleGeneration = Generation.Genesis_8;
-            }
+            get => ToggleGeneration.HasFlag(Generation.Genesis_8);
+            set => ToggleGeneration = Generation.Genesis_8;
         }
         #endregion
 
@@ -287,46 +244,25 @@ namespace Daz_Package_Manager
         public Gender ToggleGender
         {
             get => showingGender;
-            set
-            {
-                showingGender ^= value;
-            }
+            set => showingGender ^= value;
         }
 
         public bool ToggleMale
         {
-            get
-            {
-                return ToggleGender.HasFlag(Gender.Male);
-            }
-            set
-            {
-                ToggleGender = Gender.Male;
-            }
+            get => ToggleGender.HasFlag(Gender.Male);
+            set => ToggleGender = Gender.Male;
         }
 
         public bool ToggleFemale
         {
-            get
-            {
-                return ToggleGender.HasFlag(Gender.Female);
-            }
-            set
-            {
-                ToggleGender = Gender.Female;
-            }
+            get => ToggleGender.HasFlag(Gender.Female);
+            set => ToggleGender = Gender.Female;
         }
 
         public bool ToggleUnknownGender
         {
-            get
-            {
-                return ToggleGender.HasFlag(Gender.Unknown);
-            }
-            set
-            {
-                ToggleGender = Gender.Unknown;
-            }
+            get => ToggleGender.HasFlag(Gender.Unknown);
+            set => ToggleGender = Gender.Unknown;
         }
         #endregion
 
@@ -336,7 +272,7 @@ namespace Daz_Package_Manager
         {
             if (Working = !Working)
             {
-                Helpers.Output.Write("Start processing.", Brushes.Green, 0.0);
+                Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
                 worker.RunWorkerAsync();
             }
         }
@@ -378,7 +314,7 @@ namespace Daz_Package_Manager
                 }
                 catch (JsonException)
                 {
-                    Output.Write("Unable to load cache file. Clearing Cache.");
+                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
                     packageJsonFile.Dispose();
                     File.Delete(saveFileLocation);
                 }
@@ -387,7 +323,7 @@ namespace Daz_Package_Manager
             {
             }
         }
-        private string SaveFileLocation(string savePath)
+        private static string SaveFileLocation(string savePath)
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }
@@ -410,23 +346,21 @@ namespace Daz_Package_Manager
             {
                 var sceneFileInfo = new FileInfo(sceneLocation);
                 var packagesInScene = SceneFile.PackageInScene(sceneFileInfo, Packages);
-                Output.Write("Packages Selected:", Brushes.Green);
+                Output.Write("Packages Selected:", Output.Level.Status);
                 packagesInScene.ToList().ForEach(package=> 
                 {
                     package.Selected = true;
-                    Output.Write(package.ProductName, Brushes.Gray);
+                    Output.Write(package.ProductName, Output.Level.Info);
                 });
 
             } catch (CorruptFileException error)
             {
-                Output.Write("Invalid scene file: " + error.Message, Brushes.Red);
+                Output.Write("Invalid scene file: " + error.Message, Output.Level.Error);
             } catch (ArgumentException)
             {
-                Output.Write("Please select scene file.", Brushes.Red);
+                Output.Write("Please select scene file.", Output.Level.Error);
             }
         }
-
-
 
         public void GenerateVirtualInstallFolder(string destination)
         {
@@ -434,15 +368,15 @@ namespace Daz_Package_Manager
 
             if (destination == null || destination == "")
             {
-                Output.Write("Please select a location to install virtual packages to.", Brushes.Red);
+                Output.Write("Please select a location to install virtual packages to.", Output.Level.Error);
                 return;
             }
 
-            Output.Write("Installing to virtual folder location: " + destination, Brushes.Green);
+            Output.Write("Installing to virtual folder location: " + destination, Output.Level.Status);
             foreach (var package in packagesToSave)
             {
                 var basePath = package.InstalledLocation;
-                Output.Write("Installing: " + package.ProductName, Brushes.Gray);
+                Output.Write("Installing: " + package.ProductName, Output.Level.Info);
                 foreach (var file in package.Files)
                 {
                     var sourcePath = Path.GetFullPath(Path.Combine(basePath, file));
@@ -459,7 +393,7 @@ namespace Daz_Package_Manager
                     }
                 }
             }
-            Output.Write("Install to virtual folder complete.", Brushes.Green);
+            Output.Write("Install to virtual folder complete.", Output.Level.Status);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

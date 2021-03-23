@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
 using Helpers;
 using SD.Tools.Algorithmia.GeneralDataStructures;
 
@@ -14,6 +13,20 @@ namespace DazPackage
     /// </summary>
     public class InstalledPackage : INotifyPropertyChanged
     {
+        public string ProductName { get; set; }
+        public string InstalledLocation { get; set; }
+        //public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
+        public List<string> Files { get; set; }
+        public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
+        public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
+        public Generation Generations { get; set; } = Generation.Unknown;
+
+        public List<InstalledFile> Characters { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
+
+        public MultiValueDictionary<AssetTypes, InstalledFile> Items { get; set; } = new MultiValueDictionary<AssetTypes, InstalledFile>();
         public InstalledPackage (FileInfo fileInfo)
         {
             var installManifest = new InstallManifestFile(fileInfo);
@@ -55,13 +68,13 @@ namespace DazPackage
                         }
                         else
                         {
-                            Output.Write(asset.ContentType + " : " + asset.Name, Brushes.Red);
+                            Output.Write(asset.ContentType + " : " + asset.Name, Output.Level.Debug);
                         }
                     }
                 } 
                 catch (FileNotFoundException)
                 {
-                    Output.Write("Missing metadatafile: " + metadataFilePath, Brushes.Red);
+                    Output.Write("Missing metadatafile: " + metadataFilePath, Output.Level.Error);
                 }
             }
             if ((Generations ^ Generation.Unknown) != Generation.None)
@@ -75,21 +88,6 @@ namespace DazPackage
             }
         }
         public InstalledPackage() { }
-
-        public string ProductName { get; set; }
-        public string InstalledLocation { get; set; }
-        //public List<AssetMetadata> Assets { get; set; } = new List<AssetMetadata>(); // File in this package.
-        public List<string> Files { get; set; }
-        public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
-        public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
-        public Generation Generations { get; set; } = Generation.Unknown;
-
-        public List<InstalledFile> Characters { get; set; } = new List<InstalledFile>();
-        public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
-        public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
-        public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
-
-        public MultiValueDictionary<AssetTypes, InstalledFile> Items { get; set; } = new MultiValueDictionary<AssetTypes, InstalledFile>();
 
         private bool selected = false;
         private static string FindImage (string assetPath)

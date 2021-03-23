@@ -2,19 +2,31 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System.Collections.Generic;
 
 using Helpers;
 
 namespace DazPackage
 {
-    public interface IContenType
+    public class InstalledFile : INotifyPropertyChanged
     {
-        public static bool ContentTypeMatches(string sourceContentType) => throw new NotImplementedException();
-    }
+        public string Image { get; set; }
+        public string Path { get; set; }
+        public string ProductName { get; set; }
+        public AssetTypes AssetType { get; set; } = AssetTypes.Unknown;
+        public string ContentType { get; set; }
+        public Generation Generations { get; set; } = Generation.Unknown;
+        public Gender Genders { get; set; } = Gender.Unknown;
+        private InstalledPackage package = new InstalledPackage();
+        public InstalledPackage Package
+        {
+            get { return package; }
+            set
+            {
+                package = value;
+                package.PropertyChanged += Package_PropertyChanged;
+            }
+        }
 
-    public class InstalledFile : IContenType, INotifyPropertyChanged
-    {
         public InstalledFile(InstalledPackage package, AssetMetadata asset)
         {
             Package = package;
@@ -38,47 +50,8 @@ namespace DazPackage
 
         public InstalledFile() { }
 
-        public string Image { get; set; }
-        public string Path { get; set; }
-        public string ProductName { get; set; }
-
-        public AssetTypes AssetType { get; set; } = AssetTypes.Unknown;
-
-        public string ContentType { get; set; }
-
-        public Generation Generations { get; set; } = Generation.Unknown;
-        public Gender Genders { get; set; } = Gender.Unknown;
-
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
-        private InstalledPackage package = new InstalledPackage();
-        public InstalledPackage Package
-        {
-            get { return package; }
-            set
-            {
-                package = value;
-                package.PropertyChanged += Package_PropertyChanged;
-            }
-        }
 
-        public static bool ContentTypeMatches(string sourceContentType) => false;
-
-
-
-        /// <summary>
-        /// Pass PropertyChanged event from package back to view.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Package_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged(e.PropertyName);
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
 
         protected static Generation GetGeneration(string compatibility)
         {
@@ -361,5 +334,20 @@ namespace DazPackage
             _ => AssetTypes.None
             #endregion
         };
+
+        /// <summary>
+        /// Pass PropertyChanged event from package back to view.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Package_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e.PropertyName);
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }

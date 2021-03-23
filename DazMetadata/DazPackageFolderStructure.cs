@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Windows.Media;
 using Helpers;
 
 namespace DazPackage
@@ -133,8 +132,6 @@ namespace DazPackage
             using var archive = ZipFile.OpenRead(file.ToString());
             var packageType = new PackageType();
 
-
-
             foreach (var entry in archive.Entries)
             {
                 var name = entry.FullName.ToLower();
@@ -149,7 +146,7 @@ namespace DazPackage
                 switch (name)
                 {
                     case "content/data/daz 3d/":
-                        Output.Write("Check: " + file.Name, Brushes.DarkRed,20.0);
+                        Output.Write("Check: " + file.Name, Output.Level.Debug);
                         break;
 
                     default:
@@ -158,7 +155,7 @@ namespace DazPackage
 
                 if (name.EndsWith("/"))
                 {
-                    Output.Write(name, Brushes.Gray, 20);
+                    Output.Write(name, Output.Level.Debug);
                     packageType.MissingDirectory = false;
                 }
             }

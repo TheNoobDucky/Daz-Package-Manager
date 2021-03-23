@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Security.Cryptography;
-using System.Windows.Media;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Windows.Controls;
@@ -21,7 +17,7 @@ namespace Helpers
             {
                 try
                 {
-                    Output.Write("Deleting empty folder: " + folder, Brushes.Blue, 60.0);
+                    Output.Write("Deleting empty folder: " + folder, Output.Level.Info, 60.0);
                     Directory.Delete(folder);
                 }
                 catch (UnauthorizedAccessException) { }
@@ -44,7 +40,7 @@ namespace Helpers
                 var destinationHash = CalculateMD5Hash(new FileInfo(destination));
                 if (sourceHash.SequenceEqual(destinationHash))
                 {
-                    Output.Write("Identical file, deleting: " + source.Name, Brushes.Blue, 20.0);
+                    Output.Write("Identical file, deleting: " + source.Name, Output.Level.Alert, 20.0);
                     try
                     {
                         source.Delete();
@@ -54,7 +50,7 @@ namespace Helpers
                 }
                 else
                 {
-                    Output.Write("Non Identical file, skipping: " + source.Name, Brushes.Red, 0.0);
+                    Output.Write("Non Identical file, skipping: " + source.Name, Output.Level.Warning, 0.0);
                 }
             }
         }
