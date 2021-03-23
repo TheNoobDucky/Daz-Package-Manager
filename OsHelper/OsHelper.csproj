@@ -4,7 +4,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
 	 <UseWindowsForms>true</UseWindowsForms>
 	 <Configurations>Debug;Release;Shipping</Configurations>
-	 <Version>1.2.0</Version>
+	 <Version>1.3.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
