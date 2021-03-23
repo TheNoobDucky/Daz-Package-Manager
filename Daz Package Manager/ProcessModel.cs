@@ -97,8 +97,13 @@ namespace Daz_Package_Manager
             totalTime.Start();
             BackgroundWorker worker = sender as BackgroundWorker;
             var folder = Properties.Settings.Default.InstallManifestFolder;
-            Output.Write("Start processing install archive folder: " + folder, Brushes.Gray, 0.0);
+            if (folder is null or "")
+            {
+                Output.Write("Please set Install Archive folder location", Brushes.Red, 0.0);
+                return;
+            }
 
+            Output.Write("Start processing install archive folder: " + folder, Brushes.Green, 0.0);
             var files = Directory.EnumerateFiles(folder).ToList();
 
             var numberOfFiles = files.Count;
@@ -133,9 +138,13 @@ namespace Daz_Package_Manager
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Packages = (List<InstalledPackage>)e.Result;
-            SaveCache(Properties.Settings.Default.CacheLocation);
-            Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+            if (e.Result is List<InstalledPackage> result)
+            {
+                Packages = result;
+                SaveCache(Properties.Settings.Default.CacheLocation);
+                Output.Write("Finished scaning install archive folder.", Brushes.Blue);
+            }
+
             Working = false;
         }
 
@@ -375,15 +384,38 @@ namespace Daz_Package_Manager
 
         public void SelectFigureBasedOnScene()
         {
-            var sceneLocation = new FileInfo(Properties.Settings.Default.SceneFile);
-            var packagesInScene = SceneFile.PackageInScene(sceneLocation, Packages);
-            packagesInScene.ToList().ForEach(x => x.Selected = true);
+            var sceneLocation = Properties.Settings.Default.SceneFile;
+            try
+            {
+                var sceneFileInfo = new FileInfo(sceneLocation);
+                var packagesInScene = SceneFile.PackageInScene(sceneFileInfo, Packages);
+                Output.Write("Packages Selected:", Brushes.Green);
+                packagesInScene.ToList().ForEach(package=> 
+                {
+                    package.Selected = true;
+                    Output.Write(package.ProductName, Brushes.Gray);
+                });
+
+            } catch (CorruptFileException error)
+            {
+                Output.Write("Invalid scene file: " + error.Message, Brushes.Red);
+            } catch (ArgumentException)
+            {
+                Output.Write("Please select scene file.", Brushes.Red);
+            }
         }
 
         public void GenerateVirtualInstallFolder(string destination)
         {
             var packagesToSave = Packages.Where(x => x.Selected);
 
+            if (destination == null || destination == "")
+            {
+                Output.Write("Please select a location to install virtual packages to.", Brushes.Red);
+                return;
+            }
+
+            Output.Write("Installing to virtual folder location: " + destination, Brushes.Green);
             foreach (var package in packagesToSave)
             {
                 var basePath = package.InstalledLocation;
@@ -397,12 +429,14 @@ namespace Daz_Package_Manager
                     if (errorCode != 0)
                     {
                         var error = SymLinker.DecodeErrorCode(errorCode);
-                        MessageBox.Show("Failed to create symlink. Aborting. Win32 Error message:" + error);
+                        MessageBox.Show("Aborting: \n" +
+                            "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
+                            "Win32 Error Message: " + error);
                         return;
                     }
                 }
             }
-            Output.Write("Install to virtual folder complete.");
+            Output.Write("Install to virtual folder complete.", Brushes.Green);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

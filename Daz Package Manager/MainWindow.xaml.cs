@@ -39,7 +39,6 @@ namespace Daz_Package_Manager
             {
                 destination = Path.Combine(destination, Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile));
                 Directory.CreateDirectory(destination);
-                Output.Write(destination);
             }
             model.GenerateVirtualInstallFolder(destination);
         }

@@ -11,27 +11,50 @@ namespace DazPackage
     {
         public SceneFile(FileInfo sceneLocation)
         {
-            var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
-            var root = sceneContent.RootElement;
+            try
+            {
+                var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
+                var root = sceneContent.RootElement;
+                try
+                {
+                    var imageLibrary = root.GetProperty("image_library").EnumerateArray();
+                    var imageMaps = imageLibrary.SelectMany(x => x.GetProperty("map").EnumerateArray());
+                    ReferencedFile.UnionWith(imageMaps.Select(x => x.GetProperty("url").ToString()));
+                } catch (KeyNotFoundException)
+                {
+                }
 
-            var imageLibrary = root.GetProperty("image_library").EnumerateArray();
-            var imageMaps = imageLibrary.SelectMany(x => x.GetProperty("map").EnumerateArray());
-            ReferencedFile.UnionWith(imageMaps.Select(x => x.GetProperty("url").ToString()));
 
 
+                var scene = root.GetProperty("scene");
+                try
+                {
+                    var modifiers = scene.GetProperty("modifiers").EnumerateArray();
+                    // Find the url section of modifier. Get the first part of the string
+                    ReferencedFile.UnionWith(modifiers.Select(x => x.GetProperty("url").ToString().Split('#')[0]));
+                }
+                catch (KeyNotFoundException)
+                {
+                }
+                try
+                {
+                    var nodes = scene.GetProperty("nodes").EnumerateArray();
+                    ReferencedFile.UnionWith(nodes.Select(x => x.GetProperty("url").ToString().Split('#')[0]));
+                }
+                catch (KeyNotFoundException)
+                {
+                }
 
-            var scene = root.GetProperty("scene");
-            var modifiers = scene.GetProperty("modifiers").EnumerateArray();
-            // Find the url section of modifier. Get the first part of the string
-            ReferencedFile.UnionWith(modifiers.Select(x => x.GetProperty("url").ToString().Split('#')[0]));
+                /// TODO materials.
 
-            var nodes = scene.GetProperty("nodes").EnumerateArray();
-            ReferencedFile.UnionWith(nodes.Select(x => x.GetProperty("url").ToString().Split('#')[0]));
+                // unscape url and remove leading '/'
+                ReferencedFile = ReferencedFile.Select(x=> Uri.UnescapeDataString(x)[1..]).ToHashSet();
 
-            /// TODO materials.
+            } catch (InvalidDataException)
+            {
+                throw new CorruptFileException(sceneLocation.FullName);
+            }
 
-            // unscape url and remove leading '/'
-            ReferencedFile = ReferencedFile.Select(x=> Uri.UnescapeDataString(x)[1..]).ToHashSet();
         }
         public HashSet<string> ReferencedFile { get; private set; } = new HashSet<string>();
 

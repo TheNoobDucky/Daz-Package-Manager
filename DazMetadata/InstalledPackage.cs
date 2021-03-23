@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
 using Helpers;
-using System;
 using SD.Tools.Algorithmia.GeneralDataStructures;
 
 namespace DazPackage
