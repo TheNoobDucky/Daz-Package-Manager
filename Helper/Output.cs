@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -11,11 +7,46 @@ namespace Helpers
 {
     public class Output
     {
+        public enum Level
+        {
+            None,
+            Status,
+            Alert,
+            Info,
+            Debug,
+            Warning,
+            Error,
+            Bug,
+        }
+
         public static void RegisterDebugField(FlowDocument debugField)
         {
             Output.debugField = debugField;
         }
-        public static void Write(string debugText, Brush brush =  null, double indent = 0.0)
+        public static void Write(string debugText, Level level, double indent = 0.0)
+        {
+            var brush = level switch
+            {
+                Level.Status => Brushes.Green,
+                Level.Alert => Brushes.Black,
+                Level.Info => Brushes.Gray,
+                Level.Debug => Brushes.Blue,
+                Level.Warning => Brushes.Orange,
+                Level.Error => Brushes.Red,
+                Level.Bug => Brushes.Yellow,
+                _ => Brushes.White,
+            };
+
+            if (level == Level.Info)
+            {
+                indent = 20.0;
+            }
+
+            Write(debugText, brush, indent);
+        }
+
+
+        private static void Write(string debugText, Brush brush = null, double indent = 0.0)
         {
             if (brush == null)
             {

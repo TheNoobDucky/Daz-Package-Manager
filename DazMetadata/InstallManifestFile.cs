@@ -1,12 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Linq;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using Helpers;
-using System;
-using System.Windows.Media;
-using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace DazPackage
 {
@@ -41,10 +38,10 @@ namespace DazPackage
                 if (installedTypes == "Content")
                 {
                     var fileEntries = content.Elements("File")?.Attributes("VALUE");
-                    
+
                     // Trim "content/" from the path since DIM will skip top level folder.
                     Files = content.Elements("File")?.Select(x =>
-                    { 
+                    {
                         var path = x.Attribute("VALUE")?.Value;
                         var target = x.Attribute("TARGET")?.Value.Length + 1; // +1 for "/" at the of path
                         Debug.Assert(target < path.Length, "Incorrect substring processing in InstallManifestFile");

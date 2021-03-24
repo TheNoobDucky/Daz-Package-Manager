@@ -1,20 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using System.Collections.Generic;
-
-using Helpers;
+using System.Windows.Data;
 
 namespace DazPackage
 {
-    public interface IContenType
+    public class InstalledFile : INotifyPropertyChanged
     {
-        public static bool ContentTypeMatches(string sourceContentType) => throw new NotImplementedException();
-    }
+        public string Image { get; set; }
+        public string Path { get; set; }
+        public string ProductName { get; set; }
+        public AssetTypes AssetType { get; set; } = AssetTypes.Unknown;
+        public string ContentType { get; set; }
+        public Generation Generations { get; set; } = Generation.Unknown;
+        public Gender Genders { get; set; } = Gender.Unknown;
+        private InstalledPackage package = new InstalledPackage();
+        public List<string> Categories { get; set; } = null;
+        public InstalledPackage Package
+        {
+            get { return package; }
+            set
+            {
+                package = value;
+                package.PropertyChanged += Package_PropertyChanged;
+            }
+        }
 
-    public class InstalledFile : IContenType, INotifyPropertyChanged
-    {
         public InstalledFile(InstalledPackage package, AssetMetadata asset)
         {
             Package = package;
@@ -26,11 +41,22 @@ namespace DazPackage
                 foreach (var compatibility in asset.Compatibilities)
                 {
                     Generations |= GetGeneration(compatibility);
+                    Genders |= GetGender(compatibility);
                 }
+
+                if (AssetTypes.Categories.HasFlag(AssetType))
+                {
+                    Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
+                }
+
                 // Unset Unknown flag if any other generation is flagged. 
                 if ((Generations ^ Generation.Unknown) != Generation.None)
                 {
                     Generations ^= Generation.Unknown;
+                }
+                if ((Genders ^ Gender.Unknown) != Gender.None)
+                {
+                    Genders ^= Gender.Unknown;
                 }
                 package.Generations |= Generations;
             }
@@ -38,49 +64,10 @@ namespace DazPackage
 
         public InstalledFile() { }
 
-        public string Image { get; set; }
-        public string Path { get; set; }
-        public string ProductName { get; set; }
-
-        public AssetTypes AssetType { get; set; } = AssetTypes.Unknown;
-
-        public string ContentType { get; set; }
-
-        public Generation Generations { get; set; } = Generation.Unknown;
-        public Gender Genders { get; set; } = Gender.Unknown;
-
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
-        private InstalledPackage package = new InstalledPackage();
-        public InstalledPackage Package
-        {
-            get { return package; }
-            set
-            {
-                package = value;
-                package.PropertyChanged += Package_PropertyChanged;
-            }
-        }
-
-        public static bool ContentTypeMatches(string sourceContentType) => false;
 
 
-
-        /// <summary>
-        /// Pass PropertyChanged event from package back to view.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Package_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged(e.PropertyName);
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
-        protected static Generation GetGeneration(string compatibility)
+        private static Generation GetGeneration(string compatibility)
         {
             return compatibility switch
             {
@@ -90,6 +77,16 @@ namespace DazPackage
                 "/Genesis" => Generation.Genesis_1,
                 string s when s.StartsWith("/Generation4") => Generation.Gen4,
                 _ => Generation.Unknown,
+            };
+        }
+
+        private static Gender GetGender(string compatibility)
+        {
+            return compatibility switch
+            {
+                string s when s.EndsWith("/Female") => Gender.Female,
+                string s when s.EndsWith("/Male") => Gender.Male,
+                _ => Gender.Unknown,
             };
         }
 
@@ -361,5 +358,64 @@ namespace DazPackage
             _ => AssetTypes.None
             #endregion
         };
+
+        /// <summary>
+        /// Pass PropertyChanged event from package back to view.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Package_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(e.PropertyName);
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+
+    public class InstalledItemContentTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string str && str != null)
+            {
+                return str.Replace("/", " ");
+            }
+            return null;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
+            // (kudos Scott Chamberlain), if you do not support a conversion 
+            // back you should return a Binding.DoNothing or a 
+            // DependencyProperty.UnsetValue
+            return Binding.DoNothing;
+            // Original code:
+            // throw new NotImplementedException();
+        }
+    }
+
+    public class InstalledItemCategoriesCnverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is List<string> categoires)
+            {
+                return categoires;
+            }
+            return null;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
+            // (kudos Scott Chamberlain), if you do not support a conversion 
+            // back you should return a Binding.DoNothing or a 
+            // DependencyProperty.UnsetValue
+            return Binding.DoNothing;
+            // Original code:
+            // throw new NotImplementedException();
+        }
     }
 }

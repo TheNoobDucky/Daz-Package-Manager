@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Helpers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Windows.Media;
-using Helpers;
 
 namespace DazPackage
 {
@@ -51,7 +49,7 @@ namespace DazPackage
 
             foreach (var generation in generations)
             {
-                var generationNumber = generation.Value; 
+                var generationNumber = generation.Value;
 
                 foreach (var gender in genders)
                 {
@@ -133,15 +131,13 @@ namespace DazPackage
             using var archive = ZipFile.OpenRead(file.ToString());
             var packageType = new PackageType();
 
-
-
             foreach (var entry in archive.Entries)
             {
                 var name = entry.FullName.ToLower();
 
                 FlagContent del = null;
 
-                if (lookupTable.TryGetValue(name,out del))
+                if (lookupTable.TryGetValue(name, out del))
                 {
                     del(packageType);
                 }
@@ -149,7 +145,7 @@ namespace DazPackage
                 switch (name)
                 {
                     case "content/data/daz 3d/":
-                        Output.Write("Check: " + file.Name, Brushes.DarkRed,20.0);
+                        Output.Write("Check: " + file.Name, Output.Level.Debug);
                         break;
 
                     default:
@@ -158,7 +154,7 @@ namespace DazPackage
 
                 if (name.EndsWith("/"))
                 {
-                    Output.Write(name, Brushes.Gray, 20);
+                    Output.Write(name, Output.Level.Debug);
                     packageType.MissingDirectory = false;
                 }
             }
@@ -173,7 +169,7 @@ namespace DazPackage
             package.CharacterContent.Morphs = true;
         }
 
-        private static void FlagGeneration (PackageType package, int generation)
+        private static void FlagGeneration(PackageType package, int generation)
         {
             switch (generation)
             {

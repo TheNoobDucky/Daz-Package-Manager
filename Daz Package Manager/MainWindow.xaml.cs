@@ -1,13 +1,10 @@
-﻿using System;
-using System.Windows;
-using Helpers;
-using System.IO;
+﻿using Helpers;
 using OsHelper;
-using System.Windows.Controls;
+using System;
 using System.ComponentModel;
-using System.Windows.Data;
 using System.Diagnostics;
-using DazPackage;
+using System.IO;
+using System.Windows;
 
 namespace Daz_Package_Manager
 {
@@ -47,26 +44,22 @@ namespace Daz_Package_Manager
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            var button = (Button)sender;
-            
             if (!model.Working)
-            {   
-                model.Scan();
-            } else
             {
-                model.Cancel();
+                model.Scan();
             }
         }
 
-        private void ScanCompleted (object sender, PropertyChangedEventArgs e)
-        { 
+        private void ScanCompleted(object sender, PropertyChangedEventArgs e)
+        {
             if (e.PropertyName == "Working")
             {
                 var model = (ProcessModel)sender;
                 if (model.Working)
                 {
                     ScanInstallManifestFolderButton.Content = "Waiting For Scan To Complete.";
-                } else
+                }
+                else
                 {
                     ScanInstallManifestFolderButton.Content = "Scan Install Manifest Archive."; // TODO improve this.
                 }
@@ -149,23 +142,6 @@ namespace Daz_Package_Manager
         private void SaveUserSetting(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
-        }
-
-        private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
-        {
-            var tabControl = e.OriginalSource as TabControl;
-
-            if (tabControl != null)
-            {
-                var tabItem = e.AddedItems[0] as TabItem;
-                Helper.TriggerFilterRefresh(tabItem.Content as DataGrid);
-            }
-        }
-
-        private void UpdateDisplayHandler(object sender, RoutedEventArgs e)
-        {
-            var tabItem = DisplayTab.SelectedItem as TabItem;
-            Helper.TriggerFilterRefresh(tabItem.Content as DataGrid);
         }
     }
 }

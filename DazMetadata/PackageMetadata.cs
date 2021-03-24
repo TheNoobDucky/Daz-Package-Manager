@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using System.Diagnostics;
-using System.Linq;
 
 namespace DazPackage
 {
@@ -19,7 +17,7 @@ namespace DazPackage
         {
         }
 
-        public PackageMetadata (FileInfo file) : this(OpenFile(file))
+        public PackageMetadata(FileInfo file) : this(OpenFile(file))
         {
         }
 

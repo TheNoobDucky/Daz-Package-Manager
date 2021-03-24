@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Security.Cryptography;
-using System.Windows.Media;
 using System.IO.Compression;
+using System.Linq;
 using System.Text.Json;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace Helpers
 {
@@ -21,7 +16,7 @@ namespace Helpers
             {
                 try
                 {
-                    Output.Write("Deleting empty folder: " + folder, Brushes.Blue, 60.0);
+                    Output.Write("Deleting empty folder: " + folder, Output.Level.Info, 60.0);
                     Directory.Delete(folder);
                 }
                 catch (UnauthorizedAccessException) { }
@@ -44,7 +39,7 @@ namespace Helpers
                 var destinationHash = CalculateMD5Hash(new FileInfo(destination));
                 if (sourceHash.SequenceEqual(destinationHash))
                 {
-                    Output.Write("Identical file, deleting: " + source.Name, Brushes.Blue, 20.0);
+                    Output.Write("Identical file, deleting: " + source.Name, Output.Level.Alert, 20.0);
                     try
                     {
                         source.Delete();
@@ -54,7 +49,7 @@ namespace Helpers
                 }
                 else
                 {
-                    Output.Write("Non Identical file, skipping: " + source.Name, Brushes.Red, 0.0);
+                    Output.Write("Non Identical file, skipping: " + source.Name, Output.Level.Warning, 0.0);
                 }
             }
         }
@@ -66,19 +61,36 @@ namespace Helpers
             return md5.ComputeHash(sourceStream);
         }
 
-        public static JsonDocument ReadJsonFromGZfile (FileInfo file)
+        public static JsonDocument ReadJsonFromGZfile(FileInfo file)
         {
             using var sceneStream = file.OpenRead();
             using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
             return JsonDocument.Parse(scene);
         }
 
-        public static void TriggerFilterRefresh (DataGrid dataGrid)
+        public static void TriggerFilterRefresh(ItemsControl dataGrid)
         {
             if (dataGrid != null && dataGrid.ItemsSource != null)
             {
-                CollectionViewSource.GetDefaultView(dataGrid.ItemsSource).Refresh();
+                //CollectionViewSource.GetDefaultView(dataGrid.ItemsSource).Refresh();
             }
+        }
+
+        private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
+        {
+            var tabControl = e.OriginalSource as TabControl;
+
+            if (tabControl != null)
+            {
+                var tabItem = e.AddedItems[0] as TabItem;
+                Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
+            }
+        }
+
+        private void UpdateDisplayHandler(object sender, RoutedEventArgs e)
+        {
+            //var tabItem = DisplayTab.SelectedItem as TabItem;
+            //Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
         }
     }
 }
