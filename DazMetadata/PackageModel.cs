@@ -62,7 +62,7 @@ namespace Daz_Package_Manager
             var end = 0;
             var sanityCheck = 0;
             var packages = new ConcurrentBag<InstalledPackage>();
-            Output.Write("Processing " + numberOfFiles + " files.", Output.Level.Error);
+            Output.Write("Processing " + numberOfFiles + " files.", Output.Level.Status);
 
             var timer = new Stopwatch();
             timer.Start();
@@ -97,8 +97,7 @@ namespace Daz_Package_Manager
                 }
             }
             Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
-            Output.Write(totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
-
+            Output.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
             e.Result = packages.ToList();
         }
 

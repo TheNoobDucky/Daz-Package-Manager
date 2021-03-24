@@ -397,7 +397,7 @@
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="TODO">
+            <TabItem Header="Unassigned">
                 <DataGrid Name="TODODisplay" ItemsSource="{Binding TODO.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
