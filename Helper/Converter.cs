@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace Helpers
@@ -19,7 +15,7 @@ namespace Helpers
                 if (xg.Name is string xs && yg.Name is string ys)
                 {
                     // higher group number have lower priority
-                    return comparer.Compare(xs,ys);
+                    return comparer.Compare(xs, ys);
                 }
             }
             throw new NotImplementedException();

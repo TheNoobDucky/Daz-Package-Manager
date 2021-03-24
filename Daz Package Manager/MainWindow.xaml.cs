@@ -1,13 +1,10 @@
-﻿using System;
-using System.Windows;
-using Helpers;
-using System.IO;
+﻿using Helpers;
 using OsHelper;
-using System.Windows.Controls;
+using System;
 using System.ComponentModel;
-using System.Windows.Data;
 using System.Diagnostics;
-using DazPackage;
+using System.IO;
+using System.Windows;
 
 namespace Daz_Package_Manager
 {
@@ -46,22 +43,23 @@ namespace Daz_Package_Manager
         }
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
-        {            
+        {
             if (!model.Working)
-            {   
+            {
                 model.Scan();
             }
         }
 
-        private void ScanCompleted (object sender, PropertyChangedEventArgs e)
-        { 
+        private void ScanCompleted(object sender, PropertyChangedEventArgs e)
+        {
             if (e.PropertyName == "Working")
             {
                 var model = (ProcessModel)sender;
                 if (model.Working)
                 {
                     ScanInstallManifestFolderButton.Content = "Waiting For Scan To Complete.";
-                } else
+                }
+                else
                 {
                     ScanInstallManifestFolderButton.Content = "Scan Install Manifest Archive."; // TODO improve this.
                 }

@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Helpers;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using Helpers;
-using System.Windows.Media;
+using System.Linq;
 using System.Text.Json;
 using static System.Text.Json.JsonElement;
 
@@ -15,7 +14,7 @@ namespace DazPackage
         {
             static string GetUrl(JsonElement element)
             {
-                var result = new JsonElement ();
+                var result = new JsonElement();
                 return element.TryGetProperty("url", out result) ? result.ToString() : "";
             }
 
@@ -33,8 +32,8 @@ namespace DazPackage
                 var imageLibrary = new JsonElement();
                 if (root.TryGetProperty("image_library", out imageLibrary))
                 {
-                        var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
-                        ReferencedFile.UnionWith(imageMaps.Select(GetUrl));
+                    var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
+                    ReferencedFile.UnionWith(imageMaps.Select(GetUrl));
                 }
 
                 var scene = new JsonElement();

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text.Json;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace Helpers
 {
@@ -63,14 +61,14 @@ namespace Helpers
             return md5.ComputeHash(sourceStream);
         }
 
-        public static JsonDocument ReadJsonFromGZfile (FileInfo file)
+        public static JsonDocument ReadJsonFromGZfile(FileInfo file)
         {
             using var sceneStream = file.OpenRead();
             using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
             return JsonDocument.Parse(scene);
         }
 
-        public static void TriggerFilterRefresh (ItemsControl dataGrid)
+        public static void TriggerFilterRefresh(ItemsControl dataGrid)
         {
             if (dataGrid != null && dataGrid.ItemsSource != null)
             {

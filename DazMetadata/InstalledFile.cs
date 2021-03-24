@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows.Data;
-using Helpers;
 
 namespace DazPackage
 {

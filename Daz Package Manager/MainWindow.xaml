@@ -163,7 +163,7 @@
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <TabItem Header="Packages">
                 <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False"
-                        AutoGenerateColumns="False" >
+                        AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />

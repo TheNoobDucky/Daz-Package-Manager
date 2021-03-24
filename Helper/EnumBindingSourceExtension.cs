@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Markup;
 
 // Inspiration https://www.youtube.com/watch?v=Bp5LFXjwtQ0
@@ -13,7 +9,7 @@ namespace Helpers
     {
         public Type EnumType { get; private set; }
 
-        public FlagEnumBindingSourceExtension (Type enumType)
+        public FlagEnumBindingSourceExtension(Type enumType)
         {
             if (enumType is null || !enumType.IsEnum)
             {

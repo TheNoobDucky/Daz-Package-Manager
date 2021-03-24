@@ -72,7 +72,7 @@ namespace DazPackage
             // throw new NotImplementedException();
         }
 
-        public static int GroupNumber (string str)
+        public static int GroupNumber(string str)
         {
             return str switch
             {
@@ -82,7 +82,7 @@ namespace DazPackage
                 "Genesis" => 3,
                 "Gen 4" => 4,
                 "Unknwon" => 50,
-                _=> 100
+                _ => 100
             };
         }
     }
@@ -153,7 +153,7 @@ namespace DazPackage
         TODO = 1 << 29,
 
         Shown = Accessory | Attachment | Character | Clothing | Hair | Morph | Prop | Pose | TODO,
-        Other = Expression | Eyebrow | Tear | Script | Scene | Light  | Shape | Animation ,
+        Other = Expression | Eyebrow | Tear | Script | Scene | Light | Shape | Animation,
         Handled = Shown | Other,
         NotProcessed = Material | Skipped | Support | Missing,
         Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose,

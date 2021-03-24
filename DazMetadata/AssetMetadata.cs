@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Linq;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace DazPackage
 {
     public class AssetMetadata
     {
-        public AssetMetadata (XElement asset)
+        public AssetMetadata(XElement asset)
         {
             Name = asset.Attribute("VALUE")?.Value;
             ContentType = asset.Element("ContentType")?.Attribute("VALUE")?.Value;
@@ -23,7 +23,7 @@ namespace DazPackage
                 .Select(x => x.Value)
                 .ToList();
         }
-        public AssetMetadata () { }
+        public AssetMetadata() { }
         public string Name { get; set; }
         public string ContentType { get; set; }
         public List<string> Categories { get; set; }

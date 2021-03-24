@@ -46,7 +46,7 @@ namespace Helpers
         }
 
 
-        private static void Write(string debugText, Brush brush =  null, double indent = 0.0)
+        private static void Write(string debugText, Brush brush = null, double indent = 0.0)
         {
             if (brush == null)
             {

@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 
 namespace OsHelper
 {
@@ -8,7 +8,7 @@ namespace OsHelper
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, UInt32 dwFlags);
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -21,7 +21,7 @@ namespace OsHelper
             var success = CreateSymbolicLink(dest, source, (UInt32)isFile);
             if (!success)
             {
-                var errorCode =  Marshal.GetLastWin32Error();
+                var errorCode = Marshal.GetLastWin32Error();
                 if (errorCode == 0x000000B7) // File already exist
                 {
                     return 0;
@@ -33,11 +33,11 @@ namespace OsHelper
         public enum SymbolicLink : UInt32
         {
             AllowUnprevileged = 0x2,
-            File = (0x0| AllowUnprevileged),
-            Directory = (0x1|AllowUnprevileged),
+            File = (0x0 | AllowUnprevileged),
+            Directory = (0x1 | AllowUnprevileged),
         }
 
-        public static string DecodeErrorCode (int errorCode)
+        public static string DecodeErrorCode(int errorCode)
         {
             return new Win32Exception(errorCode).Message;
         }

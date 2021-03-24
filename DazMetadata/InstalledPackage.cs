@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Helpers;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Helpers;
-using SD.Tools.Algorithmia.GeneralDataStructures;
 
 namespace DazPackage
 {
@@ -30,7 +29,7 @@ namespace DazPackage
         public List<InstalledFile> Items { get; set; } = new List<InstalledFile>();
         public List<InstalledFile> OtherItems { get; set; } = new List<InstalledFile>();
 
-        public InstalledPackage (FileInfo fileInfo)
+        public InstalledPackage(FileInfo fileInfo)
         {
             var installManifest = new InstallManifestFile(fileInfo);
             ProductName = installManifest.ProductName;
@@ -74,7 +73,7 @@ namespace DazPackage
                             Output.Write(asset.ContentType + " : " + asset.Name, Output.Level.Debug);
                         }
                     }
-                } 
+                }
                 catch (FileNotFoundException)
                 {
                     Output.Write("Missing metadatafile: " + metadataFilePath, Output.Level.Error);
@@ -93,7 +92,7 @@ namespace DazPackage
         public InstalledPackage() { }
 
         private bool selected = false;
-        private static string FindImage (string assetPath)
+        private static string FindImage(string assetPath)
         {
             var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
 

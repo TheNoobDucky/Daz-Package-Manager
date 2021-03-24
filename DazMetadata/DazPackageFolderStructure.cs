@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Helpers;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using Helpers;
 
 namespace DazPackage
 {
@@ -50,7 +49,7 @@ namespace DazPackage
 
             foreach (var generation in generations)
             {
-                var generationNumber = generation.Value; 
+                var generationNumber = generation.Value;
 
                 foreach (var gender in genders)
                 {
@@ -138,7 +137,7 @@ namespace DazPackage
 
                 FlagContent del = null;
 
-                if (lookupTable.TryGetValue(name,out del))
+                if (lookupTable.TryGetValue(name, out del))
                 {
                     del(packageType);
                 }
@@ -170,7 +169,7 @@ namespace DazPackage
             package.CharacterContent.Morphs = true;
         }
 
-        private static void FlagGeneration (PackageType package, int generation)
+        private static void FlagGeneration(PackageType package, int generation)
         {
             switch (generation)
             {

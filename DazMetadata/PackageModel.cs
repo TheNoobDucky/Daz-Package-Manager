@@ -102,13 +102,13 @@ namespace Daz_Package_Manager
             e.Result = packages.ToList();
         }
 
-        public void RebuildCache ()
+        public void RebuildCache()
         {
             foreach (var item in packages.SelectMany(x => x.Items))
             {
                 ItemsCache.AddAsset(item, item.AssetType, item.Generations, item.Genders);
             }
-            foreach (var item in packages.SelectMany(x=>x.OtherItems))
+            foreach (var item in packages.SelectMany(x => x.OtherItems))
             {
                 ItemsCache.AddAsset(item, AssetTypes.Other, item.Generations, item.Genders);
             }

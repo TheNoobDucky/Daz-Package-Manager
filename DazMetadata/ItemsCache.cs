@@ -1,10 +1,8 @@
-﻿using System;
+﻿using SD.Tools.Algorithmia.GeneralDataStructures;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SD.Tools.Algorithmia.GeneralDataStructures;
 
 namespace DazPackage
 {
@@ -14,10 +12,10 @@ namespace DazPackage
 
         public IEnumerable<InstalledFile> GetAssets(AssetTypes assetType, Generation generation = Generation.All, Gender gender = Gender.All)
         {
-            return cache.Where(x => x.Key.CheckFlag(assetType)).SelectMany(x=>x.Value.GetAssets(generation,gender));
+            return cache.Where(x => x.Key.CheckFlag(assetType)).SelectMany(x => x.Value.GetAssets(generation, gender));
         }
 
-        public void AddAsset (InstalledFile file, AssetTypes assetType, Generation generation, Gender gender)
+        public void AddAsset(InstalledFile file, AssetTypes assetType, Generation generation, Gender gender)
         {
             if (!cache.TryGetValue(assetType, out GenerationCache gen))
             {
@@ -52,7 +50,7 @@ namespace DazPackage
 
         public IEnumerable<InstalledFile> GetAssets(Generation generation, Gender gender = Gender.All)
         {
-            return cache.Where(x=> x.Key.CheckFlag(generation)).SelectMany(x=>x.Value.GetAssets(gender));
+            return cache.Where(x => x.Key.CheckFlag(generation)).SelectMany(x => x.Value.GetAssets(gender));
         }
         public void AddAsset(InstalledFile file, Generation generation, Gender gender)
         {
@@ -61,12 +59,12 @@ namespace DazPackage
                 gen = new GenderCache();
                 cache.Add(generation, gen);
             }
-            gen.AddAsset(file,gender);
+            gen.AddAsset(file, gender);
         }
 
         public void Merge(GenerationCache other)
         {
-            foreach (var (key,value) in other.cache)
+            foreach (var (key, value) in other.cache)
             {
                 cache.GetValueOrDefault(key).Merge(value);
             }
@@ -77,12 +75,12 @@ namespace DazPackage
     {
         public MultiValueDictionary<Gender, InstalledFile> cache { get; set; } = new MultiValueDictionary<Gender, InstalledFile>();
 
-        public IEnumerable<InstalledFile> GetAssets (Gender gender)
+        public IEnumerable<InstalledFile> GetAssets(Gender gender)
         {
-            return cache.Where(x => x.Key.CheckFlag(gender)).SelectMany(x=>x.Value);
+            return cache.Where(x => x.Key.CheckFlag(gender)).SelectMany(x => x.Value);
         }
 
-        public void AddAsset (InstalledFile file, Gender gender)
+        public void AddAsset(InstalledFile file, Gender gender)
         {
             cache.Add(gender, file);
         }

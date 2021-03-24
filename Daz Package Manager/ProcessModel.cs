@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DazPackage;
+using Helpers;
+using OsHelper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -8,10 +11,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Data;
-
-using DazPackage;
-using Helpers;
-using OsHelper;
 namespace Daz_Package_Manager
 {
     class ProcessModel : INotifyPropertyChanged
@@ -34,17 +33,17 @@ namespace Daz_Package_Manager
             {
                 SaveCache(Properties.Settings.Default.CacheLocation);
                 Working = false;
-            } 
+            }
             else
             {
 
             }
-             UpdateSelections();
+            UpdateSelections();
         }
 
         public void UpdateSelections()
         {
-            PackagesViewSource.Source = packageModel.Packages.Where(x=>x.Generations.CheckFlag(showingGeneration));
+            PackagesViewSource.Source = packageModel.Packages.Where(x => x.Generations.CheckFlag(showingGeneration));
             Accessories.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Accessory, showingGeneration, showingGender);
             Attachments.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Attachment, showingGeneration, showingGender);
             Characters.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Character, showingGeneration, showingGender);
@@ -90,7 +89,7 @@ namespace Daz_Package_Manager
         private bool working = false;
         public bool Working
         {
-            get => working; 
+            get => working;
             private set
             {
                 working = value;
@@ -200,7 +199,7 @@ namespace Daz_Package_Manager
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
-                packageModel.ScanInstallManifestFolderAsync(Properties.Settings.Default.InstallManifestFolder); 
+                packageModel.ScanInstallManifestFolderAsync(Properties.Settings.Default.InstallManifestFolder);
             }
         }
 

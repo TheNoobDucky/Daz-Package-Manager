@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace OsHelper
 {
@@ -20,7 +17,7 @@ namespace OsHelper
         }
     }
     public class SelectFile
-    { 
+    {
         public static (bool success, string location) AskForLocation()
         {
             OpenFileDialog dialog = new OpenFileDialog();
