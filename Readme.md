@@ -73,17 +73,13 @@ There is an option to create it in a subfolder with scene file name.
 Step 6: Add the virtual folder as a base folder in Daz Studio. 
 Remove base folders that contains contents you dont want daz to see.
 
-
-## Planned Features
-
-1. Handle experssions (they are considered as pose?).
-2. Implement some sort of search functionality.
-3. Detect character gender.
-4. Image grid
-
 ## Version Log
 
-Recommand V1.3.4
+V1.4.0
+New Features:
+
+* Image gallery for character, clothing, hair, and poses.
+* Performance improvement by grouping items.
 
 V1.3.4
 Bugfix: 
