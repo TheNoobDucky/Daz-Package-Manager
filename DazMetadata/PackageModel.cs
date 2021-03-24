@@ -103,6 +103,8 @@ namespace Daz_Package_Manager
 
         public void RebuildCache()
         {
+            ItemsCache.Clear();
+
             foreach (var item in packages.SelectMany(x => x.Items))
             {
                 ItemsCache.AddAsset(item, item.AssetType, item.Generations, item.Genders);

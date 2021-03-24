@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows.Data;
@@ -43,9 +44,9 @@ namespace DazPackage
                     Genders |= GetGender(compatibility);
                 }
 
-                if (AssetType.HasFlag(AssetTypes.Pose) || AssetType.HasFlag(AssetTypes.Character) || AssetType.HasFlag(AssetTypes.Clothing))
+                if (AssetTypes.Categories.HasFlag(AssetType))
                 {
-                    Categories = asset.Categories;
+                    Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
                 }
 
                 // Unset Unknown flag if any other generation is flagged. 

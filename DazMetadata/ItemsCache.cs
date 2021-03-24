@@ -33,6 +33,11 @@ namespace DazPackage
             }
         }
 
+        public void Clear()
+        {
+            cache.Clear();
+        }
+
         public static AssetCache MergeAllBags(ConcurrentBag<AssetCache> items)
         {
             var result = new AssetCache();

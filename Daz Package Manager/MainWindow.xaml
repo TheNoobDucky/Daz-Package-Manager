@@ -421,7 +421,7 @@
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="Clothings Viewer">
+            <TabItem Header="Clothings Gallery">
                 <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
                         ItemTemplate="{StaticResource ImageBox}">
                     <ListBox.ItemsPanel>
@@ -441,7 +441,7 @@
 
             </TabItem>
 
-            <TabItem Header="Characters Viewer">
+            <TabItem Header="Characters Gallery">
                 <ListBox Name="CharactersViewer" ItemsSource="{Binding Characters.View}"
                         ItemTemplate="{StaticResource ImageBox}">
                     <ListBox.ItemsPanel>
@@ -460,7 +460,26 @@
                 </ListBox>
             </TabItem>
 
-            <TabItem Header="Poses Viewer">
+            <TabItem Header="Hairs Gallery">
+                <ListBox Name="HairsViewer" ItemsSource="{Binding Hairs.View}"
+                        ItemTemplate="{StaticResource ImageBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=CharactersViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource GroupedDataHeader}"
+                                ContainerStyle="{StaticResource GroupedDataRow}">
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                </ListBox>
+            </TabItem>
+
+            <TabItem Header="Poses Gallery">
                 <ListBox Name="PosesViewer" ItemsSource="{Binding Poses.View}" ItemTemplate="{StaticResource ImageBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
