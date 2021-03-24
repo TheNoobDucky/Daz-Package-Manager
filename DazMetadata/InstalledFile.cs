@@ -38,11 +38,16 @@ namespace DazPackage
                 foreach (var compatibility in asset.Compatibilities)
                 {
                     Generations |= GetGeneration(compatibility);
+                    Genders |= GetGender(compatibility);
                 }
                 // Unset Unknown flag if any other generation is flagged. 
                 if ((Generations ^ Generation.Unknown) != Generation.None)
                 {
                     Generations ^= Generation.Unknown;
+                }
+                if ((Genders ^ Gender.Unknown) != Gender.None)
+                {
+                    Genders ^= Gender.Unknown;
                 }
                 package.Generations |= Generations;
             }
@@ -53,7 +58,7 @@ namespace DazPackage
         [JsonIgnore] public bool Selected { get { return Package.Selected; } set { Package.Selected = value; OnPropertyChanged(); } }
 
 
-        protected static Generation GetGeneration(string compatibility)
+        private static Generation GetGeneration(string compatibility)
         {
             return compatibility switch
             {
@@ -63,6 +68,16 @@ namespace DazPackage
                 "/Genesis" => Generation.Genesis_1,
                 string s when s.StartsWith("/Generation4") => Generation.Gen4,
                 _ => Generation.Unknown,
+            };
+        }
+
+        private static Gender GetGender (string compatibility)
+        {
+            return compatibility switch
+            {
+                string s when s.EndsWith("/Famale") => Gender.Female,
+                string s when s.EndsWith("/Male") => Gender.Male,
+                _ => Gender.Unknown,
             };
         }
 

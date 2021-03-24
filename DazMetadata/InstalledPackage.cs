@@ -93,6 +93,7 @@ namespace DazPackage
         private static string FindImage (string assetPath)
         {
             var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
+
             if (!File.Exists(figureImage))
             {
                 figureImage = Path.ChangeExtension(assetPath, ".png");

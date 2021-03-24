@@ -3,19 +3,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
-        xmlns:Helper="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:Helpers="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties" mc:Ignorable="d" Title="MainWindow"
         Height="1200" Width="1500">
     <Window.Resources>
         <DataTemplate x:Key="SelectCheckbox">
             <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
         </DataTemplate>
+        <Helpers:NullImageConverter x:Key="nullImageConverter" />
+
         <DataTemplate x:Key="ImageBox">
-            <Image Name="Image"
-                    Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}},Path=DataContext.ImageSize}"
-                    Source="{Binding Image}" />
+            <Image Name="Image" Source="{Binding Image, Converter={StaticResource nullImageConverter}, IsAsync=true}" />
         </DataTemplate>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <Thickness x:Key="DefaultMargin" Top="5" Left="5" Right="5" Bottom="5"></Thickness>
     </Window.Resources>
 
 
@@ -27,7 +28,7 @@
 
         <FrameworkElement x:Name="DummyContext" Width="{Binding ImageSize}" Visibility="Collapsed" />
 
-        <Grid Grid.Row="0" Grid.Column="0" Margin="5 5">
+        <Grid Grid.Row="0" Grid.Column="0" Margin="{StaticResource DefaultMargin}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
@@ -48,48 +49,48 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="5 5" />
-            <Button Grid.Row="0" Grid.Column="1" Click="SelectInstallManifestFolder" Margin="5 5"
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="{StaticResource DefaultMargin}" />
+            <Button Grid.Row="0" Grid.Column="1" Click="SelectInstallManifestFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Select Install Manifest Archive Folder" />
-            <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" IsReadOnly="True" Margin="5 5"
+            <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" IsReadOnly="True" Margin="{StaticResource DefaultMargin}"
                     DataContext="{x:Static properties:Settings.Default}" Text="{Binding InstallManifestFolder}" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="5 5" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="1" Grid.Column="1" Name="ScanInstallManifestFolderButton"
-                    Click="ScanInstallManifestFolder" Margin="5 5" Content="Scan Install Manifest Archive" />
+                    Click="ScanInstallManifestFolder" Margin="{StaticResource DefaultMargin}" Content="Scan Install Manifest Archive" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="5 5" />
-            <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="5 5"
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="{StaticResource DefaultMargin}" />
+            <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="{StaticResource DefaultMargin}"
                     Content="Select Scene File(Optional)" />
-            <TextBox Grid.Row="2" Grid.Column="2" Name="SceneFileLocation" IsReadOnly="True" Margin="5 5"
-                    DataContext="{x:Static properties:Settings.Default}" Text="{Binding SceneFile}" />
+            <TextBox Grid.Row="2" Grid.Column="2" Name="SceneFileLocation" IsReadOnly="True"
+                    Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}" Text="{Binding SceneFile}" />
 
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="5 5" />
-            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="5 5" Padding="5,1"
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="{StaticResource DefaultMargin}" />
+            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene" Margin="{StaticResource DefaultMargin}" Padding="5,1"
                     Content="Select Package Based On Scene (Optional)" />
             
-            <CheckBox Grid.Row="3" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
+            <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding BatchProcessScene}"
                     Content="Batch select packages all scenes in the same folder" />
             
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="5 5" />
-            <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="5 5"
+            <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="{StaticResource DefaultMargin}" />
+            <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Select Output Folder Location" />
-            <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" IsReadOnly="True" Margin="5 5"
+            <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" IsReadOnly="True" Margin="{StaticResource DefaultMargin}"
                     DataContext="{x:Static properties:Settings.Default}" Text="{Binding OutputFolder}" />
 
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="5 5" />
-            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="5 5"
+            <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="{StaticResource DefaultMargin}" />
+            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Generate Virtual Install Folder" />
 
-            <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="5 5"
+            <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Where To Save Cache File" />
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
-                    Margin="5 5" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" />
+                    Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}" Text="{Binding CacheLocation}" />
 
-            <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="5 5"
+            <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="{StaticResource DefaultMargin}"
                     Content="Clear Package Selection" />
-            <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="5 5" Visibility="Hidden"
+            <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="{StaticResource DefaultMargin}" Visibility="Hidden"
                     Content="Reload Cache" />
 
             <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Grid.RowSpan="2">
@@ -129,7 +130,7 @@
                           Margin="5 1" Checked="UpdateDisplayHandler" Unchecked="UpdateDisplayHandler" />
             </StackPanel>
 
-            <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 5" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting" Unchecked="SaveUserSetting"
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
                     Content="Create subfolder based on scene name" />
 
@@ -165,6 +166,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -184,6 +186,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -203,6 +206,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -222,6 +226,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -241,6 +246,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -260,6 +266,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />                        
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -279,6 +286,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />                        
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -298,6 +306,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />                        
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -317,6 +326,7 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
@@ -336,10 +346,23 @@
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generation" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Gender" Binding="{Binding Genders}" IsReadOnly="True" />                        
                         <DataGridTextColumn Header="Content Type" Binding="{Binding ContentType}" IsReadOnly="True" />
 
                     </DataGrid.Columns>
                 </DataGrid>
+            </TabItem>
+
+            <TabItem Header="Clothings Viewer">
+                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Others.View}"
+                        ItemTemplate="{StaticResource ImageBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Width="{Binding ImageSize}" Orientation="Horizontal"
+                                    MaxWidth="{Binding ActualWidth, ElementName=ClothingsViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
             </TabItem>
 
             <TabItem Header="Log Output">
@@ -354,7 +377,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Logs:" />
-                    <Button Grid.Row="0" Grid.Column="1" Margin="5 5" Click="ClearDebugLogHandler" Content="Clear Log" />
+                    <Button Grid.Row="0" Grid.Column="1" Margin="{StaticResource DefaultMargin}" Click="ClearDebugLogHandler" Content="Clear Log" />
                     <ScrollViewer Grid.Row="1" Grid.ColumnSpan="100 " VerticalScrollBarVisibility="Visible"
                             HorizontalScrollBarVisibility="Visible">
                         <RichTextBox Name="DebugRtb" Background="LightGray" Grid.Row="1"
