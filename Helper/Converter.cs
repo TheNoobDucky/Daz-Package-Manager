@@ -12,6 +12,14 @@ namespace Helpers
         {
             if (x is CollectionViewGroup xg && y is CollectionViewGroup yg)
             {
+                if (xg.Name == null )
+                {
+                    return 1;
+                }
+                if (yg.Name == null)
+                {
+                    return -1;
+                }
                 if (xg.Name is string xs && yg.Name is string ys)
                 {
                     // higher group number have lower priority

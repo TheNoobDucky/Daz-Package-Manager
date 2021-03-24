@@ -72,16 +72,18 @@ namespace Daz_Package_Manager
         public ProcessModel()
         {
             PackagesViewSource.GroupDescriptions.Add(packageGroup);
-            Accessories.GroupDescriptions.Add(ItemGroup);
-            Attachments.GroupDescriptions.Add(ItemGroup);
-            Characters.GroupDescriptions.Add(ItemGroup);
-            Clothings.GroupDescriptions.Add(ItemGroup);
-            Hairs.GroupDescriptions.Add(ItemGroup);
-            Morphs.GroupDescriptions.Add(ItemGroup);
-            Poses.GroupDescriptions.Add(ItemGroup);
-            Props.GroupDescriptions.Add(ItemGroup);
-            Others.GroupDescriptions.Add(ItemGroup);
-            TODO.GroupDescriptions.Add(ItemGroup);
+            Accessories.GroupDescriptions.Add(itemContentGrouping);
+            Attachments.GroupDescriptions.Add(itemContentGrouping);
+            Clothings.GroupDescriptions.Add(itemContentGrouping);
+            Hairs.GroupDescriptions.Add(itemContentGrouping);
+            Morphs.GroupDescriptions.Add(itemContentGrouping);
+            Props.GroupDescriptions.Add(itemContentGrouping);
+            Others.GroupDescriptions.Add(itemContentGrouping);
+            TODO.GroupDescriptions.Add(itemContentGrouping);
+
+
+            Characters.GroupDescriptions.Add(itemCategoriesGrouping);
+            Poses.GroupDescriptions.Add(itemCategoriesGrouping);
 
             packageModel.PropertyChanged += ModelChangedHandler;
         }
@@ -327,16 +329,23 @@ namespace Daz_Package_Manager
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private static InstalledItemGroupingConverter installedItemGroupingConverter = new InstalledItemGroupingConverter();
-        private static GenerationStringConverter generationStringConverter = new GenerationStringConverter();
-        private static GenerationGroupCompare generationGroupCompare = new GenerationGroupCompare();
-        private static StringCompareHelper itemGroupCompare = new StringCompareHelper();
-        private static PropertyGroupDescription packageGroup = new PropertyGroupDescription("Generations", generationStringConverter)
+        private static readonly GenerationStringConverter generationStringConverter = new GenerationStringConverter();
+        private static readonly GenerationGroupCompare generationGroupCompare = new GenerationGroupCompare();
+        private static readonly PropertyGroupDescription packageGroup = new PropertyGroupDescription("Generations", generationStringConverter)
         {
             CustomSort = generationGroupCompare
         };
 
-        private static PropertyGroupDescription ItemGroup = new PropertyGroupDescription("ContentType", installedItemGroupingConverter)
+        private static readonly StringCompareHelper itemGroupCompare = new StringCompareHelper();
+
+        private static readonly InstalledItemContentTypeConverter installedItemContentTypeConverter = new InstalledItemContentTypeConverter();
+        private static readonly PropertyGroupDescription itemContentGrouping = new PropertyGroupDescription("ContentType", installedItemContentTypeConverter)
+        {
+            CustomSort = itemGroupCompare
+        };
+
+        private static readonly InstalledItemCategoriesCnverter installedItemCategoriesConverter = new InstalledItemCategoriesCnverter();
+        private static readonly PropertyGroupDescription itemCategoriesGrouping = new PropertyGroupDescription("Categories", installedItemCategoriesConverter)
         {
             CustomSort = itemGroupCompare
         };
