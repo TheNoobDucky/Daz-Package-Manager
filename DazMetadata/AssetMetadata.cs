@@ -8,13 +8,8 @@ namespace DazPackage
     {
         public AssetMetadata (XElement asset)
         {
-            Name = asset.Attribute("VALUE").Value;
-            var content = asset.Element("ContentType");
-            if (content != null)
-            {
-                ContentType = content.Attribute("VALUE").Value;
-            }
-
+            Name = asset.Attribute("VALUE")?.Value;
+            ContentType = asset.Element("ContentType")?.Attribute("VALUE")?.Value;
             Categories = asset
                 .Elements("Categories")
                 .Elements("Category")

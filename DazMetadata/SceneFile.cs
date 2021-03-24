@@ -4,6 +4,8 @@ using System.Linq;
 using System.IO;
 using Helpers;
 using System.Windows.Media;
+using System.Text.Json;
+using static System.Text.Json.JsonElement;
 
 namespace DazPackage
 {
@@ -11,46 +13,55 @@ namespace DazPackage
     {
         public SceneFile(FileInfo sceneLocation)
         {
+            static string GetUrl(JsonElement element)
+            {
+                var result = new JsonElement ();
+                return element.TryGetProperty("url", out result) ? result.ToString() : "";
+            }
+
+            static ArrayEnumerator GetMap(JsonElement element)
+            {
+                var result = new JsonElement();
+                return element.TryGetProperty("map", out result) ? result.EnumerateArray() : new ArrayEnumerator();
+            }
+
             try
             {
                 var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
                 var root = sceneContent.RootElement;
-                try
+
+                var imageLibrary = new JsonElement();
+                if (root.TryGetProperty("image_library", out imageLibrary))
                 {
-                    var imageLibrary = root.GetProperty("image_library").EnumerateArray();
-                    var imageMaps = imageLibrary.SelectMany(x => x.GetProperty("map").EnumerateArray());
-                    ReferencedFile.UnionWith(imageMaps.Select(x => x.GetProperty("url").ToString()));
-                } 
-                catch (KeyNotFoundException)
-                {
+                        var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
+                        ReferencedFile.UnionWith(imageMaps.Select(GetUrl));
                 }
 
-                var scene = root.GetProperty("scene");
-                try
+                var scene = new JsonElement();
+                if (root.TryGetProperty("scene", out scene))
                 {
-                    var modifiers = scene.GetProperty("modifiers").EnumerateArray();
-                    // Find the url section of modifier. Get the first part of the string
-                    ReferencedFile.UnionWith(modifiers.Select(x => x.GetProperty("url").ToString().Split('#')[0]));
-                }
-                catch (KeyNotFoundException)
-                {
-                }
-                try
-                {
-                    var nodes = scene.GetProperty("nodes").EnumerateArray();
-                    ReferencedFile.UnionWith(nodes.Select(x => x.GetProperty("url").ToString().Split('#')[0]));
-                }
-                catch (KeyNotFoundException)
-                {
-                }
+                    var modifiers = new JsonElement();
+                    if (scene.TryGetProperty("modifiers", out modifiers))
+                    {
+                        ReferencedFile.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                    }
 
-                /// TODO materials.
+                    var nodes = new JsonElement();
+                    if (scene.TryGetProperty("nodes", out nodes))
+                    {
+                        // Find the url section of modifier. Get the first part of the string
+                        ReferencedFile.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                    }
+
+                    /// TODO materials.
+                }
 
                 ReferencedFile.Remove("");
                 // unscape url and remove leading '/'
-                ReferencedFile = ReferencedFile.Select(x=> Uri.UnescapeDataString(x)[1..]).ToHashSet();
+                ReferencedFile = ReferencedFile.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
 
-            } catch (InvalidDataException)
+            }
+            catch (InvalidDataException)
             {
                 throw new CorruptFileException(sceneLocation.FullName);
             }

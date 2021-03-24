@@ -133,6 +133,10 @@ namespace Daz_Package_Manager
                     {
                         Output.Write("Missing files for package: " + files[x], Brushes.Red);
                     }
+                    catch (CorruptFileException error)
+                    {
+                        Output.Write(error.Message, Brushes.Blue); //really red
+                    }
                 });
                 sanityCheck += count;
 

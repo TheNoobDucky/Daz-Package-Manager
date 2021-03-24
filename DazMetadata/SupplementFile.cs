@@ -26,7 +26,7 @@ namespace DazPackage
         {
             get
             {
-                return xml.Element("ProductName").Attribute("VALUE").Value;
+                return xml.Element("ProductName")?.Attribute("VALUE")?.Value;
             }
         }
         private readonly XElement xml;
