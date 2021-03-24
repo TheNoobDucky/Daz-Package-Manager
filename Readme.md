@@ -52,7 +52,8 @@ A prebuild program is saved in Release folder, not sure if it is build correctly
 
 Step 0: Set Windows to developer mode or run as admin.
 
-Step 1: Select the folder where DIM save install manifest files.
+Step 1: Select the folder where DIM save install manifest files. 
+You can find them by going to DIM advanced setting -> Installation -> Manifest Archive. 
 
 Step 2: Press "Scan Install Manifest Archive" button. 
 A list of installed packages should show up. 
@@ -82,7 +83,12 @@ Remove base folders that contains contents you dont want daz to see.
 
 ## Version Log
 
-Recommand V1.3.0
+Recommand V1.3.4
+
+V1.3.4
+Bugfix: 
+* Disable canceling scan (was not working before).
+* Better error handling when parsing metadata file.
 
 V1.3.0
 New Features:

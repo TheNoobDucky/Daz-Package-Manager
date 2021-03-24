@@ -3,7 +3,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Configurations>Debug;Release;Shipping</Configurations>
-    <Version>1.3.0</Version>
+    <Version>1.3.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">

@@ -8,7 +8,7 @@
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<PackageId>DazPackageManager</PackageId>
-	<Version>1.3.0</Version>
+	<Version>1.3.4</Version>
 	<Configurations>Debug;Release;Shipping</Configurations>
   </PropertyGroup>
 
