@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-
+using System.Windows.Data;
 using Helpers;
 
 namespace DazPackage
@@ -71,11 +72,11 @@ namespace DazPackage
             };
         }
 
-        private static Gender GetGender (string compatibility)
+        private static Gender GetGender(string compatibility)
         {
             return compatibility switch
             {
-                string s when s.EndsWith("/Famale") => Gender.Female,
+                string s when s.EndsWith("/Female") => Gender.Female,
                 string s when s.EndsWith("/Male") => Gender.Male,
                 _ => Gender.Unknown,
             };
@@ -363,6 +364,28 @@ namespace DazPackage
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+    }
+
+    public class InstalledItemGroupingConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is string str && str != null)
+            {
+                return str.Replace("/", " ");
+            }
+            return null;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
+            // (kudos Scott Chamberlain), if you do not support a conversion 
+            // back you should return a Binding.DoNothing or a 
+            // DependencyProperty.UnsetValue
+            return Binding.DoNothing;
+            // Original code:
+            // throw new NotImplementedException();
         }
     }
 }

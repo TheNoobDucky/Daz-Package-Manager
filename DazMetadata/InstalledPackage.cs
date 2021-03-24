@@ -21,12 +21,15 @@ namespace DazPackage
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
         public Generation Generations { get; set; } = Generation.Unknown;
 
-        public List<InstalledFile> Characters { get; set; } = new List<InstalledFile>();
-        public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
-        public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
-        public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
+        //public List<InstalledFile> Characters { get; set; } = new List<InstalledFile>();
+        //public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
+        //public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
+        //public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
 
-        public MultiValueDictionary<AssetTypes, InstalledFile> Items { get; set; } = new MultiValueDictionary<AssetTypes, InstalledFile>();
+        //public MultiValueDictionary<AssetTypes, InstalledFile> Items { get; set; } = new MultiValueDictionary<AssetTypes, InstalledFile>();
+        public List<InstalledFile> Items { get; set; } = new List<InstalledFile>();
+        public List<InstalledFile> OtherItems { get; set; } = new List<InstalledFile>();
+
         public InstalledPackage (FileInfo fileInfo)
         {
             var installManifest = new InstallManifestFile(fileInfo);
@@ -55,11 +58,11 @@ namespace DazPackage
                             };
                             if ((assetType & AssetTypes.Shown) != AssetTypes.None)
                             {
-                                Items.Add(assetType, item);
+                                Items.Add(item);
                             }
                             else
                             {
-                                Items.Add(AssetTypes.Other, item);
+                                OtherItems.Add(item);
                             }
                         }
                         else if ((assetType & AssetTypes.NotProcessed) != AssetTypes.None)

@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Windows.Data;
 
 namespace DazPackage
 {
@@ -14,6 +18,90 @@ namespace DazPackage
         Genesis_8 = 1 << 8,
 
         All = ~None,
+    }
+    public class GenerationStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Generation generation)
+            {
+                var list = new List<string>();
+
+                if (generation.HasFlag(Generation.Genesis_8))
+                {
+                    list.Add("Genesis 8");
+                }
+
+                if (generation.HasFlag(Generation.Genesis_3))
+                {
+                    list.Add("Genesis 3");
+                }
+
+                if (generation.HasFlag(Generation.Genesis_2))
+                {
+                    list.Add("Genesis 2");
+                }
+
+                if (generation.HasFlag(Generation.Genesis_1))
+                {
+                    list.Add("Genesis");
+                }
+
+                if (generation.HasFlag(Generation.Gen4))
+                {
+                    list.Add("Gen 4");
+                }
+
+                if (list.Count == 0)
+                {
+                    list.Add("Unknown");
+                }
+                return list;
+            }
+            return Binding.DoNothing;
+
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
+            // (kudos Scott Chamberlain), if you do not support a conversion 
+            // back you should return a Binding.DoNothing or a 
+            // DependencyProperty.UnsetValue
+            return Binding.DoNothing;
+            // Original code:
+            // throw new NotImplementedException();
+        }
+
+        public static int GroupNumber (string str)
+        {
+            return str switch
+            {
+                "Genesis 8" => 0,
+                "Genesis 3" => 1,
+                "Genesis 2" => 2,
+                "Genesis" => 3,
+                "Gen 4" => 4,
+                "Unknwon" => 50,
+                _=> 100
+            };
+        }
+    }
+
+    public class GenerationGroupCompare : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+
+            if (x is CollectionViewGroup xg && y is CollectionViewGroup yg)
+            {
+                if (xg.Name is string xs && yg.Name is string ys)
+                {
+                    // higher group number have lower priority
+                    return GenerationStringConverter.GroupNumber(xs) - GenerationStringConverter.GroupNumber(ys);
+                }
+            }
+            throw new NotImplementedException();
+        }
     }
 
     public static class GenerationExtension

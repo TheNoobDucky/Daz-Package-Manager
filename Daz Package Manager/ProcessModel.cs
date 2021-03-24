@@ -1,50 +1,60 @@
-﻿using DazPackage;
-using Helpers;
-using OsHelper;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
+using DazPackage;
+using Helpers;
+using OsHelper;
 namespace Daz_Package_Manager
 {
     class ProcessModel : INotifyPropertyChanged
     {
-        private List<InstalledPackage> packages = new List<InstalledPackage>();
+        public PackageModel packageModel = new PackageModel();
+
         public List<InstalledPackage> Packages
         {
-            get => packages;
+            get => packageModel.Packages;
             set
             {
-                packages = value;
-                PackagesViewSource.Source = packages;
-                var a = packages.SelectMany(x =>
-                { 
-                    var y = x.Items.GetValues(AssetTypes.Clothing, false);
-                    return y ?? new HashSet<InstalledFile>();
-                }
-                );
-                Accessories.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Accessory, true));
-                Attachments.Source = packages.SelectMany(x =>  x.Items.GetValues(AssetTypes.Attachment, true));
-                Characters.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Character, true));
-                Clothings.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Clothing, true));
-                Hairs.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Hair, true));
-                Morphs.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Morph, true));
-                Props.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Prop, true));
-                Poses.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Pose, true));
-                Others.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.Other, true));
-                TODO.Source = packages.SelectMany(x => x.Items.GetValues(AssetTypes.TODO, true));
+                packageModel.Packages = value;
+                UpdateSelections();
             }
+        }
+
+        private void ModelChangedHandler(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Packages")
+            {
+                SaveCache(Properties.Settings.Default.CacheLocation);
+                Working = false;
+            } 
+            else
+            {
+
+            }
+             UpdateSelections();
+        }
+
+        public void UpdateSelections()
+        {
+            PackagesViewSource.Source = packageModel.Packages.Where(x=>x.Generations.CheckFlag(showingGeneration));
+            Accessories.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Accessory, showingGeneration, showingGender);
+            Attachments.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Attachment, showingGeneration, showingGender);
+            Characters.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Character, showingGeneration, showingGender);
+            Clothings.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Clothing, showingGeneration, showingGender);
+            Hairs.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Hair, showingGeneration, showingGender);
+            Morphs.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Morph, showingGeneration, showingGender);
+            Props.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Prop, showingGeneration, showingGender);
+            Poses.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Pose, showingGeneration, showingGender);
+            Others.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Other, showingGeneration, showingGender);
+            TODO.Source = packageModel.ItemsCache.GetAssets(AssetTypes.TODO, showingGeneration, showingGender);
         }
 
         public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
@@ -59,126 +69,29 @@ namespace Daz_Package_Manager
         public CollectionViewSource Others { get; set; } = new CollectionViewSource();
         public CollectionViewSource TODO { get; set; } = new CollectionViewSource();
 
+
         public ProcessModel()
         {
-            worker.DoWork += DoWork;
-            worker.RunWorkerCompleted += RunWorkerCompleted;
-            worker.ProgressChanged += ProgressChanged;
-            worker.WorkerReportsProgress = true;
-            void FilterGenerationAndGender(object sender, FilterEventArgs args)
-            {
-                if (args.Item is InstalledFile item)
-                {
-                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None) && ((item.Genders & showingGender) != Gender.None);
-                }
-            }
-            PackagesViewSource.Filter += (sender,args) => {
-                if (args.Item is InstalledPackage item)
-                {
-                    args.Accepted = ((item.Generations & showingGeneration) != Generation.None);
-                }
-            };
+            PackagesViewSource.GroupDescriptions.Add(packageGroup);
+            Accessories.GroupDescriptions.Add(ItemGroup);
+            Attachments.GroupDescriptions.Add(ItemGroup);
+            Characters.GroupDescriptions.Add(ItemGroup);
+            Clothings.GroupDescriptions.Add(ItemGroup);
+            Hairs.GroupDescriptions.Add(ItemGroup);
+            Morphs.GroupDescriptions.Add(ItemGroup);
+            Poses.GroupDescriptions.Add(ItemGroup);
+            Props.GroupDescriptions.Add(ItemGroup);
+            Others.GroupDescriptions.Add(ItemGroup);
+            TODO.GroupDescriptions.Add(ItemGroup);
 
-            Accessories.Filter += FilterGenerationAndGender;
-            Attachments.Filter += FilterGenerationAndGender;
-            Characters.Filter += FilterGenerationAndGender;
-            Clothings.Filter += FilterGenerationAndGender;
-            Hairs.Filter += FilterGenerationAndGender;
-            Morphs.Filter += FilterGenerationAndGender;
-            Poses.Filter += FilterGenerationAndGender;
-        }
-
-        private void DoWork(object sender, DoWorkEventArgs e)
-        {
-            var totalTime = new Stopwatch();
-            totalTime.Start();
-            BackgroundWorker worker = sender as BackgroundWorker;
-            var folder = Properties.Settings.Default.InstallManifestFolder;
-            if (folder is null or "")
-            {
-                Output.Write("Please set install archive folder location", Output.Level.Error);
-                return;
-            }
-
-            Output.Write("Start processing install archive folder: " + folder, Output.Level.Status);
-            var files = Directory.EnumerateFiles(folder).ToList();
-
-            var numberOfFiles = files.Count;
-            var batchSize = 200;
-            var end = 0;
-            var sanityCheck = 0;
-            var wip = new ConcurrentBag<InstalledPackage>();
-
-            Output.Write("Processing " + numberOfFiles + " files.", Output.Level.Error);
-
-            var timer = new Stopwatch();
-            timer.Start();
-
-            for (var start = 0; start < numberOfFiles; start = end)
-            {
-                end = Math.Min(start + batchSize, numberOfFiles);
-                var count = end - start;
-
-                Parallel.For(start, end, x =>
-                {
-                    try
-                    {
-                        wip.Add(new InstalledPackage(new FileInfo(files[x])));
-                    } 
-                    catch (DirectoryNotFoundException)
-                    {
-                        Output.Write("Missing files for package: " + files[x], Output.Level.Error);
-                    }
-                    catch (CorruptFileException error)
-                    {
-                        Output.Write(error.Message, Output.Level.Error);
-                    }
-                });
-                sanityCheck += count;
-
-                var progress = sanityCheck * 100 / numberOfFiles;
-                if (timer.Elapsed.TotalSeconds > 1)
-                {
-                    worker.ReportProgress(progress, null);
-                    timer.Restart();
-                }
-            }
-            Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
-            totalTime.Stop();
-            Output.Write(totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
-            e.Result = wip.ToList();
-        }
-
-        private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            try
-            {
-                if (e.Result is List<InstalledPackage> result)
-                {
-                    Packages = result;
-                    SaveCache(Properties.Settings.Default.CacheLocation);
-                    Output.Write("Finished scaning install archive folder.", Output.Level.Status);
-                }
-            } 
-            catch (TargetInvocationException error)
-            {
-                Output.Write("Error source: " + error.InnerException.Source.ToString(), Output.Level.Error);
-                Output.Write("Error error message: " + error.InnerException.Message, Output.Level.Error);
-            }
-
-            Working = false;
-        }
-
-        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Output.Level.Alert);
+            packageModel.PropertyChanged += ModelChangedHandler;
         }
 
         private bool working = false;
-
         public bool Working
         {
-            get => working; private set
+            get => working; 
+            private set
             {
                 working = value;
                 OnPropertyChanged();
@@ -205,7 +118,7 @@ namespace Daz_Package_Manager
             set
             {
                 imageVisible = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
@@ -214,7 +127,7 @@ namespace Daz_Package_Manager
         public Generation ToggleGeneration
         {
             get => showingGeneration;
-            set => showingGeneration ^= value;
+            set { showingGeneration ^= value; UpdateSelections(); }
         }
 
         public bool ToggleGen0
@@ -259,7 +172,7 @@ namespace Daz_Package_Manager
         public Gender ToggleGender
         {
             get => showingGender;
-            set => showingGender ^= value;
+            set { showingGender ^= value; UpdateSelections(); }
         }
 
         public bool ToggleMale
@@ -281,20 +194,14 @@ namespace Daz_Package_Manager
         }
         #endregion
 
-        private readonly BackgroundWorker worker = new BackgroundWorker();
 
         public void Scan()
         {
             if (Working = !Working)
             {
                 Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
-                worker.RunWorkerAsync();
+                packageModel.ScanInstallManifestFolderAsync(Properties.Settings.Default.InstallManifestFolder); 
             }
-        }
-
-        public void Cancel()
-        {
-            //this.worker.CancelAsync();
         }
 
         public void UnselectAll()
@@ -309,7 +216,7 @@ namespace Daz_Package_Manager
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
-            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(Packages, option));
+            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(packageModel, option));
         }
 
         public void LoadCache(string savePath)
@@ -325,7 +232,10 @@ namespace Daz_Package_Manager
                 using var packageJsonFile = File.OpenText(saveFileLocation);
                 try
                 {
-                    Packages = JsonSerializer.Deserialize<List<InstalledPackage>>(packageJsonFile.ReadToEnd(), option);
+                    var model = JsonSerializer.Deserialize<PackageModel>(packageJsonFile.ReadToEnd(), option);
+                    packageJsonFile.Dispose();
+                    packageModel.ItemsCache = model.ItemsCache;
+                    Packages = model.Packages;
                 }
                 catch (JsonException)
                 {
@@ -343,12 +253,11 @@ namespace Daz_Package_Manager
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }
 
-
-        public void SelectPackageBasedOnFolder (string location)
+        public void SelectPackageBasedOnFolder(string location)
         {
             var folder = Path.GetDirectoryName(location);
             var files = Directory.GetFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
-                
+
             foreach (var file in files)
             {
                 SelectPackageBasedOnScene(file);
@@ -362,16 +271,18 @@ namespace Daz_Package_Manager
                 var sceneFileInfo = new FileInfo(sceneLocation);
                 var packagesInScene = SceneFile.PackageInScene(sceneFileInfo, Packages);
                 Output.Write("Packages Selected:", Output.Level.Status);
-                packagesInScene.ToList().ForEach(package=> 
+                packagesInScene.ToList().ForEach(package =>
                 {
                     package.Selected = true;
                     Output.Write(package.ProductName, Output.Level.Info);
                 });
 
-            } catch (CorruptFileException error)
+            }
+            catch (CorruptFileException error)
             {
                 Output.Write("Invalid scene file: " + error.Message, Output.Level.Error);
-            } catch (ArgumentException)
+            }
+            catch (ArgumentException)
             {
                 Output.Write("Please select scene file.", Output.Level.Error);
             }
@@ -416,5 +327,19 @@ namespace Daz_Package_Manager
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        private static InstalledItemGroupingConverter installedItemGroupingConverter = new InstalledItemGroupingConverter();
+        private static GenerationStringConverter generationStringConverter = new GenerationStringConverter();
+        private static GenerationGroupCompare generationGroupCompare = new GenerationGroupCompare();
+        private static StringCompareHelper itemGroupCompare = new StringCompareHelper();
+        private static PropertyGroupDescription packageGroup = new PropertyGroupDescription("Generations", generationStringConverter)
+        {
+            CustomSort = generationGroupCompare
+        };
+
+        private static PropertyGroupDescription ItemGroup = new PropertyGroupDescription("ContentType", installedItemGroupingConverter)
+        {
+            CustomSort = itemGroupCompare
+        };
     }
 }

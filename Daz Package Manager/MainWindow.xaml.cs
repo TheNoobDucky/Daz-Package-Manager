@@ -46,15 +46,10 @@ namespace Daz_Package_Manager
         }
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
-        {
-            var button = (Button)sender;
-            
+        {            
             if (!model.Working)
             {   
                 model.Scan();
-            } else
-            {
-                model.Cancel();
             }
         }
 
@@ -150,24 +145,5 @@ namespace Daz_Package_Manager
         {
             Properties.Settings.Default.Save();
         }
-
-        private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
-        {
-            var tabControl = e.OriginalSource as TabControl;
-
-            if (tabControl != null)
-            {
-                var tabItem = e.AddedItems[0] as TabItem;
-                Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
-            }
-        }
-
-        private void UpdateDisplayHandler(object sender, RoutedEventArgs e)
-        {
-            var tabItem = DisplayTab.SelectedItem as TabItem;
-            Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
-        }
-
-
     }
 }

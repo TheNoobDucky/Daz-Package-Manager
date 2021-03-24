@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows;
 
 namespace Helpers
 {
@@ -73,8 +74,25 @@ namespace Helpers
         {
             if (dataGrid != null && dataGrid.ItemsSource != null)
             {
-                CollectionViewSource.GetDefaultView(dataGrid.ItemsSource).Refresh();
+                //CollectionViewSource.GetDefaultView(dataGrid.ItemsSource).Refresh();
             }
+        }
+
+        private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
+        {
+            var tabControl = e.OriginalSource as TabControl;
+
+            if (tabControl != null)
+            {
+                var tabItem = e.AddedItems[0] as TabItem;
+                Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
+            }
+        }
+
+        private void UpdateDisplayHandler(object sender, RoutedEventArgs e)
+        {
+            //var tabItem = DisplayTab.SelectedItem as TabItem;
+            //Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
         }
     }
 }
