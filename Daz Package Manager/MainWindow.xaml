@@ -354,17 +354,43 @@
             </TabItem>
 
             <TabItem Header="Clothings Viewer">
-                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Others.View}"
+                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
                         ItemTemplate="{StaticResource ImageBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel Width="{Binding ImageSize}" Orientation="Horizontal"
+                            <WrapPanel Orientation="Horizontal" ItemWidth="{Binding ImageSize}"
+                                    ItemHeight="{Binding ImageSize}"
                                     MaxWidth="{Binding ActualWidth, ElementName=ClothingsViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                 </ListBox>
             </TabItem>
 
+            <TabItem Header="Characters Viewer">
+                <ListBox Name="CharactersViewer" ItemsSource="{Binding Characters.View}"
+                        ItemTemplate="{StaticResource ImageBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" ItemWidth="{Binding ImageSize}"
+                                    ItemHeight="{Binding ImageSize}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=CharactersViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+            </TabItem>
+
+            <TabItem Header="Poses Viewer">
+                <ListBox Name="PosesViewer" ItemsSource="{Binding Poses.View}" ItemTemplate="{StaticResource ImageBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" ItemWidth="{Binding ImageSize}"
+                                    ItemHeight="{Binding ImageSize}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=PosesViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+            </TabItem>
+            
             <TabItem Header="Log Output">
                 <Grid>
                     <Grid.RowDefinitions>

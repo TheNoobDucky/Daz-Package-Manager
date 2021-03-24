@@ -69,7 +69,7 @@ namespace Helpers
             return JsonDocument.Parse(scene);
         }
 
-        public static void TriggerFilterRefresh (DataGrid dataGrid)
+        public static void TriggerFilterRefresh (ItemsControl dataGrid)
         {
             if (dataGrid != null && dataGrid.ItemsSource != null)
             {

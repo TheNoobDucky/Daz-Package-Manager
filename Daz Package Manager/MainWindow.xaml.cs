@@ -158,14 +158,16 @@ namespace Daz_Package_Manager
             if (tabControl != null)
             {
                 var tabItem = e.AddedItems[0] as TabItem;
-                Helper.TriggerFilterRefresh(tabItem.Content as DataGrid);
+                Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
             }
         }
 
         private void UpdateDisplayHandler(object sender, RoutedEventArgs e)
         {
             var tabItem = DisplayTab.SelectedItem as TabItem;
-            Helper.TriggerFilterRefresh(tabItem.Content as DataGrid);
+            Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
         }
+
+
     }
 }
