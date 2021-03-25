@@ -118,3 +118,4 @@ Bugfix:
 
 ## License
 [GPL 2.0](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+Duck Icon from https://iconarchive.com/show/free-flat-sample-icons-by-thesquid.ink/rubber-duck-icon.html under CC Attribution 3.0 Unported
