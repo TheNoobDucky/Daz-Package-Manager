@@ -31,7 +31,7 @@ namespace Daz_Package_Manager
         {
             if (e.PropertyName == "Packages")
             {
-                SaveCache(Properties.Settings.Default.CacheLocation);
+                packageModel.SaveToFile(SaveFileLocation());
                 Working = false;
             }
             else
@@ -204,51 +204,13 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void UnselectAll()
+
+        public void LoadCache()
         {
-            Packages.ForEach(x => x.Selected = false);
+            packageModel.LoadFromFile(SaveFileLocation());
         }
 
-        public void SaveCache(string savePath)
-        {
-            var option = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
-            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(packageModel, option));
-        }
-
-        public void LoadCache(string savePath)
-        {
-            try
-            {
-                var option = new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = true
-                };
-                var saveFileLocation = SaveFileLocation(savePath);
-                using var packageJsonFile = File.OpenText(saveFileLocation);
-                try
-                {
-                    var model = JsonSerializer.Deserialize<PackageModel>(packageJsonFile.ReadToEnd(), option);
-                    packageJsonFile.Dispose();
-                    packageModel.ItemsCache = model.ItemsCache;
-                    Packages = model.Packages;
-                }
-                catch (JsonException)
-                {
-                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
-                    packageJsonFile.Dispose();
-                    File.Delete(saveFileLocation);
-                }
-            }
-            catch (FileNotFoundException)
-            {
-            }
-        }
-        private static string SaveFileLocation(string savePath)
+        private static string SaveFileLocation()
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }

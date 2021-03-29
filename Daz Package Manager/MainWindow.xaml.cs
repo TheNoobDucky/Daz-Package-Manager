@@ -26,7 +26,7 @@ namespace Daz_Package_Manager
             Output.WriteDebug = true;
             DataContext = model;
             model.PropertyChanged += ScanCompleted;
-            model.LoadCache(Properties.Settings.Default.CacheLocation);
+            model.LoadCache();
         }
 
         readonly ProcessModel model = new ProcessModel();
@@ -130,13 +130,13 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            model.UnselectAll();
+            PackageModel.UnselectAll(model.Packages);
         }
         private static TraceSource ts = new TraceSource("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            model.LoadCache(Properties.Settings.Default.CacheLocation);
+            model.LoadCache();
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
