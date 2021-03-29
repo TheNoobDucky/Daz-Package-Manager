@@ -63,6 +63,7 @@ namespace DazPackage
                             {
                                 OtherItems.Add(item);
                             }
+                            AssetTypes |= assetType;
                         }
                         else if ((assetType & AssetTypes.NotProcessed) != AssetTypes.None)
                         {
