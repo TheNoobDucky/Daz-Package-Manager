@@ -252,33 +252,27 @@ namespace Daz_Package_Manager
 
         public void GenerateVirtualInstallFolder(string destination)
         {
-            var packagesToSave = Packages.Where(x => x.Selected);
-
             if (destination == null || destination == "")
             {
                 Output.Write("Please select a location to install virtual packages to.", Output.Level.Error);
                 return;
             }
 
+            var packagesToSave = Packages.Where(x => x.Selected);
+
             Output.Write("Installing to virtual folder location: " + destination, Output.Level.Status);
+
             foreach (var package in packagesToSave)
             {
-                var basePath = package.InstalledLocation;
                 Output.Write("Installing: " + package.ProductName, Output.Level.Info);
-                foreach (var file in package.Files)
+                try
                 {
-                    var sourcePath = Path.GetFullPath(Path.Combine(basePath, file));
-                    var destinationPath = Path.GetFullPath(Path.Combine(destination, file));
-                    Directory.CreateDirectory(Directory.GetParent(destinationPath).FullName);
-                    var errorCode = SymLinker.CreateSymlink(sourcePath, destinationPath, SymLinker.SymbolicLink.File);
-                    if (errorCode != 0)
-                    {
-                        var error = SymLinker.DecodeErrorCode(errorCode);
-                        MessageBox.Show("Aborting: \n" +
-                            "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
-                            "Win32 Error Message: " + error);
-                        return;
-                    }
+                    VirtualPackage.Install(package, destination);
+                } 
+                catch (SymLinkerError error)
+                {
+                    Output.Write("Error creating symlink file, aborting.", Output.Level.Error);
+                    MessageBox.Show(error.Message);
                 }
             }
             Output.Write("Install to virtual folder complete.", Output.Level.Status);
