@@ -350,12 +350,21 @@ namespace DazPackage
             "Set" => AssetTypes.Scene,
             "Support" => AssetTypes.Support,
 
-            "Follower/Attachment/Head/Forehead/Eyebrows" => AssetTypes.Eyebrow,
-            "Follower/Attachment/Head/Face/Eyelashes" => AssetTypes.Eyebrow,
-            "Follower/Attachment/Head/Face/Tears" => AssetTypes.Tear,
+            "Follower/Attachment/Head/Forehead/Eyebrows" => AssetTypes.Attachment,
+            "Follower/Attachment/Head/Face/Eyelashes" => AssetTypes.Attachment,
+            "Follower/Attachment/Head/Face/Tears" => AssetTypes.Attachment,
+            "Follower/Attachment/Head/Face/Eye" => AssetTypes.Attachment,
+            "Follower/Accessory/Head/Eyelashes" => AssetTypes.Attachment,
+            "Follower/Accessory/Head/Eye" => AssetTypes.Attachment,
             "Preset/Simulation-Settings" => AssetTypes.Skipped,
+            "Follower/Attachment/Head/Face/Hair" => AssetTypes.Hair,
+            "Follower/Accessory/Head/Ear" => AssetTypes.Attachment,
             "Follower/Accessory/Arm" => AssetTypes.Accessory,
             "Prop/Arm" => AssetTypes.Prop,
+            "Preset/Materials/NVIDIA Iray" => AssetTypes.Material,
+            "Preset/Materials/3Delight" => AssetTypes.Material,
+            "Prop/Head/Eye" => AssetTypes.Prop,
+
             _ => AssetTypes.None
             #endregion
         };
