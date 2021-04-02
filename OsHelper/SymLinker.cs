@@ -16,17 +16,25 @@ namespace OsHelper
         /// <param name="dest"></param> Destination file location including file name
         /// <param name="isFile"></param> is file or folder
         /// <returns> win32 error code or 0 </returns>
-        public static int CreateSymlink(string source, string dest, SymbolicLink isFile)
+        public static void CreateSymlink(string source, string dest, SymbolicLink isFile)
+        {
+            var errorCode = CreateSymlinkHelper(source, dest, isFile);
+            if (errorCode != 0)
+            {
+                var error = DecodeErrorCode(errorCode);
+                throw new SymLinkerError(
+                    "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
+                            "Win32 Error Message: " + error);
+            }
+        }
+
+        public static int CreateSymlinkHelper(string source, string dest, SymbolicLink isFile)
         {
             var success = CreateSymbolicLink(dest, source, (UInt32)isFile);
             if (!success)
             {
                 var errorCode = Marshal.GetLastWin32Error();
-                if (errorCode == 0x000000B7) // File already exist
-                {
-                    return 0;
-                }
-                return errorCode;
+                return errorCode == 0x000000B7 ? 0 : errorCode; // File exist
             }
             return 0;
         }
@@ -41,5 +49,21 @@ namespace OsHelper
         {
             return new Win32Exception(errorCode).Message;
         }
+    }
+
+    /// <summary>
+    /// Raised when encounted an error duing symbolic io.
+    /// </summary>
+    [Serializable]
+    public class SymLinkerError : Exception
+    {
+        public SymLinkerError() : base() { }
+        public SymLinkerError(string message) : base(message) { }
+        public SymLinkerError(string message, Exception inner) : base(message, inner) { }
+
+        // A constructor is needed for serialization when an
+        // exception propagates from a remoting server to the client.
+        protected SymLinkerError(System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }
