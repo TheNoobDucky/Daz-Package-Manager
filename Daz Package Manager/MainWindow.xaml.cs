@@ -36,7 +36,8 @@ namespace Daz_Package_Manager
         {
             var destination = InstallFolder();
             Directory.CreateDirectory(destination);
-            model.GenerateVirtualInstallFolder(destination);
+            var makeCopy = Properties.Settings.Default.MakeCopy;
+            model.GenerateVirtualInstallFolder(destination, makeCopy);
         }
 
         private string InstallFolder ()

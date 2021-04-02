@@ -17,7 +17,7 @@ namespace DazPackage
         /// <param name="package">Packages to be installed.</param>
         /// <param name="destination">Destination folder.</param>
         /// <exception cref="SymlinkError">Error when creating the virtual file link.</exception>
-        public static void Install(InstalledPackage package, string destination)
+        public static void Install(InstalledPackage package, string destination, bool makeCopy = false)
         {
             var basePath = package.InstalledLocation;
             foreach (var file in package.Files)
@@ -25,7 +25,23 @@ namespace DazPackage
                 var sourcePath = Path.GetFullPath(Path.Combine(basePath, file));
                 var destinationPath = Path.GetFullPath(Path.Combine(destination, file));
                 Directory.CreateDirectory(Directory.GetParent(destinationPath).FullName);
-                SymLinker.CreateSymlink(sourcePath, destinationPath, SymLinker.SymbolicLink.File);
+                if (makeCopy)
+                {
+                    try
+                    {
+                        File.Copy(sourcePath, destinationPath, false);
+                    }
+                    catch (IOException error)
+                    {
+                        if (error.HResult != -2147024816) // ignore fileExist 0x80070050
+                        {
+                            Output.Write(file + " : " + error.Message, Output.Level.Warning);
+                        }
+                    }
+                } else
+                {
+                    SymLinker.CreateSymlink(sourcePath, destinationPath, SymLinker.SymbolicLink.File);
+                }
             }
         }
 
