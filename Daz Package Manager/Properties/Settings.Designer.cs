@@ -118,5 +118,17 @@ namespace Daz_Package_Manager.Properties {
                 this["MakeCopy"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool WarnMissingFile {
+            get {
+                return ((bool)(this["WarnMissingFile"]));
+            }
+            set {
+                this["WarnMissingFile"] = value;
+            }
+        }
     }
 }

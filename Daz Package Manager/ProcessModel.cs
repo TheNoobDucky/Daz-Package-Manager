@@ -252,7 +252,7 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void GenerateVirtualInstallFolder(string destination, bool makeCopy = false)
+        public void GenerateVirtualInstallFolder(string destination, bool makeCopy = false, bool warnMissingFile = false)
         {
             if (destination == null || destination == "")
             {
@@ -269,7 +269,7 @@ namespace Daz_Package_Manager
                 Output.Write("Installing: " + package.ProductName, Output.Level.Info);
                 try
                 {
-                    VirtualPackage.Install(package, destination, makeCopy);
+                    VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
                 } 
                 catch (SymLinkerError error)
                 {

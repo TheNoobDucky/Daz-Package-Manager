@@ -141,6 +141,10 @@
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding MakeCopy}" Content="Copy Files Instead" />
             
+            <CheckBox Grid.Row="1" Grid.Column="5" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
+                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
+                    IsChecked="{Binding WarnMissingFile}" Content="Ignore Missing File" />
+            
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="{StaticResource DefaultMargin}"
                     Visibility="Hidden" Content="Reload Cache" />
 
