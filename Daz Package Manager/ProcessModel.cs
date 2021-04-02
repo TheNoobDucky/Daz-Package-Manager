@@ -33,12 +33,13 @@ namespace Daz_Package_Manager
             {
                 packageModel.SaveToFile(SaveFileLocation());
                 Working = false;
+                UpdateSelections();
             }
             else
             {
 
             }
-            UpdateSelections();
+            //UpdateSelections();
         }
 
         public void UpdateSelections()
@@ -71,7 +72,7 @@ namespace Daz_Package_Manager
 
         public ProcessModel()
         {
-            PackagesViewSource.GroupDescriptions.Add(packageGroup);
+            PackagesViewSource.GroupDescriptions.Add(itemAssetTypeGrouping);
             Accessories.GroupDescriptions.Add(itemContentGrouping);
             Attachments.GroupDescriptions.Add(itemContentGrouping);
             Clothings.GroupDescriptions.Add(itemContentGrouping);
@@ -292,6 +293,11 @@ namespace Daz_Package_Manager
         };
 
         private static readonly StringCompareHelper itemGroupCompare = new StringCompareHelper();
+        private static readonly InstalledItemContentTypeConverter installedPackageAssetTypeConverter = new InstalledItemContentTypeConverter();
+        private static readonly PropertyGroupDescription itemAssetTypeGrouping = new PropertyGroupDescription("AssetTypes", installedPackageAssetTypeConverter)
+        {
+            CustomSort = itemGroupCompare
+        };
 
         private static readonly InstalledItemContentTypeConverter installedItemContentTypeConverter = new InstalledItemContentTypeConverter();
         private static readonly PropertyGroupDescription itemContentGrouping = new PropertyGroupDescription("ContentType", installedItemContentTypeConverter)

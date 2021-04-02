@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows.Data;
+using Helpers;
 
 namespace DazPackage
 {
@@ -379,6 +380,11 @@ namespace DazPackage
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value is AssetTypes asset)
+            {
+                return asset.ToString().Split(", ");
+            }
+
             if (value is string str && str != null)
             {
                 return str.Replace("/", " ");
