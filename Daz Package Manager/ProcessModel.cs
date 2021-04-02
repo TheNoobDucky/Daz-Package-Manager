@@ -73,12 +73,13 @@ namespace Daz_Package_Manager
         public ProcessModel()
         {
             PackagesViewSource.GroupDescriptions.Add(itemAssetTypeGrouping);
-            Accessories.GroupDescriptions.Add(itemContentGrouping);
-            Attachments.GroupDescriptions.Add(itemContentGrouping);
-            Clothings.GroupDescriptions.Add(itemContentGrouping);
+
             Others.GroupDescriptions.Add(itemContentGrouping);
             TODO.GroupDescriptions.Add(itemContentGrouping);
 
+            Accessories.GroupDescriptions.Add(itemCategoriesGrouping);
+            Attachments.GroupDescriptions.Add(itemCategoriesGrouping);
+            Clothings.GroupDescriptions.Add(itemCategoriesGrouping);
             Morphs.GroupDescriptions.Add(itemCategoriesGrouping);
             Props.GroupDescriptions.Add(itemCategoriesGrouping);
             Hairs.GroupDescriptions.Add(itemCategoriesGrouping);

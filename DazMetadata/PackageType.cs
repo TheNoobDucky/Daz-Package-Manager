@@ -157,7 +157,7 @@ namespace DazPackage
         Handled = Shown | Other,
         NotProcessed = Material | Skipped | Support | Missing,
         Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop,
-        Categories = Character | Clothing | Hair | Pose | Prop | Morph,
+        Categories = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop,
         All = ~None,
     }
     public enum BodyLocation
