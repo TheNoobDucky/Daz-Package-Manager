@@ -123,6 +123,11 @@
             <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Virtual Install Folder" />
 
+            <TextBlock Grid.Row="6" Grid.Column="0" Text="Step 7: " Margin="{StaticResource DefaultMargin}" />
+            <Button Grid.Row="6" Grid.Column="1" Click="GenerateInstallScript"
+                    Margin="{StaticResource DefaultMargin}" Content="Generate Install Script (optional)" />
+            <TextBlock Grid.Row="6" Grid.Column="2" Text="Will be saved to scene" Margin="{StaticResource DefaultMargin}" />
+
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Where To Save Cache File" />
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
@@ -167,6 +172,7 @@
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
 
+            
         </Grid>
 
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">

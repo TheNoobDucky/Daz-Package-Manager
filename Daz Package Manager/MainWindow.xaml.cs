@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using DazPackage;
 
 namespace Daz_Package_Manager
 {
@@ -33,13 +34,38 @@ namespace Daz_Package_Manager
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
+            var destination = InstallFolder();
+            Directory.CreateDirectory(destination);
+            model.GenerateVirtualInstallFolder(destination);
+        }
+
+        private string InstallFolder ()
+        {
             var destination = Properties.Settings.Default.OutputFolder;
             if (Properties.Settings.Default.UseSceneSubfolder)
             {
-                destination = Path.Combine(destination, Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile));
-                Directory.CreateDirectory(destination);
+                destination = Path.Combine(destination, SceneName());
             }
-            model.GenerateVirtualInstallFolder(destination);
+            return destination;
+        }
+
+        private string SceneName ()
+        {
+            return Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile);
+        }
+
+        private void GenerateInstallScript(object sender, RoutedEventArgs e)
+        {
+            var virtualFolder = InstallFolder();
+            var sceneLocation = Properties.Settings.Default.SceneFile;
+
+
+            var scene = Properties.Settings.Default.SceneFile;
+            var sceneRoot = Directory.GetParent(scene);
+            var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
+            var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
+
+            VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene);
         }
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Helpers;
 
 namespace DazPackage
 {
@@ -27,5 +28,23 @@ namespace DazPackage
                 SymLinker.CreateSymlink(sourcePath, destinationPath, SymLinker.SymbolicLink.File);
             }
         }
+
+        public static void SaveInstallScript(string scriptLocation, string virtualFolder, string sceneFile)
+        {
+            virtualFolder = virtualFolder.Replace('\\' , '/');
+            sceneFile = sceneFile.Replace('\\', '/');
+            string script_template =
+                "(function() { \n" +
+                $"\tvar virtualFolder = \"{virtualFolder}\";\n" +
+                $"\tvar sceneFile = \"{sceneFile}\";\n" +
+                "\tvar contentManager = App.getContentMgr();\n" +
+                "\t//contentManager.removeAllContentDirectories();\n" +
+                "\tcontentManager.addContentDirectory(virtualFolder);\n" +
+                "\tcontentManager.openFile(sceneFile, false)\n" +
+                "})();";
+
+            File.WriteAllText(scriptLocation, script_template);
+        }
     }
+
 }
