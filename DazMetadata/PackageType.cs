@@ -156,8 +156,8 @@ namespace DazPackage
         Other = Expression | Eyebrow | Tear | Script | Scene | Light | Shape | Animation,
         Handled = Shown | Other,
         NotProcessed = Material | Skipped | Support | Missing,
-        Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose,
-        Categories = Character | Clothing | Hair | Pose,
+        Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop,
+        Categories = Character | Clothing | Hair | Pose | Prop,
         All = ~None,
     }
     public enum BodyLocation

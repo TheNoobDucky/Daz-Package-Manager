@@ -44,11 +44,6 @@ namespace DazPackage
                     Genders |= GetGender(compatibility);
                 }
 
-                if (AssetTypes.Categories.HasFlag(AssetType))
-                {
-                    Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
-                }
-
                 // Unset Unknown flag if any other generation is flagged. 
                 if ((Generations ^ Generation.Unknown) != Generation.None)
                 {
@@ -59,6 +54,11 @@ namespace DazPackage
                     Genders ^= Gender.Unknown;
                 }
                 package.Generations |= Generations;
+            }
+
+            if (AssetTypes.Categories.HasFlag(AssetType))
+            {
+                Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
             }
         }
 
