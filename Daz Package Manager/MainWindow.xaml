@@ -15,6 +15,15 @@
         <DataTemplate x:Key="ImageBox">
             <Image Name="Image" Source="{Binding Image, Converter={StaticResource nullImageConverter}, IsAsync=true}" />
         </DataTemplate>
+        
+        <DataTemplate x:Key="ImageGalleryBox">
+            <Grid>
+                <Image Name="Image"
+                        Source="{Binding Image, Converter={StaticResource nullImageConverter}, IsAsync=true}" />
+                <CheckBox VerticalAlignment="Top" Padding="5 5 1000 1000"  IsChecked="{Binding Selected}" />
+            </Grid>
+        </DataTemplate>
+        
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Thickness x:Key="DefaultMargin" Top="5" Left="5" Right="5" Bottom="5"></Thickness>
         <DataTemplate x:Key="GroupedDataHeader">
@@ -423,7 +432,7 @@
 
             <TabItem Header="Clothings Gallery">
                 <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
-                        ItemTemplate="{StaticResource ImageBox}">
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
@@ -443,7 +452,7 @@
 
             <TabItem Header="Characters Gallery">
                 <ListBox Name="CharactersViewer" ItemsSource="{Binding Characters.View}"
-                        ItemTemplate="{StaticResource ImageBox}">
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
@@ -462,7 +471,7 @@
 
             <TabItem Header="Hairs Gallery">
                 <ListBox Name="HairsViewer" ItemsSource="{Binding Hairs.View}"
-                        ItemTemplate="{StaticResource ImageBox}">
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
@@ -480,7 +489,8 @@
             </TabItem>
 
             <TabItem Header="Poses Gallery">
-                <ListBox Name="PosesViewer" ItemsSource="{Binding Poses.View}" ItemTemplate="{StaticResource ImageBox}">
+                <ListBox Name="PosesViewer" ItemsSource="{Binding Poses.View}"
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
