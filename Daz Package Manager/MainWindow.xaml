@@ -262,7 +262,7 @@
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="Chothings">
+            <TabItem Header="Clothings">
                 <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding Clothings.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
@@ -430,15 +430,15 @@
                 </DataGrid>
             </TabItem>
 
-            <TabItem Header="Clothings Gallery">
-                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
+            <TabItem Header="Accessories Gallery">
+                <ListBox Name="AccessoriesViewer" ItemsSource="{Binding Accessories.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
-                                    MaxWidth="{Binding ActualWidth, ElementName=ClothingsViewer}" />
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=AccessoriesViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=AccessoriesViewer}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=AccessoriesViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.GroupStyle>
@@ -447,9 +447,27 @@
                         </GroupStyle>
                     </ListBox.GroupStyle>
                 </ListBox>
-
             </TabItem>
 
+            <TabItem Header="Attachments Gallery">
+                <ListBox Name="AttachmentsViewer" ItemsSource="{Binding Attachments.View}"
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=AttachmentsViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=AttachmentsViewer}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=AttachmentsViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource GroupedDataHeader}"
+                                ContainerStyle="{StaticResource GroupedDataRow}">
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                </ListBox>
+            </TabItem>
+            
             <TabItem Header="Characters Gallery">
                 <ListBox Name="CharactersViewer" ItemsSource="{Binding Characters.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
@@ -468,6 +486,25 @@
                     </ListBox.GroupStyle>
                 </ListBox>
             </TabItem>
+            
+            <TabItem Header="Clothings Gallery">
+                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=ClothingsViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=ClothingsViewer}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=ClothingsViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource GroupedDataHeader}"
+                                ContainerStyle="{StaticResource GroupedDataRow}">
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                </ListBox>
+            </TabItem>
 
             <TabItem Header="Hairs Gallery">
                 <ListBox Name="HairsViewer" ItemsSource="{Binding Hairs.View}"
@@ -475,9 +512,47 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
-                                    MaxWidth="{Binding ActualWidth, ElementName=CharactersViewer}" />
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=HairsViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=HairsViewer}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=HairsViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource GroupedDataHeader}"
+                                ContainerStyle="{StaticResource GroupedDataRow}">
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                </ListBox>
+            </TabItem>
+
+            <TabItem Header="Morphs Gallery">
+                <ListBox Name="MorphsViewer" ItemsSource="{Binding Morphs.View}"
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=MorphsViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=MorphsViewer}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=MorphsViewer}" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.GroupStyle>
+                        <GroupStyle HeaderTemplate="{StaticResource GroupedDataHeader}"
+                                ContainerStyle="{StaticResource GroupedDataRow}">
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                </ListBox>
+            </TabItem>
+
+            <TabItem Header="Props Gallery">
+                <ListBox Name="PropsView" ItemsSource="{Binding Props.View}"
+                        ItemTemplate="{StaticResource ImageGalleryBox}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=PropsView}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=PropsView}"
+                                    MaxWidth="{Binding ActualWidth, ElementName=PropsView}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                     <ListBox.GroupStyle>
@@ -494,8 +569,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
+                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=PosesViewer}"
+                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=PosesViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=PosesViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>

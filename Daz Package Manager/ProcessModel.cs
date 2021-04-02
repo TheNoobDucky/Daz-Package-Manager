@@ -76,10 +76,10 @@ namespace Daz_Package_Manager
             Accessories.GroupDescriptions.Add(itemContentGrouping);
             Attachments.GroupDescriptions.Add(itemContentGrouping);
             Clothings.GroupDescriptions.Add(itemContentGrouping);
-            Morphs.GroupDescriptions.Add(itemContentGrouping);
             Others.GroupDescriptions.Add(itemContentGrouping);
             TODO.GroupDescriptions.Add(itemContentGrouping);
 
+            Morphs.GroupDescriptions.Add(itemCategoriesGrouping);
             Props.GroupDescriptions.Add(itemCategoriesGrouping);
             Hairs.GroupDescriptions.Add(itemCategoriesGrouping);
             Characters.GroupDescriptions.Add(itemCategoriesGrouping);
