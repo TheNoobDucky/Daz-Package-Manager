@@ -1,6 +1,8 @@
 # Daz Package Mananger
 
-## Warning: After opening a scene using Virtual folder, removing the virtual folder as base directory and then save scene will cause daz to save texture maps as absolute path. This will cause error when opening the scene if you delete the virtual folder or open it on another computer. Saving the file again while having the virtual file added will fix the issue.
+## Warning: Do not safe the scene while the virtual folder is not added as a base folder.
+After opening a scene using Virtual folder, texture images might be resolved using the virtual folder link. Saving the scene while the virtual folder is removed will cause daz to save the image path as absolute path. This will cause missing texture issue when you next open the scene without the virtual folder added. Saving the scene again with the virtual folder added will fix the issue.
+
 
 ## Introduction
 This program is intended to solve the problem of super slow character load when a large number of morphs are installed. 
