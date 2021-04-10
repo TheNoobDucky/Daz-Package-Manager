@@ -384,15 +384,10 @@ namespace DazPackage
         }
     }
 
-    public class InstalledItemContentTypeConverter : IValueConverter
+    public class ContentTypeToDisplayConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is AssetTypes asset)
-            {
-                return asset.ToString().Split(", ");
-            }
-
             if (value is string str && str != null)
             {
                 return str.Replace("/", " ");
@@ -411,7 +406,7 @@ namespace DazPackage
         }
     }
 
-    public class InstalledItemCategoriesCnverter : IValueConverter
+    public class CategoriesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

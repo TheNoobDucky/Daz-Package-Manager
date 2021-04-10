@@ -77,13 +77,34 @@ namespace Daz_Package_Manager
             Others.GroupDescriptions.Add(itemContentGrouping);
             TODO.GroupDescriptions.Add(itemContentGrouping);
 
+            Accessories.GroupDescriptions.Add(generationGrouping);
+            Accessories.GroupDescriptions.Add(genderGrouping);
             Accessories.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Attachments.GroupDescriptions.Add(generationGrouping);
+            Attachments.GroupDescriptions.Add(genderGrouping);
             Attachments.GroupDescriptions.Add(itemCategoriesGrouping);
-            Clothings.GroupDescriptions.Add(itemCategoriesGrouping);
-            Morphs.GroupDescriptions.Add(itemCategoriesGrouping);
-            Props.GroupDescriptions.Add(itemCategoriesGrouping);
-            Hairs.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Characters.GroupDescriptions.Add(generationGrouping);
+            Characters.GroupDescriptions.Add(genderGrouping);
             Characters.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Clothings.GroupDescriptions.Add(generationGrouping);
+            Clothings.GroupDescriptions.Add(genderGrouping);
+            Clothings.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Hairs.GroupDescriptions.Add(generationGrouping);
+            Hairs.GroupDescriptions.Add(genderGrouping);
+            Hairs.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Morphs.GroupDescriptions.Add(generationGrouping);
+            Morphs.GroupDescriptions.Add(genderGrouping);
+            Morphs.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Props.GroupDescriptions.Add(itemCategoriesGrouping);
+
+            Poses.GroupDescriptions.Add(generationGrouping);
+            Poses.GroupDescriptions.Add(genderGrouping);
             Poses.GroupDescriptions.Add(itemCategoriesGrouping);
 
             packageModel.PropertyChanged += ModelChangedHandler;
@@ -286,30 +307,36 @@ namespace Daz_Package_Manager
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private static readonly GenerationStringConverter generationStringConverter = new GenerationStringConverter();
+        private static readonly GenerationToStringConverter generationToStringConverter = new GenerationToStringConverter();
         private static readonly GenerationGroupCompare generationGroupCompare = new GenerationGroupCompare();
-        private static readonly PropertyGroupDescription packageGroup = new PropertyGroupDescription("Generations", generationStringConverter)
+        private static readonly PropertyGroupDescription generationGrouping = new PropertyGroupDescription("Generations", generationToStringConverter)
         {
             CustomSort = generationGroupCompare
         };
 
-        private static readonly StringCompareHelper itemGroupCompare = new StringCompareHelper();
-        private static readonly InstalledItemContentTypeConverter installedPackageAssetTypeConverter = new InstalledItemContentTypeConverter();
+        private static readonly StringCompareHelper stringCompare = new StringCompareHelper();
+        private static readonly AssetToStringConverter installedPackageAssetTypeConverter = new AssetToStringConverter();
         private static readonly PropertyGroupDescription itemAssetTypeGrouping = new PropertyGroupDescription("AssetTypes", installedPackageAssetTypeConverter)
         {
-            CustomSort = itemGroupCompare
+            CustomSort = stringCompare
         };
 
-        private static readonly InstalledItemContentTypeConverter installedItemContentTypeConverter = new InstalledItemContentTypeConverter();
+        private static readonly GenderToStringConverter genderToStringConverter = new GenderToStringConverter();
+        private static readonly PropertyGroupDescription genderGrouping = new PropertyGroupDescription("Genders", genderToStringConverter)
+        {
+            CustomSort = stringCompare
+        };
+
+        private static readonly ContentTypeToDisplayConverter installedItemContentTypeConverter = new ContentTypeToDisplayConverter();
         private static readonly PropertyGroupDescription itemContentGrouping = new PropertyGroupDescription("ContentType", installedItemContentTypeConverter)
         {
-            CustomSort = itemGroupCompare
+            CustomSort = stringCompare
         };
 
-        private static readonly InstalledItemCategoriesCnverter installedItemCategoriesConverter = new InstalledItemCategoriesCnverter();
+        private static readonly CategoriesConverter installedItemCategoriesConverter = new CategoriesConverter();
         private static readonly PropertyGroupDescription itemCategoriesGrouping = new PropertyGroupDescription("Categories", installedItemCategoriesConverter)
         {
-            CustomSort = itemGroupCompare
+            CustomSort = stringCompare
         };
     }
 }
