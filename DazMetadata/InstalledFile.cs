@@ -54,7 +54,6 @@ namespace DazPackage
                 {
                     Genders ^= Gender.Unknown;
                 }
-                package.Generations |= Generations;
             }
 
             if (AssetTypes.Categories.HasFlag(AssetType))

@@ -19,13 +19,8 @@ namespace DazPackage
         public bool Selected { get => selected; set { selected = value; OnPropertyChanged(); } }
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
         public Generation Generations { get; set; } = Generation.Unknown;
+        public Gender Genders { get; set; } = Gender.Unknown;
 
-        //public List<InstalledFile> Characters { get; set; } = new List<InstalledFile>();
-        //public List<InstalledFile> Poses { get; set; } = new List<InstalledFile>();
-        //public List<InstalledFile> Clothings { get; set; } = new List<InstalledFile>();
-        //public List<InstalledFile> Others { get; set; } = new List<InstalledFile>();
-
-        //public MultiValueDictionary<AssetTypes, InstalledFile> Items { get; set; } = new MultiValueDictionary<AssetTypes, InstalledFile>();
         public List<InstalledFile> Items { get; set; } = new List<InstalledFile>();
         public List<InstalledFile> OtherItems { get; set; } = new List<InstalledFile>();
 
@@ -63,6 +58,8 @@ namespace DazPackage
                             {
                                 OtherItems.Add(item);
                             }
+                            Generations |= item.Generations;
+                            Genders |= item.Genders;
                             AssetTypes |= assetType;
                         }
                         else if ((assetType & AssetTypes.NotProcessed) != AssetTypes.None)
@@ -83,6 +80,11 @@ namespace DazPackage
             if ((Generations ^ Generation.Unknown) != Generation.None)
             {
                 Generations ^= Generation.Unknown;
+            }
+
+            if ((Genders ^ Gender.Unknown) != Gender.None)
+            {
+                Genders ^= Gender.Unknown;
             }
 
             if ((AssetTypes ^ AssetTypes.Unknown) != AssetTypes.None)

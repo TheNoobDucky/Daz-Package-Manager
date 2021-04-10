@@ -196,6 +196,7 @@
                                 IsReadOnly="True" />
                         <DataGridTextColumn Header="Content Types" Binding="{Binding AssetTypes}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Generations" Binding="{Binding Generations}" IsReadOnly="True" />
+                        <DataGridTextColumn Header="Genders" Binding="{Binding Genders}" IsReadOnly="True" />
                     </DataGrid.Columns>
                     <DataGrid.GroupStyle>
                         <GroupStyle HeaderTemplate="{StaticResource GroupedDataHeader}"
