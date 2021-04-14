@@ -188,13 +188,14 @@ namespace DazPackage
         Missing = 1 << 30,
         Skipped = 1 << 31,
         TODO = 1 << 29,
+        HIDDEN_ASSET_GROUP = 1 << 28, // used to hide the combination flags below by making it impossible to get in actual use.
 
-        Shown = Accessory | Attachment | Character | Clothing | Hair | Morph | Prop | Pose | TODO,
-        Other = Expression | Script | Scene | Light | Shape | Animation, // Eyebrow | Tear
-        Handled = Shown | Other,
-        NotProcessed = Material | Skipped | Support | Missing,
-        Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop,
-        Categories = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop,
+        Shown = Accessory | Attachment | Character | Clothing | Hair | Morph | Prop | Pose | TODO | HIDDEN_ASSET_GROUP,
+        Other = Expression | Script | Scene | Light | Shape | Animation | HIDDEN_ASSET_GROUP, // Eyebrow | Tear
+        Handled = Shown | Other | HIDDEN_ASSET_GROUP,
+        NotProcessed = Material | Skipped | Support | Missing | HIDDEN_ASSET_GROUP,
+        Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
+        Categories = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
         All = ~None,
     }
     public class AssetToStringConverter : IValueConverter
