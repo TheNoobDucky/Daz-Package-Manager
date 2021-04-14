@@ -97,18 +97,24 @@ namespace DazPackage
         private bool selected = false;
         private static string FindImage(string assetPath)
         {
+            // Largest image used in hover over menu.
             var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
 
-            if (!File.Exists(figureImage))
+            if (File.Exists(figureImage))
             {
-                figureImage = Path.ChangeExtension(assetPath, ".png");
-                if (!File.Exists(figureImage))
-                {
-                    figureImage = "";
-                }
+                return figureImage;
+            }
+            
+            // Normal image.
+            figureImage = Path.ChangeExtension(assetPath, ".png");
+            if (File.Exists(figureImage))
+            {
+                return figureImage;
             }
 
-            return figureImage;
+            // Sometimes it is named this way.
+            figureImage = Path.ChangeExtension(assetPath, ".duf.png");
+            return File.Exists(figureImage) ? figureImage : "";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
