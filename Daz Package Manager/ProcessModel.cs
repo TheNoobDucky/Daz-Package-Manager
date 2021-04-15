@@ -73,39 +73,53 @@ namespace Daz_Package_Manager
         public ProcessModel()
         {
             PackagesViewSource.GroupDescriptions.Add(itemAssetTypeGrouping);
-
-            Others.GroupDescriptions.Add(itemContentGrouping);
-            TODO.GroupDescriptions.Add(itemContentGrouping);
+            PackagesViewSource.GroupDescriptions.Add(generationGrouping);
+            PackagesViewSource.GroupDescriptions.Add(genderGrouping);
+            PackagesViewSource.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Accessories.GroupDescriptions.Add(generationGrouping);
             Accessories.GroupDescriptions.Add(genderGrouping);
             Accessories.GroupDescriptions.Add(itemCategoriesGrouping);
+            Accessories.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Attachments.GroupDescriptions.Add(generationGrouping);
             Attachments.GroupDescriptions.Add(genderGrouping);
             Attachments.GroupDescriptions.Add(itemCategoriesGrouping);
+            Attachments.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Characters.GroupDescriptions.Add(generationGrouping);
             Characters.GroupDescriptions.Add(genderGrouping);
             Characters.GroupDescriptions.Add(itemCategoriesGrouping);
+            Characters.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Clothings.GroupDescriptions.Add(generationGrouping);
             Clothings.GroupDescriptions.Add(genderGrouping);
             Clothings.GroupDescriptions.Add(itemCategoriesGrouping);
+            Clothings.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Hairs.GroupDescriptions.Add(generationGrouping);
             Hairs.GroupDescriptions.Add(genderGrouping);
             Hairs.GroupDescriptions.Add(itemCategoriesGrouping);
+            Hairs.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Morphs.GroupDescriptions.Add(generationGrouping);
             Morphs.GroupDescriptions.Add(genderGrouping);
             Morphs.GroupDescriptions.Add(itemCategoriesGrouping);
+            Morphs.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Others.GroupDescriptions.Add(itemContentGrouping);
+            Others.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Props.GroupDescriptions.Add(itemCategoriesGrouping);
+            Props.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             Poses.GroupDescriptions.Add(generationGrouping);
             Poses.GroupDescriptions.Add(genderGrouping);
             Poses.GroupDescriptions.Add(itemCategoriesGrouping);
+            Poses.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            TODO.GroupDescriptions.Add(itemContentGrouping);
+            TODO.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             packageModel.PropertyChanged += ModelChangedHandler;
         }
