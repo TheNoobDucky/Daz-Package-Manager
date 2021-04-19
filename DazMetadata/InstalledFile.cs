@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows.Data;
+using Helpers;
 
 namespace DazPackage
 {
@@ -44,11 +45,6 @@ namespace DazPackage
                     Genders |= GetGender(compatibility);
                 }
 
-                if (AssetTypes.Categories.HasFlag(AssetType))
-                {
-                    Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
-                }
-
                 // Unset Unknown flag if any other generation is flagged. 
                 if ((Generations ^ Generation.Unknown) != Generation.None)
                 {
@@ -58,7 +54,11 @@ namespace DazPackage
                 {
                     Genders ^= Gender.Unknown;
                 }
-                package.Generations |= Generations;
+            }
+
+            if (AssetTypes.Categories.HasFlag(AssetType))
+            {
+                Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
             }
         }
 
@@ -349,12 +349,21 @@ namespace DazPackage
             "Set" => AssetTypes.Scene,
             "Support" => AssetTypes.Support,
 
-            "Follower/Attachment/Head/Forehead/Eyebrows" => AssetTypes.Eyebrow,
-            "Follower/Attachment/Head/Face/Eyelashes" => AssetTypes.Eyebrow,
-            "Follower/Attachment/Head/Face/Tears" => AssetTypes.Tear,
+            "Follower/Attachment/Head/Forehead/Eyebrows" => AssetTypes.Attachment,
+            "Follower/Attachment/Head/Face/Eyelashes" => AssetTypes.Attachment,
+            "Follower/Attachment/Head/Face/Tears" => AssetTypes.Attachment,
+            "Follower/Attachment/Head/Face/Eye" => AssetTypes.Attachment,
+            "Follower/Accessory/Head/Eyelashes" => AssetTypes.Attachment,
+            "Follower/Accessory/Head/Eye" => AssetTypes.Attachment,
             "Preset/Simulation-Settings" => AssetTypes.Skipped,
+            "Follower/Attachment/Head/Face/Hair" => AssetTypes.Hair,
+            "Follower/Accessory/Head/Ear" => AssetTypes.Attachment,
             "Follower/Accessory/Arm" => AssetTypes.Accessory,
             "Prop/Arm" => AssetTypes.Prop,
+            "Preset/Materials/NVIDIA Iray" => AssetTypes.Material,
+            "Preset/Materials/3Delight" => AssetTypes.Material,
+            "Prop/Head/Eye" => AssetTypes.Prop,
+
             _ => AssetTypes.None
             #endregion
         };
@@ -375,7 +384,7 @@ namespace DazPackage
         }
     }
 
-    public class InstalledItemContentTypeConverter : IValueConverter
+    public class ContentTypeToDisplayConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -397,7 +406,7 @@ namespace DazPackage
         }
     }
 
-    public class InstalledItemCategoriesCnverter : IValueConverter
+    public class CategoriesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

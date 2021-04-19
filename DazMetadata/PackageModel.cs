@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Daz_Package_Manager
@@ -17,31 +19,12 @@ namespace Daz_Package_Manager
     {
         public PackageModel()
         {
-            worker.DoWork += DoWork;
+            worker.DoWork += ScanInBackground;
             worker.RunWorkerCompleted += RunWorkerCompleted;
             worker.ProgressChanged += ProgressChanged;
             worker.WorkerReportsProgress = true;
         }
-
-        public AssetCache ItemsCache = new AssetCache();
-        private List<InstalledPackage> packages = new List<InstalledPackage>();
-        public List<InstalledPackage> Packages
-        {
-            get => packages;
-            set
-            {
-                packages = value;
-                RebuildCache();
-                OnPropertyChanged();
-            }
-        }
-
-        public void ScanInstallManifestFolderAsync(string folder)
-        {
-            worker.RunWorkerAsync(folder);
-        }
-
-        private void DoWork(object sender, DoWorkEventArgs e)
+        private void ScanInBackground(object sender, DoWorkEventArgs e)
         {
             var totalTime = new Stopwatch();
             totalTime.Start();
@@ -101,6 +84,63 @@ namespace Daz_Package_Manager
             e.Result = packages.ToList();
         }
 
+        public static void UnselectAll(List<InstalledPackage> packages)
+        {
+            packages.ForEach(x => x.Selected = false);
+        }
+
+        public void SaveToFile (string savePath)
+        {
+            var option = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
+            };
+            File.WriteAllText(savePath, JsonSerializer.Serialize(this, option));
+        }
+
+        public void LoadFromFile (string saveFileLocation)
+        {
+            try
+            {
+                var option = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    WriteIndented = true
+                };
+                using var packageJsonFile = File.OpenText(saveFileLocation);
+                try
+                {
+                    var model = JsonSerializer.Deserialize<PackageModel>(packageJsonFile.ReadToEnd(), option);
+                    packageJsonFile.Dispose();
+                    ItemsCache = model.ItemsCache;
+                    Packages = model.Packages;
+                }
+                catch (JsonException)
+                {
+                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
+                    packageJsonFile.Dispose();
+                    File.Delete(saveFileLocation);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+            }
+        }
+
+        #region Cache
+        public AssetCache ItemsCache = new AssetCache();
+        private List<InstalledPackage> packages = new List<InstalledPackage>();
+        public List<InstalledPackage> Packages
+        {
+            get => packages;
+            set
+            {
+                packages = value;
+                RebuildCache();
+                OnPropertyChanged();
+            }
+        }
         public void RebuildCache()
         {
             ItemsCache.Clear();
@@ -113,6 +153,13 @@ namespace Daz_Package_Manager
             {
                 ItemsCache.AddAsset(item, AssetTypes.Other, item.Generations, item.Genders);
             }
+        }
+        #endregion
+
+        #region Background worker
+        public void ScanInstallManifestFolderAsync(string folder)
+        {
+            worker.RunWorkerAsync(folder);
         }
 
         private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -144,5 +191,6 @@ namespace Daz_Package_Manager
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+        #endregion
     }
 }

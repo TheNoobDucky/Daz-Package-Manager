@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using DazPackage;
 
 namespace Daz_Package_Manager
 {
@@ -26,20 +27,47 @@ namespace Daz_Package_Manager
             Output.WriteDebug = true;
             DataContext = model;
             model.PropertyChanged += ScanCompleted;
-            model.LoadCache(Properties.Settings.Default.CacheLocation);
+            model.LoadCache();
         }
 
         readonly ProcessModel model = new ProcessModel();
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
+            var destination = InstallFolder();
+            Directory.CreateDirectory(destination);
+            var makeCopy = Properties.Settings.Default.MakeCopy;
+            var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
+            model.GenerateVirtualInstallFolder(destination, makeCopy, warnMissingFile);
+        }
+
+        private string InstallFolder ()
+        {
             var destination = Properties.Settings.Default.OutputFolder;
             if (Properties.Settings.Default.UseSceneSubfolder)
             {
-                destination = Path.Combine(destination, Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile));
-                Directory.CreateDirectory(destination);
+                destination = Path.Combine(destination, SceneName());
             }
-            model.GenerateVirtualInstallFolder(destination);
+            return destination;
+        }
+
+        private string SceneName ()
+        {
+            return Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile);
+        }
+
+        private void GenerateInstallScript(object sender, RoutedEventArgs e)
+        {
+            var virtualFolder = InstallFolder();
+            var sceneLocation = Properties.Settings.Default.SceneFile;
+
+
+            var scene = Properties.Settings.Default.SceneFile;
+            var sceneRoot = Directory.GetParent(scene);
+            var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
+            var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
+
+            VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene);
         }
 
         private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
@@ -130,13 +158,13 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            model.UnselectAll();
+            PackageModel.UnselectAll(model.Packages);
         }
         private static TraceSource ts = new TraceSource("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            model.LoadCache(Properties.Settings.Default.CacheLocation);
+            model.LoadCache();
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
