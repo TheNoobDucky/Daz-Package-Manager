@@ -98,11 +98,11 @@ namespace Daz_Package_Manager
         {
             if (Properties.Settings.Default.BatchProcessScene)
             {
-                model.SelectPackageBasedOnFolder(Properties.Settings.Default.SceneFile);
+                model.SelectPackagesBasedOnFolder(Properties.Settings.Default.SceneFile);
             }
             else
             {
-                model.SelectPackageBasedOnScene(Properties.Settings.Default.SceneFile);
+                model.SelectPackagesBasedOnScene(Properties.Settings.Default.SceneFile);
             }
         }
 

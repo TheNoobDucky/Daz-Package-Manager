@@ -252,30 +252,35 @@ namespace Daz_Package_Manager
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }
 
-        public void SelectPackageBasedOnFolder(string location)
+        public void SelectPackagesBasedOnFolder(string location)
         {
             var folder = Path.GetDirectoryName(location);
             var files = Directory.GetFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
 
             foreach (var file in files)
             {
-                SelectPackageBasedOnScene(file);
+                SelectPackagesBasedOnScene(file);
             }
         }
 
-        public void SelectPackageBasedOnScene(string sceneLocation)
+        public void SelectPackagesBasedOnScene(string sceneLocation)
         {
             try
             {
                 var sceneFileInfo = new FileInfo(sceneLocation);
-                var packagesInScene = SceneFile.PackageInScene(sceneFileInfo, Packages);
+                var (packagesInScene, remainingFiles) = SceneFile.PackagesInScene(sceneFileInfo, Packages);
                 Output.Write("Packages Selected:", Output.Level.Status);
-                packagesInScene.ToList().ForEach(package =>
+                packagesInScene.ForEach(package =>
                 {
                     package.Selected = true;
                     Output.Write(package.ProductName, Output.Level.Info);
                 });
+                if (remainingFiles.Count > 0)
+                {
 
+                    Output.Write("Unable to find reference for the following files:", Output.Level.Warning);
+                    remainingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
+                }
             }
             catch (CorruptFileException error)
             {
