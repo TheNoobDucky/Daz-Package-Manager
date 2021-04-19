@@ -16,11 +16,12 @@
             <Image Name="Image" Source="{Binding Image, Converter={StaticResource nullImageConverter}, IsAsync=true}" />
         </DataTemplate>
         
-        <DataTemplate x:Key="ImageGalleryBox">
+        <DataTemplate x:Key="ImageGalleryBox" >
             <Grid>
                 <Image Name="Image"
                         Source="{Binding Image, Converter={StaticResource nullImageConverter}, IsAsync=true}" />
-                <CheckBox VerticalAlignment="Top" Padding="5 5 1000 1000"  IsChecked="{Binding Selected}" />
+                <CheckBox VerticalAlignment="Top" Padding="5 5 1000 1000" IsChecked="{Binding Selected}"
+                        ToolTip="{Binding Path}"/>
             </Grid>
         </DataTemplate>
         
