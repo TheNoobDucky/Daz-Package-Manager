@@ -5,8 +5,47 @@ After opening a scene using Virtual folder, texture images might be resolved usi
 
 
 ## Introduction
-This program is intended to solve the problem of super slow character load when a large number of morphs are installed. 
+This program let you create a virtual folder with only selected products, thereby improving Daz character load speed. You can select products both manually or get the program to automatically extract referenced products from a scene or folder of scenes.
 
+## How To Use
+### Install
+1. Download zip file [here](https://github.com/TheNoobDucky/Daz-Package-Manager/releases/tag/V1.5.0)
+2. May also need to install ".NET Desktop Runtime 5" at [https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries)
+3. Either turn developer mode on windows 10 or run the program as administrator. [How to turn developer mode on](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)
+4. Unzip the file and run Daz Package Manager.exe.
+
+#### Use
+Step 0: Set Windows to developer mode or run as admin.
+
+Step 1: Press "Select Install Manifest Archive Folder" button to select the folder where DIM save install manifest files. 
+You can find them by going to DIM -> advanced setting -> Installation -> Manifest Archive. 
+
+Step 2: Press "Scan Install Manifest Archive" button. 
+A list of installed packages should show up in "Log Output". 
+The results will be cached and will presist over program sessions.
+Only need to rerun after installing new contents.
+
+Optional Step 3: Press "Select Scene File" button to select a scene file.
+
+Optional Step 4a: Press "Select Packages Based on Scene" button to select packages based on files referenced by the selected scene.
+
+Step 4b: Select additional packages you want to include.
+There is a "Clear Package Selection" button to unselect all. 
+
+Step 5: Press "Select Output Folder Location" button to select where to save the virtual folder. 
+Virtual folder need to be on a local drive.
+Does not work with network drive.
+The source files can be on network drive.
+
+Step 6: Press "Generate Virtual Install Folder" to generate the virtual folder.
+There is an option to create it in a subfolder with scene file name.
+
+Step 7: Add the virtual folder as a base folder in Daz Studio. 
+Remove base folders that contains contents you dont want daz to see.
+Optionally use "Generate Install Script" button to create a Dazscript that will automatically include the virtual folder and open the scene.
+
+
+## Background Info
 The approach taken is to create a virtual folder containing reference to all the file needed in a scene.
 By using the virtual folder as daz base folder,
 only morphs needed are visibile to Daz, 
@@ -39,39 +78,6 @@ Download link:[https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.
 * Only work with packages installed by DIM and have an install manifest.
 
 * Character detection depend on default metadata.
-
-## Download Link
-
-https://github.com/TheNoobDucky/Daz-Package-Manager/releases/
-May also need to download ".NET Desktop Runtime 5" at [https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries)
-
-## How to Use
-A prebuild program is saved in Release folder, not sure if it is build correctly.
-
-Step 0: Set Windows to developer mode or run as admin.
-
-Step 1: Select the folder where DIM save install manifest files. 
-You can find them by going to DIM advanced setting -> Installation -> Manifest Archive. 
-
-Step 2: Press "Scan Install Manifest Archive" button. 
-A list of installed packages should show up. 
-The result is caches and will presist over program sessions.
-Only need to rerun when installing new contents.
-
-Step 3: Optionally select a scene file and select packages based on the contents of the scene.
-
-Step 4: Select where to save the virtual folder. 
-Virtual folder need to be on a local drive.
-Does not work with network drive.
-The source files can be on network drive.
-
-Step 5: Generate the virtual folder.
-There is an option to create it in a subfolder with scene file name.
-
-Step 6: Add the virtual folder as a base folder in Daz Studio. 
-Remove base folders that contains contents you dont want daz to see.
-
-Optional step 7: Generate a script to automatically include the virtual folder and open the scene.
 
 ## Version Log
 
