@@ -3,7 +3,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Configurations>Debug;Release;Shipping</Configurations>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Algorithmia\SD.Tools.Algorithmia\SD.Tools.Algorithmia.csproj" />
     <ProjectReference Include="..\Helper\Helpers.csproj" />
+    <ProjectReference Include="..\OsHelper\OsHelper.csproj" />
   </ItemGroup>
 
 </Project>

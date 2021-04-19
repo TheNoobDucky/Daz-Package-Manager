@@ -31,19 +31,20 @@ namespace Daz_Package_Manager
         {
             if (e.PropertyName == "Packages")
             {
-                SaveCache(Properties.Settings.Default.CacheLocation);
+                packageModel.SaveToFile(SaveFileLocation());
                 Working = false;
+                UpdateSelections();
             }
             else
             {
 
             }
-            UpdateSelections();
+            //UpdateSelections();
         }
 
         public void UpdateSelections()
         {
-            PackagesViewSource.Source = packageModel.Packages.Where(x => x.Generations.CheckFlag(showingGeneration));
+            PackagesViewSource.Source = packageModel.Packages.Where(x => x.Generations.CheckFlag(showingGeneration) && x.Genders.CheckFlag(showingGender));
             Accessories.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Accessory, showingGeneration, showingGender);
             Attachments.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Attachment, showingGeneration, showingGender);
             Characters.Source = packageModel.ItemsCache.GetAssets(AssetTypes.Character, showingGeneration, showingGender);
@@ -71,18 +72,54 @@ namespace Daz_Package_Manager
 
         public ProcessModel()
         {
-            PackagesViewSource.GroupDescriptions.Add(packageGroup);
-            Accessories.GroupDescriptions.Add(itemContentGrouping);
-            Attachments.GroupDescriptions.Add(itemContentGrouping);
-            Clothings.GroupDescriptions.Add(itemContentGrouping);
-            Morphs.GroupDescriptions.Add(itemContentGrouping);
-            Props.GroupDescriptions.Add(itemContentGrouping);
-            Others.GroupDescriptions.Add(itemContentGrouping);
-            TODO.GroupDescriptions.Add(itemContentGrouping);
+            PackagesViewSource.GroupDescriptions.Add(itemAssetTypeGrouping);
+            PackagesViewSource.GroupDescriptions.Add(generationGrouping);
+            PackagesViewSource.GroupDescriptions.Add(genderGrouping);
+            PackagesViewSource.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
-            Hairs.GroupDescriptions.Add(itemCategoriesGrouping);
+            Accessories.GroupDescriptions.Add(generationGrouping);
+            Accessories.GroupDescriptions.Add(genderGrouping);
+            Accessories.GroupDescriptions.Add(itemCategoriesGrouping);
+            Accessories.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Attachments.GroupDescriptions.Add(generationGrouping);
+            Attachments.GroupDescriptions.Add(genderGrouping);
+            Attachments.GroupDescriptions.Add(itemCategoriesGrouping);
+            Attachments.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Characters.GroupDescriptions.Add(generationGrouping);
+            Characters.GroupDescriptions.Add(genderGrouping);
             Characters.GroupDescriptions.Add(itemCategoriesGrouping);
+            Characters.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Clothings.GroupDescriptions.Add(generationGrouping);
+            Clothings.GroupDescriptions.Add(genderGrouping);
+            Clothings.GroupDescriptions.Add(itemCategoriesGrouping);
+            Clothings.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Hairs.GroupDescriptions.Add(generationGrouping);
+            Hairs.GroupDescriptions.Add(genderGrouping);
+            Hairs.GroupDescriptions.Add(itemCategoriesGrouping);
+            Hairs.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Morphs.GroupDescriptions.Add(generationGrouping);
+            Morphs.GroupDescriptions.Add(genderGrouping);
+            Morphs.GroupDescriptions.Add(itemCategoriesGrouping);
+            Morphs.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Others.GroupDescriptions.Add(itemContentGrouping);
+            Others.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Props.GroupDescriptions.Add(itemCategoriesGrouping);
+            Props.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            Poses.GroupDescriptions.Add(generationGrouping);
+            Poses.GroupDescriptions.Add(genderGrouping);
             Poses.GroupDescriptions.Add(itemCategoriesGrouping);
+            Poses.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
+
+            TODO.GroupDescriptions.Add(itemContentGrouping);
+            TODO.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             packageModel.PropertyChanged += ModelChangedHandler;
         }
@@ -204,51 +241,13 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void UnselectAll()
+
+        public void LoadCache()
         {
-            Packages.ForEach(x => x.Selected = false);
+            packageModel.LoadFromFile(SaveFileLocation());
         }
 
-        public void SaveCache(string savePath)
-        {
-            var option = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
-            File.WriteAllText(SaveFileLocation(savePath), JsonSerializer.Serialize(packageModel, option));
-        }
-
-        public void LoadCache(string savePath)
-        {
-            try
-            {
-                var option = new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = true
-                };
-                var saveFileLocation = SaveFileLocation(savePath);
-                using var packageJsonFile = File.OpenText(saveFileLocation);
-                try
-                {
-                    var model = JsonSerializer.Deserialize<PackageModel>(packageJsonFile.ReadToEnd(), option);
-                    packageJsonFile.Dispose();
-                    packageModel.ItemsCache = model.ItemsCache;
-                    Packages = model.Packages;
-                }
-                catch (JsonException)
-                {
-                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
-                    packageJsonFile.Dispose();
-                    File.Delete(saveFileLocation);
-                }
-            }
-            catch (FileNotFoundException)
-            {
-            }
-        }
-        private static string SaveFileLocation(string savePath)
+        private static string SaveFileLocation()
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
         }
@@ -288,35 +287,29 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void GenerateVirtualInstallFolder(string destination)
+        public void GenerateVirtualInstallFolder(string destination, bool makeCopy = false, bool warnMissingFile = false)
         {
-            var packagesToSave = Packages.Where(x => x.Selected);
-
             if (destination == null || destination == "")
             {
                 Output.Write("Please select a location to install virtual packages to.", Output.Level.Error);
                 return;
             }
 
+            var packagesToSave = Packages.Where(x => x.Selected);
+
             Output.Write("Installing to virtual folder location: " + destination, Output.Level.Status);
+
             foreach (var package in packagesToSave)
             {
-                var basePath = package.InstalledLocation;
                 Output.Write("Installing: " + package.ProductName, Output.Level.Info);
-                foreach (var file in package.Files)
+                try
                 {
-                    var sourcePath = Path.GetFullPath(Path.Combine(basePath, file));
-                    var destinationPath = Path.GetFullPath(Path.Combine(destination, file));
-                    Directory.CreateDirectory(Directory.GetParent(destinationPath).FullName);
-                    var errorCode = SymLinker.CreateSymlink(sourcePath, destinationPath, SymLinker.SymbolicLink.File);
-                    if (errorCode != 0)
-                    {
-                        var error = SymLinker.DecodeErrorCode(errorCode);
-                        MessageBox.Show("Aborting: \n" +
-                            "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
-                            "Win32 Error Message: " + error);
-                        return;
-                    }
+                    VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
+                } 
+                catch (SymLinkerError error)
+                {
+                    Output.Write("Error creating symlink file, aborting.", Output.Level.Error);
+                    MessageBox.Show(error.Message);
                 }
             }
             Output.Write("Install to virtual folder complete.", Output.Level.Status);
@@ -328,25 +321,36 @@ namespace Daz_Package_Manager
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private static readonly GenerationStringConverter generationStringConverter = new GenerationStringConverter();
+        private static readonly GenerationToStringConverter generationToStringConverter = new GenerationToStringConverter();
         private static readonly GenerationGroupCompare generationGroupCompare = new GenerationGroupCompare();
-        private static readonly PropertyGroupDescription packageGroup = new PropertyGroupDescription("Generations", generationStringConverter)
+        private static readonly PropertyGroupDescription generationGrouping = new PropertyGroupDescription("Generations", generationToStringConverter)
         {
             CustomSort = generationGroupCompare
         };
 
-        private static readonly StringCompareHelper itemGroupCompare = new StringCompareHelper();
-
-        private static readonly InstalledItemContentTypeConverter installedItemContentTypeConverter = new InstalledItemContentTypeConverter();
-        private static readonly PropertyGroupDescription itemContentGrouping = new PropertyGroupDescription("ContentType", installedItemContentTypeConverter)
+        private static readonly StringCompareHelper stringCompare = new StringCompareHelper();
+        private static readonly AssetToStringConverter installedPackageAssetTypeConverter = new AssetToStringConverter();
+        private static readonly PropertyGroupDescription itemAssetTypeGrouping = new PropertyGroupDescription("AssetTypes", installedPackageAssetTypeConverter)
         {
-            CustomSort = itemGroupCompare
+            CustomSort = stringCompare
         };
 
-        private static readonly InstalledItemCategoriesCnverter installedItemCategoriesConverter = new InstalledItemCategoriesCnverter();
+        private static readonly GenderToStringConverter genderToStringConverter = new GenderToStringConverter();
+        private static readonly PropertyGroupDescription genderGrouping = new PropertyGroupDescription("Genders", genderToStringConverter)
+        {
+            CustomSort = stringCompare
+        };
+
+        private static readonly ContentTypeToDisplayConverter installedItemContentTypeConverter = new ContentTypeToDisplayConverter();
+        private static readonly PropertyGroupDescription itemContentGrouping = new PropertyGroupDescription("ContentType", installedItemContentTypeConverter)
+        {
+            CustomSort = stringCompare
+        };
+
+        private static readonly CategoriesConverter installedItemCategoriesConverter = new CategoriesConverter();
         private static readonly PropertyGroupDescription itemCategoriesGrouping = new PropertyGroupDescription("Categories", installedItemCategoriesConverter)
         {
-            CustomSort = itemGroupCompare
+            CustomSort = stringCompare
         };
     }
 }

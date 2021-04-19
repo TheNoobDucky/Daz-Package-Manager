@@ -19,7 +19,7 @@ namespace DazPackage
 
         All = ~None,
     }
-    public class GenerationStringConverter : IValueConverter
+    public class GenerationToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -97,7 +97,7 @@ namespace DazPackage
                 if (xg.Name is string xs && yg.Name is string ys)
                 {
                     // higher group number have lower priority
-                    return GenerationStringConverter.GroupNumber(xs) - GenerationStringConverter.GroupNumber(ys);
+                    return GenerationToStringConverter.GroupNumber(xs) - GenerationToStringConverter.GroupNumber(ys);
                 }
             }
             throw new NotImplementedException();
@@ -123,6 +123,43 @@ namespace DazPackage
 
         All = ~None,
     }
+    public class GenderToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is Gender gender)
+            {
+                var list = new List<string>();
+
+                if (gender.HasFlag(Gender.Female))
+                {
+                    list.Add("Female");
+                }
+
+                if (gender.HasFlag(Gender.Male))
+                {
+                    list.Add("Male");
+                }
+
+                if (list.Count == 0)
+                {
+                    list.Add("Unknown");
+                }
+                return list;
+            }
+            return null;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
+            // (kudos Scott Chamberlain), if you do not support a conversion 
+            // back you should return a Binding.DoNothing or a 
+            // DependencyProperty.UnsetValue
+            return Binding.DoNothing;
+            // Original code:
+            // throw new NotImplementedException();
+        }
+    }
 
     [Flags]
     public enum AssetTypes
@@ -136,7 +173,7 @@ namespace DazPackage
         Character = 1 << 5,
         Clothing = 1 << 6,
         Expression = 1 << 7,
-        Eyebrow = 1 << 8,
+        //Eyebrow = 1 << 8,
         Hair = 1 << 9,
         Light = 1 << 10,
         Material = 1 << 11,
@@ -147,19 +184,42 @@ namespace DazPackage
         Script = 1 << 16,
         Shape = 1 << 17,
         Support = 1 << 18,
-        Tear = 1 << 19,
+        //Tear = 1 << 19,
         Missing = 1 << 30,
         Skipped = 1 << 31,
         TODO = 1 << 29,
+        HIDDEN_ASSET_GROUP = 1 << 28, // used to hide the combination flags below by making it impossible to get in actual use.
 
-        Shown = Accessory | Attachment | Character | Clothing | Hair | Morph | Prop | Pose | TODO,
-        Other = Expression | Eyebrow | Tear | Script | Scene | Light | Shape | Animation,
-        Handled = Shown | Other,
-        NotProcessed = Material | Skipped | Support | Missing,
-        Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose,
-        Categories = Character | Clothing | Hair | Pose,
+        Shown = Accessory | Attachment | Character | Clothing | Hair | Morph | Prop | Pose | TODO | HIDDEN_ASSET_GROUP,
+        Other = Expression | Script | Scene | Light | Shape | Animation | HIDDEN_ASSET_GROUP, // Eyebrow | Tear
+        Handled = Shown | Other | HIDDEN_ASSET_GROUP,
+        NotProcessed = Material | Skipped | Support | Missing | HIDDEN_ASSET_GROUP,
+        Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
+        Categories = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
         All = ~None,
     }
+    public class AssetToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is AssetTypes asset)
+            {
+                return asset.ToString().Split(", ");
+            }
+            return null;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            // According to https://msdn.microsoft.com/en-us/library/system.windows.data.ivalueconverter.convertback(v=vs.110).aspx#Anchor_1
+            // (kudos Scott Chamberlain), if you do not support a conversion 
+            // back you should return a Binding.DoNothing or a 
+            // DependencyProperty.UnsetValue
+            return Binding.DoNothing;
+            // Original code:
+            // throw new NotImplementedException();
+        }
+    }
+
     public enum BodyLocation
     {
         None,
