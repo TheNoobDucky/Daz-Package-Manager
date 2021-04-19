@@ -30,13 +30,11 @@ The algorithm:
 
 * Only run on Windows 10.
 
-* Require .NET Desktop Runtime 5.0.4 at [https://dotnet.microsoft.com/download/dotnet/5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
+* Require .NET Desktop Runtime 5 at [https://dotnet.microsoft.com/download/dotnet/5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
+Download link:[https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries)
 
 * Need to run with developer mode or admin privilege. 
 [Due to the permission required to create symbolic link](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinka)
-
-* Minimumal amount of error handlings are implemented. 
-Program probabaly only work when used in the intended way.
 
 * Only work with packages installed by DIM and have an install manifest.
 
@@ -45,12 +43,10 @@ Program probabaly only work when used in the intended way.
 ## Download Link
 
 https://github.com/TheNoobDucky/Daz-Package-Manager/releases/
-May also need to download ".NET Desktop Runtime 5.0.4" at [https://dotnet.microsoft.com/download/dotnet/5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
-
+May also need to download ".NET Desktop Runtime 5" at [https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries)
 
 ## How to Use
 A prebuild program is saved in Release folder, not sure if it is build correctly.
-
 
 Step 0: Set Windows to developer mode or run as admin.
 
@@ -75,27 +71,34 @@ There is an option to create it in a subfolder with scene file name.
 Step 6: Add the virtual folder as a base folder in Daz Studio. 
 Remove base folders that contains contents you dont want daz to see.
 
+Optional step 7: Generate a script to automatically include the virtual folder and open the scene.
+
 ## Version Log
 
-V1.4.0
+V 1.5.0:
+* Rearranged how content organised on display.
+* Change the way contents are sorted to be more user friendly.
+* Add filter by gender for package.
+
+V 1.4.0:
 New Features:
 
 * Image gallery for character, clothing, hair, and poses.
 * Performance improvement by grouping items.
 
-V1.3.4
+V 1.3.4:
 Bugfix: 
 * Disable canceling scan (was not working before).
 * Better error handling when parsing metadata file.
 
-V1.3.0
+V 1.3.0:
 New Features:
 * Can browse accessories, attachments, characters, clothings, hairs, morpsh, props, poses
 * Performance Improvements including more efficient processing and filtering contents.
 * More robust error handling.
 *  Better error reporting.
 
-V1.2.0
+V 1.2.0:
 New Features:
 * Images are not resizable.
 * Hide Image. This improve UI speed.
@@ -107,12 +110,12 @@ New Features:
 WIP:
 * Character gender detection not implemented.
 
-V1.1.0
+V 1.1.0:
 Bug fix.
 * Able to find poses.
 * Improved Performance
 
-V1.0.0
+V 1.0.0:
 Basic Functionality.
 
 Bugfix:
