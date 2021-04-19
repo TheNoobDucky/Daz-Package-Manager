@@ -58,7 +58,7 @@ namespace DazPackage
 
             if (AssetTypes.Categories.HasFlag(AssetType))
             {
-                Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
+                Categories = asset.Categories?.ToList();
             }
         }
 
@@ -390,7 +390,7 @@ namespace DazPackage
         {
             if (value is string str && str != null)
             {
-                return str.Replace("/", " ");
+                return str;
             }
             return null;
         }
