@@ -37,7 +37,7 @@ namespace Helpers
                 _ => Brushes.White,
             };
 
-            if (level == Level.Info)
+            if (level == Level.Info && indent == 0.0)
             {
                 indent = 20.0;
             }

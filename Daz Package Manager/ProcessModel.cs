@@ -278,7 +278,7 @@ namespace Daz_Package_Manager
                 if (remainingFiles.Count > 0)
                 {
 
-                    Output.Write("Unable to find reference for the following files:", Output.Level.Warning);
+                    Output.Write("Unable to find reference for the following files:", Output.Level.Status);
                     remainingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
                 }
             }

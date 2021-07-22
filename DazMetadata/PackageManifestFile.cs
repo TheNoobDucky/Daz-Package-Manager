@@ -1,4 +1,7 @@
-﻿using System.IO.Compression;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO.Compression;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -10,17 +13,41 @@ namespace DazPackage
     /// </summary>
     public class PackageManifestFile
     {
-        public PackageManifestFile(ZipArchiveEntry file)
+        public static XElement GetXML(ZipArchiveEntry file)
         {
             try
             {
-                xml = XElement.Load(file.Open());
+                return XElement.Load(file.Open());
             }
             catch (XmlException)
             {
                 throw new CorruptFileException(file.Name);
             }
         }
-        private readonly XElement xml;
+
+        public static List<string> GetFiles (XElement content)
+        {
+            var fileEntries = content.Elements("File")?.Attributes("VALUE");
+
+            // Trim "content/" from the path since DIM will skip top level folder.
+            var Files = content.Elements("File")?.Select(x =>
+            {
+                var path = x.Attribute("VALUE")?.Value;
+                var target = x.Attribute("TARGET")?.Value.Length + 1; // +1 for "/" at the of path
+                Debug.Assert(target < path.Length, "Incorrect substring processing in InstallManifestFile");
+                return path[target.Value..]; //TODO this part does not work for plugin type.
+            }).ToList();
+            return Files;
+        }
+
+        public static List<string> FindMetadataFile (List<string> files)
+        {
+            var MetadataFiles = files.Where(x =>
+            {
+                var y = x.ToLower();
+                return y.StartsWith("runtime/support/") && y.EndsWith(".dsx");
+            }).ToList();
+            return MetadataFiles;
+        }
     }
 }
