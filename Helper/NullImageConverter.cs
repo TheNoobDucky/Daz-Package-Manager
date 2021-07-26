@@ -20,6 +20,11 @@ namespace Helpers
                 catch (NotSupportedException)
                 {
                 }
+                catch (System.Net.WebException)
+                {
+                    // Unable to find the image.
+                    // TODO display error message
+                }
             }
             return DependencyProperty.UnsetValue;
 

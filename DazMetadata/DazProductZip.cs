@@ -18,80 +18,85 @@ namespace DazPackage
         public DazProductZip(FileInfo file)
         {
             this.file = file;
-
-            using var archive = System.IO.Compression.ZipFile.OpenRead(file.ToString());
-
-            // Check Manifest.dsx file
             try
             {
-                var manifestFile = archive.GetEntry("Manifest.dsx");
+                using var archive = System.IO.Compression.ZipFile.OpenRead(file.ToString());
 
-                if (manifestFile == null)
-                {
-                    HasSupplementFile = false;
-                    return;
-                }
-
-                var packageXML = PackageManifestFile.GetXML(manifestFile);
-
-                /// Check for metadata file
-                var files = PackageManifestFile.GetFiles(packageXML);
-                metadataFiles = PackageManifestFile.FindMetadataFile(files);
-
-
-                //var metadataFileEntries = archive.Entries.Where(
-                //x =>
-                //(x.FullName.StartsWith("Content/Runtime/Support/") || x.FullName.StartsWith("Content/runtime/Support/"))
-                //&& x.FullName.EndsWith(".dsx"));
-
-                var numberOfMetadataFiles = metadataFiles.Count();
-                MissingMetadata = numberOfMetadataFiles == 0;
-                MultipleMetadataFiles = numberOfMetadataFiles != 1;
-
-                if (!MissingMetadata && !MultipleMetadataFiles)
-                {
-                    var metadataFileEntry = "Content/" + metadataFiles.First();
-
-                    var metadataFile = archive.GetEntry(metadataFileEntry);
-
-                    if (metadataFile == null)
-                    {
-                        MissingMetadata = true;
-                        return;
-                    }
-
-                    packageMetadata = new PackageMetadata(metadataFile);
-                    ProductName = packageMetadata.ProductName;
-
-                    if(packageMetadata == null) 
-                    {
-                        Output.Write("Debug", Output.Level.Error);
-
-                    }
-                }
-
-                // Check for Supplemen.dsx file.
+                // Check Manifest.dsx file
                 try
                 {
-                    var supplementFileEntry = archive.GetEntry("Supplement.dsx");
-                    if (supplementFileEntry == null)
+                    var manifestFile = archive.GetEntry("Manifest.dsx");
+
+                    if (manifestFile == null)
                     {
                         HasSupplementFile = false;
                         return;
                     }
-                    var supplement = new SupplementFile(supplementFileEntry);
-                    ProductName = supplement.ProductName;
-                    HasSupplementFile = true;
-                }
-                catch (InvalidOperationException)
-                {
-                }
-            }
-            catch (InvalidOperationException e)
-            {
-                Output.Write(e.Message, Output.Level.Error);
-            }
 
+                    var packageXML = PackageManifestFile.GetXML(manifestFile);
+
+                    /// Check for metadata file
+                    var files = PackageManifestFile.GetFiles(packageXML);
+                    metadataFiles = PackageManifestFile.FindMetadataFile(files);
+
+
+                    //var metadataFileEntries = archive.Entries.Where(
+                    //x =>
+                    //(x.FullName.StartsWith("Content/Runtime/Support/") || x.FullName.StartsWith("Content/runtime/Support/"))
+                    //&& x.FullName.EndsWith(".dsx"));
+
+                    var numberOfMetadataFiles = metadataFiles.Count();
+                    MissingMetadata = numberOfMetadataFiles == 0;
+                    MultipleMetadataFiles = numberOfMetadataFiles != 1;
+
+                    if (!MissingMetadata && !MultipleMetadataFiles)
+                    {
+                        var metadataFileEntry = "Content/" + metadataFiles.First();
+
+                        var metadataFile = archive.GetEntry(metadataFileEntry);
+
+                        if (metadataFile == null)
+                        {
+                            MissingMetadata = true;
+                            return;
+                        }
+
+                        packageMetadata = new PackageMetadata(metadataFile);
+                        ProductName = packageMetadata.ProductName;
+
+                        if (packageMetadata == null)
+                        {
+                            Output.Write("Debug", Output.Level.Error);
+
+                        }
+                    }
+
+                    // Check for Supplemen.dsx file.
+                    try
+                    {
+                        var supplementFileEntry = archive.GetEntry("Supplement.dsx");
+                        if (supplementFileEntry == null)
+                        {
+                            HasSupplementFile = false;
+                            return;
+                        }
+                        var supplement = new SupplementFile(supplementFileEntry);
+                        ProductName = supplement.ProductName;
+                        HasSupplementFile = true;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                    }
+                }
+                catch (InvalidOperationException e)
+                {
+                    Output.Write($"{e.Message} {file.FullName}", Output.Level.Error);
+                }
+            }
+            catch (InvalidDataException e)
+            {
+                Output.Write($"{e.Message} {file.FullName}", Output.Level.Error);
+            }
         }
 
 

@@ -115,7 +115,5 @@ namespace Helpers
             //var tabItem = DisplayTab.SelectedItem as TabItem;
             //Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);
         }
-
-
     }
 }

@@ -11,6 +11,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Data;
+using Daz_Package_Manager_Lib;
+
 namespace Daz_Package_Manager
 {
     class ProcessModel : INotifyPropertyChanged
