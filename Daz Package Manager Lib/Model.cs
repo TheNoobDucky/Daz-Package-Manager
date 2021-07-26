@@ -11,85 +11,88 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daz_Package_Manager_Lib
 {
-    public class PackageModel
+    public class Model
     {
-        public PackageModel()
-        {
-            worker.DoWork += ScanInBackground;
-            worker.RunWorkerCompleted += RunWorkerCompleted;
-            worker.ProgressChanged += ProgressChanged;
-            worker.WorkerReportsProgress = true;
-        }
-        private void ScanInBackground(object sender, DoWorkEventArgs e)
+        public Task<List<InstalledPackage>> ScanInBackground(string folder, CancellationToken token)
         {
             var totalTime = new Stopwatch();
             totalTime.Start();
-            BackgroundWorker worker = sender as BackgroundWorker;
+            List<InstalledPackage> packages = null;
 
-            var folder = e.Argument as string;
             if (folder is null or "")
             {
-                Output.Write("Please set install archive folder location", Output.Level.Error);
-                return;
+                Output.Write("Please select install archive folder location", Output.Level.Error);
+                return Task.FromResult(packages);
             }
+            packages = new List<InstalledPackage>();
 
             Output.Write("Start processing install archive folder: " + folder, Output.Level.Status);
             var files = Directory.EnumerateFiles(folder).ToList();
 
-            var numberOfFiles = files.Count;
+            var totalFiles = files.Count;
             var batchSize = 200;
-            var end = 0;
-            var sanityCheck = 0;
-            var packages = new ConcurrentBag<InstalledPackage>();
-            Output.Write("Processing " + numberOfFiles + " files.", Output.Level.Status);
+            var processedFiles = 0;
+            //var packages = new ConcurrentBag<InstalledPackage>();
+            Output.Write("Processing " + totalFiles + " files.", Output.Level.Status);
 
             var timer = new Stopwatch();
             timer.Start();
 
-            for (var start = 0; start < numberOfFiles; start = end)
+            for (var start = 0; start < totalFiles; start = processedFiles)
             {
-                end = Math.Min(start + batchSize, numberOfFiles);
-                var count = end - start;
+                token.ThrowIfCancellationRequested();
 
-                Parallel.For(start, end, x =>
-                {
-                    try
-                    {
-                        packages.Add(new InstalledPackage(new FileInfo(files[x])));
-                    }
-                    catch (DirectoryNotFoundException)
-                    {
-                        Output.Write("Missing files for package: " + files[x], Output.Level.Error);
-                    }
-                    catch (CorruptFileException error)
-                    {
-                        Output.Write(error.Message, Output.Level.Error);
-                    }
-                });
-                sanityCheck += count;
+                var numberOfFilesToProcess = Math.Min(start + batchSize, totalFiles) - start;
+                
+                packages.AddRange(ProcessBundle(files.GetRange(start, numberOfFilesToProcess)));
 
-                var progress = sanityCheck * 100 / numberOfFiles;
+                processedFiles += numberOfFilesToProcess;
+
                 if (timer.Elapsed.TotalSeconds > 1)
                 {
-                    worker.ReportProgress(progress, null);
+                    Output.Write($"{processedFiles} / {totalFiles} files processed:", Output.Level.Alert);
+
                     timer.Restart();
                 }
             }
-            Debug.Assert(sanityCheck == numberOfFiles, "Batch processing implemented incorrectly, missed some packages.");
+            Debug.Assert(processedFiles == totalFiles, "Batch processing implemented incorrectly, missed some packages.");
             Output.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
-            e.Result = packages.ToList();
+            return Task.FromResult(packages);
         }
 
-        public static void UnselectAll(List<InstalledPackage> packages)
+        private static List<InstalledPackage> ProcessBundle(List<string> files)
+        {
+            var packages = new ConcurrentBag<InstalledPackage>();
+
+            Parallel.ForEach(files, file =>
+            {
+                try
+                {
+                    packages.Add(new InstalledPackage(file));
+                }
+                catch (DirectoryNotFoundException)
+                {
+                    Output.Write("Missing files for package: " + file, Output.Level.Error);
+                }
+                catch (CorruptFileException error)
+                {
+                    Output.Write(error.Message, Output.Level.Error);
+                }
+            });
+            return packages.ToList();
+        }
+
+        public static void UnselectPackages(List<InstalledPackage> packages)
         {
             packages.ForEach(x => x.Selected = false);
         }
 
-        public void SaveToFile (string savePath)
+        public void SaveToFile(string savePath)
         {
             var option = new JsonSerializerOptions
             {
@@ -99,7 +102,7 @@ namespace Daz_Package_Manager_Lib
             File.WriteAllText(savePath, JsonSerializer.Serialize(this, option));
         }
 
-        public void LoadFromFile (string saveFileLocation)
+        public void LoadFromFile(string saveFileLocation)
         {
             try
             {
@@ -111,7 +114,7 @@ namespace Daz_Package_Manager_Lib
                 using var packageJsonFile = File.OpenText(saveFileLocation);
                 try
                 {
-                    var model = JsonSerializer.Deserialize<PackageModel>(packageJsonFile.ReadToEnd(), option);
+                    var model = JsonSerializer.Deserialize<Model>(packageJsonFile.ReadToEnd(), option);
                     packageJsonFile.Dispose();
                     ItemsCache = model.ItemsCache;
                     Packages = model.Packages;
@@ -141,6 +144,7 @@ namespace Daz_Package_Manager_Lib
                 OnPropertyChanged();
             }
         }
+
         public void RebuildCache()
         {
             ItemsCache.Clear();
@@ -154,38 +158,7 @@ namespace Daz_Package_Manager_Lib
                 ItemsCache.AddAsset(item, AssetTypes.Other, item.Generations, item.Genders);
             }
         }
-        #endregion
 
-        #region Background worker
-        public void ScanInstallManifestFolderAsync(string folder)
-        {
-            worker.RunWorkerAsync(folder);
-        }
-
-        private void RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            try
-            {
-                if (e.Result is List<InstalledPackage> packages)
-                {
-                    RebuildCache();
-                    Packages = packages;
-                    Output.Write("Finished scaning install archive folder.", Output.Level.Status);
-                }
-            }
-            catch (TargetInvocationException error)
-            {
-                Output.Write("Error source: " + error.InnerException.Source.ToString(), Output.Level.Error);
-                Output.Write("Error error message: " + error.InnerException.Message, Output.Level.Error);
-            }
-        }
-
-        private void ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            Output.Write(e.ProgressPercentage.ToString() + "% of work completed:", Output.Level.Alert);
-        }
-
-        private readonly BackgroundWorker worker = new BackgroundWorker();
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {

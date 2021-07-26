@@ -6,18 +6,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using Daz_Package_Manager_Lib;
 
 namespace Daz_Package_Manager
 {
-    class ProcessModel : INotifyPropertyChanged
+    public class ModelView : INotifyPropertyChanged
     {
-        public PackageModel packageModel = new PackageModel();
+        public Model packageModel = new();
 
         public List<InstalledPackage> Packages
         {
@@ -34,14 +35,12 @@ namespace Daz_Package_Manager
             if (e.PropertyName == "Packages")
             {
                 packageModel.SaveToFile(SaveFileLocation());
-                Working = false;
                 UpdateSelections();
             }
             else
             {
 
             }
-            //UpdateSelections();
         }
 
         public void UpdateSelections()
@@ -72,7 +71,7 @@ namespace Daz_Package_Manager
         public CollectionViewSource TODO { get; set; } = new CollectionViewSource();
 
 
-        public ProcessModel()
+        public ModelView()
         {
             PackagesViewSource.GroupDescriptions.Add(itemAssetTypeGrouping);
             PackagesViewSource.GroupDescriptions.Add(generationGrouping);
@@ -124,17 +123,6 @@ namespace Daz_Package_Manager
             TODO.SortDescriptions.Add(new SortDescription("ProductName", ListSortDirection.Ascending));
 
             packageModel.PropertyChanged += ModelChangedHandler;
-        }
-
-        private bool working = false;
-        public bool Working
-        {
-            get => working;
-            private set
-            {
-                working = value;
-                OnPropertyChanged();
-            }
         }
 
         private double imageSize = Properties.Settings.Default.ImageSize;
@@ -234,13 +222,46 @@ namespace Daz_Package_Manager
         #endregion
 
 
-        public void Scan()
+
+
+        private CancellationTokenSource ManifestScanToken = null;
+
+        public async Task ScanManifestFolder()
         {
-            if (Working = !Working)
+            ManifestScanToken = new CancellationTokenSource();
+            try
             {
+
                 Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
-                packageModel.ScanInstallManifestFolderAsync(Properties.Settings.Default.InstallManifestFolder);
+                var sourceFolder = Properties.Settings.Default.InstallManifestFolder;
+                var packages = await Task.Run(() => packageModel.ScanInBackground(sourceFolder, ManifestScanToken.Token), ManifestScanToken.Token);
+                if (packages != null)
+                {
+                    Packages = packages;
+                    Output.Write("Finished scaning install archive folder.", Output.Level.Status);
+                }
+
+                Output.Write($"Manifest scan task finished.", Output.Level.Status);
             }
+            catch (TargetInvocationException error)
+            {
+                Output.Write("Error source: " + error.InnerException.Source.ToString(), Output.Level.Error);
+                Output.Write("Error error message: " + error.InnerException.Message, Output.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+                Output.Write($"Manifest scan task canceled.", Output.Level.Status);
+            }
+            finally
+            {
+                ManifestScanToken.Dispose();
+            }
+        }
+
+        public void CancelManifestScan()
+        {
+            Output.Write("Canceling manifest scan task.", Output.Level.Status);
+            ManifestScanToken.Cancel();
         }
 
 
@@ -263,6 +284,11 @@ namespace Daz_Package_Manager
             {
                 SelectPackagesBasedOnScene(file);
             }
+        }
+
+        public void UnselectAll() 
+        {
+            Model.UnselectPackages(packageModel.Packages);
         }
 
         public void SelectPackagesBasedOnScene(string sceneLocation)

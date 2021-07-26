@@ -24,8 +24,9 @@ namespace DazPackage
         public List<InstalledFile> Items { get; set; } = new List<InstalledFile>();
         public List<InstalledFile> OtherItems { get; set; } = new List<InstalledFile>();
 
-        public InstalledPackage(FileInfo fileInfo)
+        public InstalledPackage(string file)
         {
+            var fileInfo = new FileInfo(file);
             var installManifest = new InstallManifestFile(fileInfo);
             ProductName = installManifest.ProductName;
             InstalledLocation = installManifest.UserInstallPath;
@@ -97,6 +98,7 @@ namespace DazPackage
         private bool selected = false;
         private static string FindImage(string assetPath)
         {
+            // Note: this is faster than GetFiles
             // Largest image used in hover over menu.
             var figureImage = Path.ChangeExtension(assetPath, ".tip.png");
 

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using DazPackage;
+using Daz_Package_Manager_Lib;
 
 namespace Daz_Package_Manager
 {
@@ -25,12 +26,12 @@ namespace Daz_Package_Manager
             }
             Output.RegisterDebugField(DebugText);
             Output.WriteDebug = true;
-            DataContext = model;
-            model.PropertyChanged += ScanCompleted;
-            model.LoadCache();
+            DataContext = modelView;
+            modelView.LoadCache();
         }
 
-        readonly ProcessModel model = new ProcessModel();
+        readonly ModelView modelView = new ModelView();
+        private const string waitText = "Cancel";
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
@@ -38,7 +39,7 @@ namespace Daz_Package_Manager
             Directory.CreateDirectory(destination);
             var makeCopy = Properties.Settings.Default.MakeCopy;
             var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-            model.GenerateVirtualInstallFolder(destination, makeCopy, warnMissingFile);
+            modelView.GenerateVirtualInstallFolder(destination, makeCopy, warnMissingFile);
         }
 
         private string InstallFolder ()
@@ -70,26 +71,21 @@ namespace Daz_Package_Manager
             VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene);
         }
 
-        private void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
+        private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            if (!model.Working)
+            if (sender is System.Windows.Controls.Button button)
             {
-                model.Scan();
-            }
-        }
+                if (button.Content is string prev_text)
+                {
+                    if (prev_text == waitText)
+                    {
+                        modelView.CancelManifestScan();
+                        return;
+                    }
 
-        private void ScanCompleted(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Working")
-            {
-                var model = (ProcessModel)sender;
-                if (model.Working)
-                {
-                    ScanInstallManifestFolderButton.Content = "Waiting For Scan To Complete.";
-                }
-                else
-                {
-                    ScanInstallManifestFolderButton.Content = "Scan Install Manifest Archive."; // TODO improve this.
+                    button.Content = waitText;
+                    await modelView.ScanManifestFolder();
+                    button.Content = prev_text;
                 }
             }
         }
@@ -98,11 +94,11 @@ namespace Daz_Package_Manager
         {
             if (Properties.Settings.Default.BatchProcessScene)
             {
-                model.SelectPackagesBasedOnFolder(Properties.Settings.Default.SceneFile);
+                modelView.SelectPackagesBasedOnFolder(Properties.Settings.Default.SceneFile);
             }
             else
             {
-                model.SelectPackagesBasedOnScene(Properties.Settings.Default.SceneFile);
+                modelView.SelectPackagesBasedOnScene(Properties.Settings.Default.SceneFile);
             }
         }
 
@@ -158,13 +154,13 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            PackageModel.UnselectAll(model.Packages);
+            modelView.UnselectAll();
         }
         private static TraceSource ts = new TraceSource("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            model.LoadCache();
+            modelView.LoadCache();
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
