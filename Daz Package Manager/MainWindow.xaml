@@ -189,7 +189,8 @@ mc:Ignorable="d" Title="MainWindow"
                     Content="TODO Add 3rd Party Folder" />
             <Button Grid.Row="3" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Remove 3rd Party Folder" />
-            
+            <ListBox Name="OtherPartyFolders"  Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="2" ItemsSource="{Binding OtherFolders}"/>
+
         </Grid>
 
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">

@@ -3,6 +3,7 @@ using Helpers;
 using OsHelper;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -77,6 +78,64 @@ namespace Daz_Package_Manager
         }
 
         private CancellationTokenSource ManifestScanToken = null;
+        public ObservableCollection<string> OtherFolders { get; private set; } = new();
+
+        public void Add3rdPartyFolder ()
+        {
+            var (success, folder) = SelectFolder.AskForLocation();
+            if (success)
+            {
+                OtherFolders.Add(folder);
+                Save3rdPartyFolders();
+            }
+        }
+
+        public void Remove3rdPartyFolder (int index)
+        {
+            OtherFolders.RemoveAt(index);
+            Save3rdPartyFolders();
+        }
+
+        private void Save3rdPartyFolders ()
+        {
+            var option = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
+            };
+            var savePath = SaveFileLocation(otherFoldersJsonFile);
+            File.WriteAllText(savePath, JsonSerializer.Serialize(OtherFolders, option));
+
+        }
+
+        public void Load3rdPartyFolders ()
+        {
+            var saveFileLocation = SaveFileLocation(otherFoldersJsonFile);
+            try
+            {
+                var option = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    WriteIndented = true
+                };
+                using var jsonFile = File.OpenText(saveFileLocation);
+                try
+                {
+                    var folders = JsonSerializer.Deserialize<ObservableCollection<string>>(jsonFile.ReadToEnd(), option);
+                    jsonFile.Dispose();
+                    OtherFolders = folders;
+                }
+                catch (JsonException)
+                {
+                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
+                    jsonFile.Dispose();
+                    File.Delete(saveFileLocation);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+            }
+        }
 
         public async Task ScanManifestFolder()
         {
@@ -199,13 +258,13 @@ namespace Daz_Package_Manager
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
-            var savePath = SaveFileLocation();
+            var savePath = SaveFileLocation(archiveJsonFile);
             File.WriteAllText(savePath, JsonSerializer.Serialize(packages.Packages, option));
         }
 
         public void LoadPackagesCache()
         {
-            var saveFileLocation = SaveFileLocation();
+            var saveFileLocation = SaveFileLocation(archiveJsonFile);
             try
             {
                 var option = new JsonSerializerOptions
@@ -232,9 +291,12 @@ namespace Daz_Package_Manager
             }
         }
 
-        private static string SaveFileLocation()
+        private const string archiveJsonFile = "Archive.json";
+        private const string otherFoldersJsonFile = "3rdPartyFolder.json";
+
+        private static string SaveFileLocation(string filename)
         {
-            return Path.Combine(Properties.Settings.Default.CacheLocation, "Archive.json");
+            return Path.Combine(Properties.Settings.Default.CacheLocation, filename);
         }
         #endregion
 

@@ -4,7 +4,7 @@ namespace OsHelper
 {
     public class SelectFolder
     {
-        public static (bool, string) AskForLocation()
+        public static (bool success, string location) AskForLocation()
         {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             DialogResult result = dialog.ShowDialog();
