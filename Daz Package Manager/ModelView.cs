@@ -75,24 +75,51 @@ namespace Daz_Package_Manager
 
             packages.PropertyChanged += ModelChangedHandler;
             settings.PropertyChanged += GuiSettingChangedHandler;
+
+            OtherParty.PropertyChanged += UpdateOtherPartyView;
         }
 
         private CancellationTokenSource ManifestScanToken = null;
-        public ObservableCollection<string> OtherFolders { get; private set; } = new();
 
-        public void Add3rdPartyFolder ()
+        public CollectionViewSource OtherPartyFoldersSource { get; private set; } = new();
+        public OtherPartyFolders OtherParty { get; private set; } = new();
+
+        private CancellationTokenSource OtherPartyToken = null;
+
+
+
+        public async Task Add3rdPartyFolder ()
         {
             var (success, folder) = SelectFolder.AskForLocation();
             if (success)
             {
-                OtherFolders.Add(folder);
-                Save3rdPartyFolders();
+                try
+                {
+                    Output.Write($"Scanning 3rd party folder {folder}", Output.Level.Status);
+                    OtherPartyToken = new();
+                    await Task.Run(()=>OtherParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
+                    Save3rdPartyFolders();
+                    Output.Write($"Finished scanning 3rd party folder {folder}", Output.Level.Status);
+                }
+                catch (TargetInvocationException error)
+                {
+                    Output.Write($"Error source: {error.InnerException.Source.ToString()}", Output.Level.Error);
+                    Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+                }
+                catch (OperationCanceledException)
+                {
+                    Output.Write($"Scanning 3rd party folder task canceled.", Output.Level.Status);
+                }
+                finally
+                {
+                    OtherPartyToken.Dispose();
+                }
             }
         }
 
         public void Remove3rdPartyFolder (int index)
         {
-            OtherFolders.RemoveAt(index);
+            OtherParty.RemoveFolder(index);
             Save3rdPartyFolders();
         }
 
@@ -104,7 +131,10 @@ namespace Daz_Package_Manager
                 WriteIndented = true
             };
             var savePath = SaveFileLocation(otherFoldersJsonFile);
-            File.WriteAllText(savePath, JsonSerializer.Serialize(OtherFolders, option));
+            File.WriteAllText(savePath, JsonSerializer.Serialize(OtherParty.Folders, option));
+
+            savePath = SaveFileLocation("temp.json");
+            File.WriteAllText(savePath, JsonSerializer.Serialize(OtherParty.Files, option));
 
         }
 
@@ -121,9 +151,16 @@ namespace Daz_Package_Manager
                 using var jsonFile = File.OpenText(saveFileLocation);
                 try
                 {
-                    var folders = JsonSerializer.Deserialize<ObservableCollection<string>>(jsonFile.ReadToEnd(), option);
+                    var folders = JsonSerializer.Deserialize<List<string>>(jsonFile.ReadToEnd(), option);
                     jsonFile.Dispose();
-                    OtherFolders = folders;
+                    OtherParty.Folders.AddRange(folders);
+
+                    saveFileLocation = SaveFileLocation("temp.json");
+                    using var jsonFile2 = File.OpenText(saveFileLocation);
+                    var files = JsonSerializer.Deserialize<List<OtherPartyFolder>>(jsonFile2.ReadToEnd(), option);
+                    OtherParty.Files = files;
+                    jsonFile2.Dispose();
+                    UpdateOtherPartyView(); //TODO tidy up.
                 }
                 catch (JsonException)
                 {
@@ -196,9 +233,34 @@ namespace Daz_Package_Manager
                     package.Selected = true;
                     Output.Write(package.ProductName, Output.Level.Info);
                 });
+
                 if (remainingFiles.Count > 0)
                 {
+                    //TODO tidy up
+                    var otherPartyFiles = OtherParty.AllFiles();
+                    var foundFiles = otherPartyFiles.Where(x =>
+                    {
+                        var relativePath = Path.GetRelativePath(x.BasePath, x.Path).ToLower().Replace('\\', '/');
+                        var result = remainingFiles.Contains(relativePath);
+                        return result;
+                    });
 
+                    if (foundFiles.Any())
+                    {
+                        Output.Write("3rd Party files Selected:", Output.Level.Status);
+                        foreach (var file in foundFiles)
+                        {
+                            file.Selected = true;
+                            Output.Write(file.Path, Output.Level.Info);
+                            var relativePath = Path.GetRelativePath(file.BasePath, file.Path).ToLower().Replace('\\', '/');
+                            _ = remainingFiles.Remove(relativePath);
+                        }
+                    }
+
+                }
+
+                if (remainingFiles.Count > 0)
+                { 
                     Output.Write("Unable to find reference for the following files:", Output.Level.Status);
                     remainingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
                 }
@@ -234,10 +296,27 @@ namespace Daz_Package_Manager
                 } 
                 catch (SymLinkerError error)
                 {
-                    Output.Write("Error creating symlink file, aborting.", Output.Level.Error);
+                    Output.Write($"Unable to copy file {error.Message}", Output.Level.Error);
                     MessageBox.Show(error.Message);
                 }
             }
+
+            var files = OtherParty.AllSelected();
+            foreach (var file in files)
+            {
+                try
+                {
+                    var filename = Path.GetRelativePath(file.BasePath, file.Path);
+                    Output.Write($"Installing: {filename}", Output.Level.Info);
+                    VirtualPackage.Install(filename, file.BasePath, destination, makeCopy, warnMissingFile);
+                }
+                catch (SymLinkerError error)
+                {
+                    Output.Write($"Unable to copy file {error.Message}", Output.Level.Error);
+                    MessageBox.Show(error.Message);
+                }
+            }
+
             Output.Write("Install to virtual folder complete.", Output.Level.Status);
         }
 
@@ -359,6 +438,18 @@ namespace Daz_Package_Manager
         {
             CustomSort = stringCompare
         };
+        #endregion
+        #region Other Party View
+        public CollectionViewSource OtherPartyView { get; set; } = new();
+        private void UpdateOtherPartyView(object sender, PropertyChangedEventArgs e)
+        {
+            UpdateOtherPartyView();
+        }
+        private void UpdateOtherPartyView()
+        {
+            OtherPartyView.Source = OtherParty.AllFiles().ToList();
+        }
+
         #endregion
 
         #region Gui Settings

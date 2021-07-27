@@ -5,9 +5,9 @@
         xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
         xmlns:Helpers="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties"
-        d:DataContext="{d:DesignInstance Type=local:ModelView}" 
-mc:Ignorable="d" Title="MainWindow"
-        Height="1200" Width="1500">
+        d:DataContext="{d:DesignInstance Type=local:ModelView}" mc:Ignorable="d" Title="MainWindow" Height="1200"
+        Loaded="Window_Loaded"
+        Width="1500">
     <Window.Resources>
         <DataTemplate x:Key="SelectCheckbox">
             <CheckBox Width="Auto" IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
@@ -59,8 +59,8 @@ mc:Ignorable="d" Title="MainWindow"
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
 
         <FrameworkElement x:Name="DummyContext" Width="{Binding Settings.ImageSize}" Visibility="Collapsed" />
@@ -85,6 +85,7 @@ mc:Ignorable="d" Title="MainWindow"
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
+               
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="{StaticResource DefaultMargin}" />
@@ -130,7 +131,7 @@ mc:Ignorable="d" Title="MainWindow"
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Step 7: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="6" Grid.Column="1" Click="GenerateInstallScript"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Install Script (optional)" />
-            <TextBlock Grid.Row="6" Grid.Column="2" Text="Will be saved to scene" Margin="{StaticResource DefaultMargin}" />
+            <TextBlock Grid.Row="6" Grid.Column="2" Text="Will be saved to scene folder" Margin="{StaticResource DefaultMargin}" />
 
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Cache Location" />
@@ -186,10 +187,11 @@ mc:Ignorable="d" Title="MainWindow"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
 
             <Button Grid.Row="3" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
-                    Content="TODO Add 3rd Party Folder" />
+                    Content="Add 3rd Party Folder" />
             <Button Grid.Row="3" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Remove 3rd Party Folder" />
-            <ListBox Name="OtherPartyFolders"  Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="2" ItemsSource="{Binding OtherFolders}"/>
+            <ListBox Name="OtherPartyFolders" Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="2" Grid.RowSpan="3"
+                    ItemsSource="{Binding OtherParty.Folders}"/>
 
         </Grid>
 
@@ -456,18 +458,14 @@ mc:Ignorable="d" Title="MainWindow"
             </TabItem>
 
             <TabItem Header="3rd Party">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-
-                </Grid>
+                <DataGrid Name="OtherPartyFiles" ItemsSource="{Binding OtherPartyView.View}" IsReadOnly="False"
+                        AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
+                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
+                        <DataGridTextColumn Header="File Location" Binding="{Binding Path}" IsReadOnly="True" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </TabItem>
 
             <TabItem Header="Accessories Gallery">

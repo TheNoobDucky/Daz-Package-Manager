@@ -23,8 +23,7 @@ namespace OsHelper
             {
                 var error = DecodeErrorCode(errorCode);
                 throw new SymLinkerError(
-                    "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
-                            "Win32 Error Message: " + error);
+                    $"Failed to create symlink, please check developer mode is turned on or run as administrator.\nWin32 Error Message: {error}. \nFile:{source}");
             }
         }
 

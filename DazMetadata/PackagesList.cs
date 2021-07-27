@@ -15,7 +15,7 @@ using System.Windows;
 
 namespace DazPackage
 {
-    public class PackagesList
+    public class PackagesList : INotifyPropertyChanged
     {
         public Task ScanInBackground(string folder, CancellationToken token)
         {

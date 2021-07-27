@@ -1,12 +1,10 @@
-﻿using Helpers;
+﻿using DazPackage;
+using Helpers;
 using OsHelper;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using DazPackage;
-using System.Collections.Generic;
 
 namespace Daz_Package_Manager
 {
@@ -28,7 +26,6 @@ namespace Daz_Package_Manager
             Output.WriteDebug = true;
             DataContext = modelView;
             modelView.LoadPackagesCache();
-            modelView.Load3rdPartyFolders();
         }
 
         private readonly ModelView modelView = new ();
@@ -169,9 +166,9 @@ namespace Daz_Package_Manager
             Properties.Settings.Default.Save();
         }
 
-        private void Add3rdPartyFolder(object sender, RoutedEventArgs e)
+        private async void Add3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            modelView.Add3rdPartyFolder();
+            await modelView.Add3rdPartyFolder();
         }
 
         private void Remove3rdPartyFolder(object sender, RoutedEventArgs e)
@@ -180,6 +177,11 @@ namespace Daz_Package_Manager
             var index = OtherPartyFolders.SelectedIndex;
             modelView.Remove3rdPartyFolder(index);
 
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            modelView.Load3rdPartyFolders();
         }
     }
 }
