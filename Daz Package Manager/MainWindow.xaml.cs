@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using DazPackage;
-using Daz_Package_Manager_Lib;
 
 namespace Daz_Package_Manager
 {
@@ -27,10 +26,10 @@ namespace Daz_Package_Manager
             Output.RegisterDebugField(DebugText);
             Output.WriteDebug = true;
             DataContext = modelView;
-            modelView.LoadCache();
+            modelView.LoadPackagesCache();
         }
 
-        readonly ModelView modelView = new ModelView();
+        private readonly ModelView modelView = new ();
         private const string waitText = "Cancel";
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
@@ -160,12 +159,22 @@ namespace Daz_Package_Manager
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            modelView.LoadCache();
+            modelView.LoadPackagesCache();
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
+        }
+
+        private void Add3rdPartyFolder(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Remove3rdPartyFolder(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

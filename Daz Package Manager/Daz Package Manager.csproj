@@ -21,7 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Daz Package Manager Lib\Daz Package Manager Lib.csproj" />
     <ProjectReference Include="..\DazMetadata\DazPackage.csproj" />
     <ProjectReference Include="..\Helper\Helpers.csproj" />
     <ProjectReference Include="..\OsHelper\OsHelper.csproj" />

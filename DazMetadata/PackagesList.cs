@@ -1,5 +1,4 @@
-﻿using DazPackage;
-using Helpers;
+﻿using Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,29 +6,29 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
-namespace Daz_Package_Manager_Lib
+namespace DazPackage
 {
-    public class Model
+    public class PackagesList
     {
-        public Task<List<InstalledPackage>> ScanInBackground(string folder, CancellationToken token)
+        public Task ScanInBackground(string folder, CancellationToken token)
         {
             var totalTime = new Stopwatch();
             totalTime.Start();
-            List<InstalledPackage> packages = null;
+            List<InstalledPackage> newPackages = null;
 
             if (folder is null or "")
             {
                 Output.Write("Please select install archive folder location", Output.Level.Error);
-                return Task.FromResult(packages);
+                return Task.FromResult(newPackages);
             }
-            packages = new List<InstalledPackage>();
+            newPackages = new List<InstalledPackage>();
 
             Output.Write("Start processing install archive folder: " + folder, Output.Level.Status);
             var files = Directory.EnumerateFiles(folder).ToList();
@@ -49,7 +48,7 @@ namespace Daz_Package_Manager_Lib
 
                 var numberOfFilesToProcess = Math.Min(start + batchSize, totalFiles) - start;
                 
-                packages.AddRange(ProcessBundle(files.GetRange(start, numberOfFilesToProcess)));
+                newPackages.AddRange(ProcessBundle(files.GetRange(start, numberOfFilesToProcess)));
 
                 processedFiles += numberOfFilesToProcess;
 
@@ -62,7 +61,8 @@ namespace Daz_Package_Manager_Lib
             }
             Debug.Assert(processedFiles == totalFiles, "Batch processing implemented incorrectly, missed some packages.");
             Output.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
-            return Task.FromResult(packages);
+            Packages = newPackages;
+            return Task.CompletedTask;
         }
 
         private static List<InstalledPackage> ProcessBundle(List<string> files)
@@ -102,38 +102,9 @@ namespace Daz_Package_Manager_Lib
             File.WriteAllText(savePath, JsonSerializer.Serialize(this, option));
         }
 
-        public void LoadFromFile(string saveFileLocation)
-        {
-            try
-            {
-                var option = new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = true
-                };
-                using var packageJsonFile = File.OpenText(saveFileLocation);
-                try
-                {
-                    var model = JsonSerializer.Deserialize<Model>(packageJsonFile.ReadToEnd(), option);
-                    packageJsonFile.Dispose();
-                    ItemsCache = model.ItemsCache;
-                    Packages = model.Packages;
-                }
-                catch (JsonException)
-                {
-                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
-                    packageJsonFile.Dispose();
-                    File.Delete(saveFileLocation);
-                }
-            }
-            catch (FileNotFoundException)
-            {
-            }
-        }
-
         #region Cache
-        public AssetCache ItemsCache = new AssetCache();
-        private List<InstalledPackage> packages = new List<InstalledPackage>();
+        public AssetCache ItemsCache = new();
+        private List<InstalledPackage> packages = new();
         public List<InstalledPackage> Packages
         {
             get => packages;
@@ -162,7 +133,7 @@ namespace Daz_Package_Manager_Lib
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            Application.Current.Dispatcher.Invoke(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
         }
         #endregion
     }

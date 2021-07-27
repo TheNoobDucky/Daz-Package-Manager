@@ -4,7 +4,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
         xmlns:Helpers="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
-        xmlns:properties="clr-namespace:Daz_Package_Manager.Properties" mc:Ignorable="d" Title="MainWindow"
+        xmlns:properties="clr-namespace:Daz_Package_Manager.Properties"
+        d:DataContext="{d:DesignInstance Type=local:ModelView}" 
+mc:Ignorable="d" Title="MainWindow"
         Height="1200" Width="1500">
     <Window.Resources>
         <DataTemplate x:Key="SelectCheckbox">
@@ -61,7 +63,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <FrameworkElement x:Name="DummyContext" Width="{Binding ImageSize}" Visibility="Collapsed" />
+        <FrameworkElement x:Name="DummyContext" Width="{Binding Settings.ImageSize}" Visibility="Collapsed" />
 
         <Grid Grid.Row="0" Grid.Column="0" Margin="{StaticResource DefaultMargin}">
             <Grid.RowDefinitions>
@@ -79,6 +81,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -111,7 +114,7 @@
             <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding BatchProcessScene}"
-                    Content="Batch select packages all scenes in the same folder" />
+                    Content="Batch process all scenes in the same folder" />
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="{StaticResource DefaultMargin}"
@@ -130,7 +133,7 @@
             <TextBlock Grid.Row="6" Grid.Column="2" Text="Will be saved to scene" Margin="{StaticResource DefaultMargin}" />
 
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
-                    Content="Select Where To Save Cache File" />
+                    Content="Select Cache Location" />
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding CacheLocation}" />
@@ -155,33 +158,37 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Margin="5 0" IsChecked="{Binding ImageVisible, Mode=TwoWay}"
+                <CheckBox Grid.Column="0" Margin="5 0" IsChecked="{Binding Settings.ImageVisible, Mode=TwoWay}"
                         Content="Show Images" />
                 <TextBlock Grid.Column="1" Margin="5, 0" Text="Image Size:" />
-                <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding ImageSize}" Minimum="0"
+                <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding Settings.ImageSize}" Minimum="0"
                         Maximum="500" SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
             </Grid>
 
             <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen0}" Content="Unknown" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen4}" Content="Gen 4" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen5}" Content="Genesis 1" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen6}" Content="Genesis 2" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen7}" Content="Genesis 3" />
-                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding ToggleGen8}" Content="Genesis 8" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen0}" Content="Unknown" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen4}" Content="Gen 4" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen5}" Content="Genesis 1" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen6}" Content="Genesis 2" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen7}" Content="Genesis 3" />
+                <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen8}" Content="Genesis 8" />
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="100">
-                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ToggleUnknownGender}" Content="Unknown"
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleUnknownGender}" Content="Unknown"
                         Margin="5 1" />
-                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ToggleFemale}" Content="Female" Margin="5 1" />
-                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding ToggleMale}" Content="Male" Margin="5 1" />
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleFemale}" Content="Female" Margin="5 1" />
+                <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleMale}" Content="Male" Margin="5 1" />
             </StackPanel>
 
             <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
 
+            <Button Grid.Row="3" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+                    Content="TODO Add 3rd Party Folder" />
+            <Button Grid.Row="3" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+                    Content="Remove 3rd Party Folder" />
             
         </Grid>
 
@@ -214,8 +221,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -238,8 +245,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -262,8 +269,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -286,8 +293,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -310,8 +317,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -334,8 +341,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -358,8 +365,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -382,8 +389,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -406,8 +413,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -430,8 +437,8 @@
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
                                 CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
                         <DataGridTemplateColumn Header="Image" IsReadOnly="True"
-                                Width="{Binding DataContext.ImageSize,Source={x:Reference DummyContext}}"
-                                Visibility="{Binding DataContext.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
+                                Width="{Binding DataContext.Settings.ImageSize,Source={x:Reference DummyContext}}"
+                                Visibility="{Binding DataContext.Settings.ImageVisible, Source={x:Reference DummyContext}, Converter={StaticResource BoolToVis}}"
                                 CellTemplate="{StaticResource ImageBox}" />
                         <DataGridTextColumn Header="Figure Location" Binding="{Binding Path}" IsReadOnly="True" />
                         <DataGridTextColumn Header="Product Name" Binding="{Binding ProductName}" IsReadOnly="True" />
@@ -447,14 +454,29 @@
                 </DataGrid>
             </TabItem>
 
+            <TabItem Header="3rd Party">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+
+                </Grid>
+            </TabItem>
+
             <TabItem Header="Accessories Gallery">
                 <ListBox Name="AccessoriesViewer" ItemsSource="{Binding Accessories.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=AccessoriesViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=AccessoriesViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=AccessoriesViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=AccessoriesViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=AccessoriesViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -472,8 +494,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=AttachmentsViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=AttachmentsViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=AttachmentsViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=AttachmentsViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=AttachmentsViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -491,8 +513,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=CharactersViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=CharactersViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=CharactersViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=CharactersViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -510,8 +532,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=ClothingsViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=ClothingsViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=ClothingsViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=ClothingsViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=ClothingsViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -529,8 +551,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=HairsViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=HairsViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=HairsViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=HairsViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=HairsViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -548,8 +570,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=MorphsViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=MorphsViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=MorphsViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=MorphsViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=MorphsViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -567,8 +589,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=PropsView}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=PropsView}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=PropsView}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=PropsView}"
                                     MaxWidth="{Binding ActualWidth, ElementName=PropsView}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
@@ -586,8 +608,8 @@
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"
-                                    ItemWidth="{Binding DataContext.ImageSize,ElementName=PosesViewer}"
-                                    ItemHeight="{Binding DataContext.ImageSize,ElementName=PosesViewer}"
+                                    ItemWidth="{Binding DataContext.Settings.ImageSize,ElementName=PosesViewer}"
+                                    ItemHeight="{Binding DataContext.Settings.ImageSize,ElementName=PosesViewer}"
                                     MaxWidth="{Binding ActualWidth, ElementName=PosesViewer}" />
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
