@@ -6,28 +6,26 @@ namespace OsHelper
     {
         public static (bool success, string location) AskForLocation()
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            DialogResult result = dialog.ShowDialog();
-
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                return (true, dialog.SelectedPath);
-            }
-            return (false, null);
+            FolderBrowserDialog dialog = new();
+            var result = dialog.ShowDialog();
+            return result == DialogResult.OK ? (true, dialog.SelectedPath) : (false, null);
         }
     }
     public class SelectFile
     {
-        public static (bool success, string location) AskForLocation()
+        public static (bool success, string location) AskForOpenLocation()
         {
-            OpenFileDialog dialog = new OpenFileDialog();
-            DialogResult result = dialog.ShowDialog();
+            OpenFileDialog dialog = new();
+            var result = dialog.ShowDialog();
+            return result == DialogResult.OK ? (true, dialog.FileName) : (false, null);
+        }
 
-            if (result == System.Windows.Forms.DialogResult.OK)
-            {
-                return (true, dialog.FileName);
-            }
-            return (false, null);
+        public static (bool success, string location) AskForSaveLocation(string filter = "json file (*.json)|*.json|text file (*.txt)|*.txt|All files|*.*")
+        {
+            SaveFileDialog dialog = new();
+            dialog.Filter = filter;
+            var result = dialog.ShowDialog();
+            return result == DialogResult.OK ? (true, dialog.FileName) : (false, null);
         }
     }
 }

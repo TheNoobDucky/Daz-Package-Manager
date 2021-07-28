@@ -117,6 +117,16 @@ namespace DazPackage
             return Task.CompletedTask;
         }
 
+        public void SelectFiles(List<string> selection)
+        {
+            var files = AllFiles().Where(x=>selection.Contains(x.Path));
+            foreach (var file in files)
+            {
+                file.Selected = true;
+            }
+        }
+
+
         public Task ReloadFolders(CancellationToken token)
         {
             var folders = new List<string>(Folders);
