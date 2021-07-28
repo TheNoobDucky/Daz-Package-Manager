@@ -8,9 +8,15 @@
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<PackageId>DazPackageManager</PackageId>
-	<Version>1.5.0</Version>
+	<Version>1.6.0</Version>
 	<Configurations>Debug;Release;Shipping</Configurations>
 	<ApplicationIcon>ducks.ico</ApplicationIcon>
+	<PackageProjectUrl></PackageProjectUrl>
+	<PackageIcon>ducks.ico</PackageIcon>
+	<PackageIconUrl />
+	<RepositoryUrl>https://github.com/TheNoobDucky/Daz-Package-Manager</RepositoryUrl>
+	<SignAssembly>false</SignAssembly>
+	<AssemblyName />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
@@ -38,6 +44,10 @@
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="ducks.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
     </None>
   </ItemGroup>
 
