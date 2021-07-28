@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace DazPackage
 {
-    public class OtherPartyEntry : INotifyPropertyChanged
+    public class ThirdPartyEntry : INotifyPropertyChanged
     {
         public string Path { get; set; }
         public string BasePath { get; set; }
@@ -30,7 +30,7 @@ namespace DazPackage
                 OnPropertyChanged();
             }
         }
-        public OtherPartyFolder Folder { get; set; }
+        public ThirdPartyFolder Folder { get; set; }
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,7 +41,7 @@ namespace DazPackage
         #endregion
     }
 
-    public class OtherPartyFolder
+    public class ThirdPartyFolder
     {
         public bool Selected
         {
@@ -59,20 +59,20 @@ namespace DazPackage
             }
         }
 
-        public List<OtherPartyEntry> Self { get; set; } = new();
-        public OtherPartyEntry SelfEntry { get => Self[0]; set => Self[0] = value; }
-        public List<OtherPartyEntry> Files { get; set; } = new();
-        public List<OtherPartyFolder> Folders { get; set; } = new();
+        public List<ThirdPartyEntry> Self { get; set; } = new();
+        public ThirdPartyEntry SelfEntry { get => Self[0]; set => Self[0] = value; }
+        public List<ThirdPartyEntry> Files { get; set; } = new();
+        public List<ThirdPartyFolder> Folders { get; set; } = new();
         public string Folder { get; set; }
         public string BasePath { get; set; }
 
         public Task ScanFiles(CancellationToken token)
         {
-            Self.Add(new OtherPartyEntry { Folder = this, Path = Folder, BasePath = BasePath, IsDirectory = true });
+            Self.Add(new ThirdPartyEntry { Folder = this, Path = Folder, BasePath = BasePath, IsDirectory = true });
             var subFolders = Directory.EnumerateDirectories(Folder);
             foreach (var subFolder in subFolders)
             {
-                var newFolder = new OtherPartyFolder { Folder = subFolder, BasePath = BasePath };
+                var newFolder = new ThirdPartyFolder { Folder = subFolder, BasePath = BasePath };
                 Folders.Add(newFolder);
                 newFolder.ScanFiles(token);
             }
@@ -81,13 +81,13 @@ namespace DazPackage
             foreach (var file in files)
             {
                 token.ThrowIfCancellationRequested();
-                Files.Add(item: new OtherPartyEntry { Folder = this, Path = file, BasePath = BasePath, IsDirectory = false });
+                Files.Add(item: new ThirdPartyEntry { Folder = this, Path = file, BasePath = BasePath, IsDirectory = false });
 
             }
             return Task.CompletedTask;
         }
 
-        public IEnumerable<OtherPartyEntry> GetAllFiles()
+        public IEnumerable<ThirdPartyEntry> GetAllFiles()
         {
             return Self.Concat(Folders.SelectMany(x => x.GetAllFiles())).Concat(Files);
         }
@@ -96,12 +96,12 @@ namespace DazPackage
     public class ThirdPartyFolders : INotifyPropertyChanged
     {
         public ObservableCollection<string> Folders { get; set; } = new();
-        public List<OtherPartyFolder> Files { get; set; } = new();
+        public List<ThirdPartyFolder> Files { get; set; } = new();
 
         public Task AddFolder(string folder, CancellationToken token)
         {
             Application.Current.Dispatcher.Invoke(() => Folders.Add(folder));
-            var newFiles = new OtherPartyFolder { Folder = folder, BasePath = folder };
+            var newFiles = new ThirdPartyFolder { Folder = folder, BasePath = folder };
             Files.Add(newFiles);
             newFiles.ScanFiles(token);
             OnPropertyChanged();
@@ -140,14 +140,34 @@ namespace DazPackage
             }
         }
 
-        public IEnumerable<OtherPartyEntry> AllFiles()
+        public IEnumerable<ThirdPartyEntry> AllFiles()
         {
             return Files.SelectMany(x => x.GetAllFiles());
         }
 
-        public IEnumerable<OtherPartyEntry> AllSelected()
+        public IEnumerable<ThirdPartyEntry> AllSelected()
         {
             return AllFiles().Where(x => x.Selected && !x.IsDirectory);
+        }
+
+        public (List<ThirdPartyEntry> foundFiles, List<string>remainingFiles) GetFiles(List<string> files)
+        {
+            var otherPartyFiles = AllFiles();
+            var foundFiles = otherPartyFiles.Where(x =>
+            {
+                var relativePath = Path.GetRelativePath(x.BasePath, x.Path).ToLower().Replace('\\', '/');
+                var result = files.Contains(relativePath);
+                return result;
+            });
+
+            var remainingFiles = new List<string>(files);
+            foreach (var file in foundFiles)
+            {
+                var relativePath = Path.GetRelativePath(file.BasePath, file.Path).ToLower().Replace('\\', '/');
+                _ = remainingFiles.Remove(relativePath);
+            }
+
+            return (foundFiles.ToList(), remainingFiles);
         }
 
         #region INotifyPropertyChanged
