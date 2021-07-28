@@ -90,6 +90,15 @@ namespace DazPackage
             packages.ForEach(x => x.Selected = false);
         }
 
+        public void SelectPackages (List<string> packageNames)
+        {
+            var selectedPackages = packages.Where(x => packageNames.Contains(x.ProductName)); 
+            foreach (var package in selectedPackages)
+            {
+                package.Selected = true;
+            }
+        }
+
         #region Cache
         public AssetCache ItemsCache = new();
         private List<InstalledPackage> packages = new();

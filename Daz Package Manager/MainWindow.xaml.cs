@@ -127,7 +127,7 @@ namespace Daz_Package_Manager
 
         private void SelectSceneFile(object sender, RoutedEventArgs e)
         {
-            var (success, location) = SelectFile.AskForLocation();
+            var (success, location) = SelectFile.AskForOpenLocation();
             if (success)
             {
                 Properties.Settings.Default.SceneFile = location;
@@ -232,6 +232,16 @@ namespace Daz_Package_Manager
                     RemoveThirdPartyButton.Content = removeContent;
                 }
             }
+        }
+
+        private void SaveSelection(object sender, RoutedEventArgs e)
+        {
+            modelView.SaveSelectionsToFile();
+        }
+
+        private void LoadSelection(object sender, RoutedEventArgs e)
+        {
+            modelView.LoadSelectionsFromFile();
         }
     }
 }
