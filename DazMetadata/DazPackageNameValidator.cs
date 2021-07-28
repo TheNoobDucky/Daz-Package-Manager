@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 
 namespace DazPackage
@@ -13,7 +10,7 @@ namespace DazPackage
         {
             return regex.Match(filename).Success;
         }
-        static readonly Regex regex = new Regex(@"^([A-Z][0-9A-Z]{0,6})(?=\d{8})(\d{8})(-(\d{2}))?_([0-9A-Za-z]+)\.zip$");
+        static readonly Regex regex = new(@"^([A-Z][0-9A-Z]{0,6})(?=\d{8})(\d{8})(-(\d{2}))?_([0-9A-Za-z]+)\.zip$");
 
         public static string StripInvalidCharacter(string input)
         {

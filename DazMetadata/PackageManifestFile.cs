@@ -25,7 +25,7 @@ namespace DazPackage
             }
         }
 
-        public static List<string> GetFiles (XElement content)
+        public static List<string> GetFiles(XElement content)
         {
             var fileEntries = content.Elements("File")?.Attributes("VALUE");
 
@@ -40,7 +40,7 @@ namespace DazPackage
             return Files;
         }
 
-        public static List<string> FindMetadataFile (List<string> files)
+        public static List<string> FindMetadataFile(List<string> files)
         {
             var MetadataFiles = files.Where(x =>
             {

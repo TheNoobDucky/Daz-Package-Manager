@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using static System.Text.Json.JsonElement;
 
 namespace DazPackage
 {
@@ -18,10 +17,10 @@ namespace DazPackage
                 return element.TryGetProperty("url", out result) ? result.ToString().ToLower() : "";
             }
 
-            static ArrayEnumerator GetMap(JsonElement element)
+            static JsonElement.ArrayEnumerator GetMap(JsonElement element)
             {
                 var result = new JsonElement();
-                return element.TryGetProperty("map", out result) ? result.EnumerateArray() : new ArrayEnumerator();
+                return element.TryGetProperty("map", out result) ? result.EnumerateArray() : new JsonElement.ArrayEnumerator();
             }
 
             try
@@ -33,7 +32,7 @@ namespace DazPackage
                 if (root.TryGetProperty("image_library", out imageLibrary))
                 {
                     var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
-                    filesInSceneLowerCase.UnionWith(imageMaps.Select(GetUrl));
+                    FilesInSceneLowerCase.UnionWith(imageMaps.Select(GetUrl));
                 }
 
                 var scene = new JsonElement();
@@ -42,22 +41,22 @@ namespace DazPackage
                     var modifiers = new JsonElement();
                     if (scene.TryGetProperty("modifiers", out modifiers))
                     {
-                        filesInSceneLowerCase.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                        FilesInSceneLowerCase.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
                     }
 
                     var nodes = new JsonElement();
                     if (scene.TryGetProperty("nodes", out nodes))
                     {
                         // Find the url section of modifier. Get the first part of the string
-                        filesInSceneLowerCase.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                        FilesInSceneLowerCase.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
                     }
 
                     /// TODO materials.
                 }
 
-                filesInSceneLowerCase.Remove("");
+                FilesInSceneLowerCase.Remove("");
                 // unscape url and remove leading '/'
-                filesInSceneLowerCase = filesInSceneLowerCase.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
+                FilesInSceneLowerCase = FilesInSceneLowerCase.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
 
             }
             catch (InvalidDataException)
@@ -66,12 +65,12 @@ namespace DazPackage
             }
 
         }
-        public HashSet<string> filesInSceneLowerCase { get; private set; } = new HashSet<string>();
+        public HashSet<string> FilesInSceneLowerCase { get; private set; } = new HashSet<string>();
 
         public static (List<InstalledPackage> packagesInScene, List<string> remainingFiles) PackagesInScene(FileInfo sceneLocation, IEnumerable<InstalledPackage> packages)
         {
             var scene = new SceneFile(sceneLocation);
-            var filesInSceneLowerCase = scene.filesInSceneLowerCase;
+            var filesInSceneLowerCase = scene.FilesInSceneLowerCase;
             // Look for packages that contain file the scene referenced.
             var packagesInScene = packages.Where(x => x.Files.Any(files => filesInSceneLowerCase.Contains(files.ToLower()))).ToList();
 

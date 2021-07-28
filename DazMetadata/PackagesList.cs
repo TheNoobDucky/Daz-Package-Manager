@@ -7,8 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -47,7 +45,7 @@ namespace DazPackage
                 token.ThrowIfCancellationRequested();
 
                 var numberOfFilesToProcess = Math.Min(start + batchSize, totalFiles) - start;
-                
+
                 newPackages.AddRange(ProcessBundle(files.GetRange(start, numberOfFilesToProcess)));
 
                 processedFiles += numberOfFilesToProcess;
@@ -90,16 +88,6 @@ namespace DazPackage
         public static void UnselectPackages(List<InstalledPackage> packages)
         {
             packages.ForEach(x => x.Selected = false);
-        }
-
-        public void SaveToFile(string savePath)
-        {
-            var option = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
-            File.WriteAllText(savePath, JsonSerializer.Serialize(this, option));
         }
 
         #region Cache

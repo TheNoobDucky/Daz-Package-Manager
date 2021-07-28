@@ -45,7 +45,7 @@ namespace DazPackage
                     //(x.FullName.StartsWith("Content/Runtime/Support/") || x.FullName.StartsWith("Content/runtime/Support/"))
                     //&& x.FullName.EndsWith(".dsx"));
 
-                    var numberOfMetadataFiles = metadataFiles.Count();
+                    var numberOfMetadataFiles = metadataFiles.Count;
                     MissingMetadata = numberOfMetadataFiles == 0;
                     MultipleMetadataFiles = numberOfMetadataFiles != 1;
 

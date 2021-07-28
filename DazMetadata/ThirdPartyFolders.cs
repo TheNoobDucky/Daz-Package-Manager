@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-
 namespace DazPackage
 {
     public class OtherPartyEntry : INotifyPropertyChanged
@@ -32,14 +31,6 @@ namespace DazPackage
             }
         }
         public OtherPartyFolder Folder { get; set; }
-
-        //public OtherPartyEntry(OtherPartyFolder folder, string path, string basePath, bool isDirectory)
-        //{
-        //    Folder = folder;
-        //    Path = path;
-        //    BasePath = basePath;
-        //    IsDirectory = isDirectory;
-        //}
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -72,7 +63,6 @@ namespace DazPackage
         public OtherPartyEntry SelfEntry { get => Self[0]; set => Self[0] = value; }
         public List<OtherPartyEntry> Files { get; set; } = new();
         public List<OtherPartyFolder> Folders { get; set; } = new();
-
         public string Folder { get; set; }
         public string BasePath { get; set; }
 
@@ -103,7 +93,7 @@ namespace DazPackage
         }
     }
 
-    public class OtherPartyFolders : INotifyPropertyChanged
+    public class ThirdPartyFolders : INotifyPropertyChanged
     {
         public ObservableCollection<string> Folders { get; set; } = new();
         public List<OtherPartyFolder> Files { get; set; } = new();

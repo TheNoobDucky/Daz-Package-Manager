@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace Helpers
@@ -12,17 +11,21 @@ namespace Helpers
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (!_suppressNotification)
+            {
                 base.OnCollectionChanged(e);
+            }
         }
 
         public void AddRange(IEnumerable<T> list)
         {
             if (list == null)
-                throw new ArgumentNullException("list");
+            {
+                throw new ArgumentNullException(nameof(list));
+            }
 
             _suppressNotification = true;
 
-            foreach (T item in list)
+            foreach (var item in list)
             {
                 Add(item);
             }

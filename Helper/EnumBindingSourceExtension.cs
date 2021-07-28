@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Windows.Markup;
 
-// Inspiration https://www.youtube.com/watch?v=Bp5LFXjwtQ0
-
 namespace Helpers
 {
+    // Inspiration https://www.youtube.com/watch?v=Bp5LFXjwtQ0
     public class FlagEnumBindingSourceExtension : MarkupExtension
     {
         public Type EnumType { get; private set; }

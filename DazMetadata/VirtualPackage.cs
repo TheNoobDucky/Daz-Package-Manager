@@ -1,11 +1,6 @@
-﻿using OsHelper;
-using System;
-using System.Collections.Generic;
+﻿using Helpers;
+using OsHelper;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Helpers;
 
 namespace DazPackage
 {
@@ -26,7 +21,7 @@ namespace DazPackage
             }
         }
 
-        public static void Install (string file, string source, string destinationBase, bool makeCopy = false, bool warnMissingFile = false)
+        public static void Install(string file, string source, string destinationBase, bool makeCopy = false, bool warnMissingFile = false)
         {
             var sourcePath = Path.GetFullPath(Path.Combine(source, file));
             var destinationPath = Path.GetFullPath(Path.Combine(destinationBase, file));
@@ -63,7 +58,7 @@ namespace DazPackage
 
         public static void SaveInstallScript(string scriptLocation, string virtualFolder, string sceneFile)
         {
-            virtualFolder = virtualFolder.Replace('\\' , '/');
+            virtualFolder = virtualFolder.Replace('\\', '/');
             sceneFile = sceneFile.Replace('\\', '/');
             string script_template =
                 "(function() { \n" +

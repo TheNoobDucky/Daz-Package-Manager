@@ -106,7 +106,7 @@ namespace DazPackage
             {
                 return figureImage;
             }
-            
+
             // Normal image.
             figureImage = Path.ChangeExtension(assetPath, ".png");
             if (File.Exists(figureImage))

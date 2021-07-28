@@ -3,7 +3,6 @@ using Helpers;
 using OsHelper;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -76,133 +75,7 @@ namespace Daz_Package_Manager
             packages.PropertyChanged += ModelChangedHandler;
             settings.PropertyChanged += GuiSettingChangedHandler;
 
-            OtherParty.PropertyChanged += UpdateOtherPartyView;
-        }
-
-        private CancellationTokenSource ManifestScanToken = null;
-
-        public CollectionViewSource OtherPartyFoldersSource { get; private set; } = new();
-        public OtherPartyFolders OtherParty { get; private set; } = new();
-
-        private CancellationTokenSource OtherPartyToken = null;
-
-
-
-        public async Task Add3rdPartyFolder ()
-        {
-            var (success, folder) = SelectFolder.AskForLocation();
-            if (success)
-            {
-                try
-                {
-                    Output.Write($"Scanning 3rd party folder {folder}", Output.Level.Status);
-                    OtherPartyToken = new();
-                    await Task.Run(()=>OtherParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
-                    Save3rdPartyFolders();
-                    Output.Write($"Finished scanning 3rd party folder {folder}", Output.Level.Status);
-                }
-                catch (TargetInvocationException error)
-                {
-                    Output.Write($"Error source: {error.InnerException.Source.ToString()}", Output.Level.Error);
-                    Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
-                }
-                catch (OperationCanceledException)
-                {
-                    Output.Write($"Scanning 3rd party folder task canceled.", Output.Level.Status);
-                }
-                finally
-                {
-                    OtherPartyToken.Dispose();
-                }
-            }
-        }
-
-        public void Remove3rdPartyFolder (int index)
-        {
-            OtherParty.RemoveFolder(index);
-            Save3rdPartyFolders();
-        }
-
-        private void Save3rdPartyFolders ()
-        {
-            var option = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
-            var savePath = SaveFileLocation(otherFoldersJsonFile);
-            File.WriteAllText(savePath, JsonSerializer.Serialize(OtherParty.Folders, option));
-
-            savePath = SaveFileLocation("temp.json");
-            File.WriteAllText(savePath, JsonSerializer.Serialize(OtherParty.Files, option));
-
-        }
-
-        public void Load3rdPartyFolders ()
-        {
-            var saveFileLocation = SaveFileLocation(otherFoldersJsonFile);
-            try
-            {
-                var option = new JsonSerializerOptions
-                {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = true
-                };
-                using var jsonFile = File.OpenText(saveFileLocation);
-                try
-                {
-                    var folders = JsonSerializer.Deserialize<List<string>>(jsonFile.ReadToEnd(), option);
-                    jsonFile.Dispose();
-                    OtherParty.Folders.AddRange(folders);
-
-                    saveFileLocation = SaveFileLocation("temp.json");
-                    using var jsonFile2 = File.OpenText(saveFileLocation);
-                    var files = JsonSerializer.Deserialize<List<OtherPartyFolder>>(jsonFile2.ReadToEnd(), option);
-                    OtherParty.Files = files;
-                    jsonFile2.Dispose();
-                    UpdateOtherPartyView(); //TODO tidy up.
-                }
-                catch (JsonException)
-                {
-                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
-                    jsonFile.Dispose();
-                    File.Delete(saveFileLocation);
-                }
-            }
-            catch (FileNotFoundException)
-            {
-            }
-        }
-
-        public async Task ScanManifestFolder()
-        {
-            ManifestScanToken = new CancellationTokenSource();
-            try
-            {
-                Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
-                var sourceFolder = Properties.Settings.Default.InstallManifestFolder;
-                await Task.Run(() => packages.ScanInBackground(sourceFolder, ManifestScanToken.Token), ManifestScanToken.Token);
-                Output.Write($"Finished scanning install manifest folder task finished.", Output.Level.Status);
-            }
-            catch (TargetInvocationException error)
-            {
-                Output.Write($"Error source: {error.InnerException.Source.ToString()}", Output.Level.Error);
-                Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
-            }
-            catch (OperationCanceledException)
-            {
-                Output.Write($"Manifest scan task canceled.", Output.Level.Status);
-            }
-            finally
-            {
-                ManifestScanToken.Dispose();
-            }
-        }
-
-        public void CancelManifestScan()
-        {
-            Output.Write("Canceling manifest scan task.", Output.Level.Status);
-            ManifestScanToken.Cancel();
+            ThirdParty.PropertyChanged += UpdateThirdPartyView;
         }
 
         public void SelectPackagesBasedOnFolder(string location)
@@ -216,7 +89,7 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void UnselectAll() 
+        public void UnselectAll()
         {
             PackagesList.UnselectPackages(packages.Packages);
         }
@@ -237,7 +110,7 @@ namespace Daz_Package_Manager
                 if (remainingFiles.Count > 0)
                 {
                     //TODO tidy up
-                    var otherPartyFiles = OtherParty.AllFiles();
+                    var otherPartyFiles = ThirdParty.AllFiles();
                     var foundFiles = otherPartyFiles.Where(x =>
                     {
                         var relativePath = Path.GetRelativePath(x.BasePath, x.Path).ToLower().Replace('\\', '/');
@@ -260,7 +133,7 @@ namespace Daz_Package_Manager
                 }
 
                 if (remainingFiles.Count > 0)
-                { 
+                {
                     Output.Write("Unable to find reference for the following files:", Output.Level.Status);
                     remainingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
                 }
@@ -283,25 +156,24 @@ namespace Daz_Package_Manager
                 return;
             }
 
-            var packagesToSave = packages.Packages.Where(x => x.Selected);
-
             Output.Write("Installing to virtual folder location: " + destination, Output.Level.Status);
 
+            var packagesToSave = packages.Packages.Where(x => x.Selected);
             foreach (var package in packagesToSave)
             {
                 Output.Write("Installing: " + package.ProductName, Output.Level.Info);
                 try
                 {
                     VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
-                } 
+                }
                 catch (SymLinkerError error)
                 {
                     Output.Write($"Unable to copy file {error.Message}", Output.Level.Error);
-                    MessageBox.Show(error.Message);
+                    _ = MessageBox.Show(error.Message);
                 }
             }
 
-            var files = OtherParty.AllSelected();
+            var files = ThirdParty.AllSelected();
             foreach (var file in files)
             {
                 try
@@ -313,12 +185,149 @@ namespace Daz_Package_Manager
                 catch (SymLinkerError error)
                 {
                     Output.Write($"Unable to copy file {error.Message}", Output.Level.Error);
-                    MessageBox.Show(error.Message);
+                    _ = MessageBox.Show(error.Message);
                 }
             }
 
             Output.Write("Install to virtual folder complete.", Output.Level.Status);
         }
+
+        #region DAZ Folders
+        private CancellationTokenSource ManifestScanToken = null;
+
+        public async Task ScanManifestFolder()
+        {
+            ManifestScanToken = new CancellationTokenSource();
+            try
+            {
+                Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
+                var sourceFolder = Properties.Settings.Default.InstallManifestFolder;
+                await Task.Run(() => packages.ScanInBackground(sourceFolder, ManifestScanToken.Token), ManifestScanToken.Token);
+                Output.Write($"Finished scanning install manifest folder task finished.", Output.Level.Status);
+            }
+            catch (TargetInvocationException error)
+            {
+                Output.Write($"Error source: {error.InnerException.Source}", Output.Level.Error);
+                Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+                Output.Write($"Manifest scan task canceled.", Output.Level.Status);
+            }
+            finally
+            {
+                ManifestScanToken.Dispose();
+            }
+        }
+
+        public void CancelManifestScan()
+        {
+            Output.Write("Canceling manifest scan task.", Output.Level.Status);
+            ManifestScanToken.Cancel();
+        }
+        #endregion
+
+        #region Third Party Contents
+        public CollectionViewSource ThirdPartyFoldersSource { get; private set; } = new();
+        public ThirdPartyFolders ThirdParty { get; private set; } = new();
+
+        private CancellationTokenSource OtherPartyToken = null;
+
+        public async Task AddThirdPartyFolder()
+        {
+            var (success, folder) = SelectFolder.AskForLocation();
+            if (success)
+            {
+                try
+                {
+                    Output.Write($"Scanning 3rd party folder {folder}", Output.Level.Status);
+                    OtherPartyToken = new();
+                    await Task.Run(() => ThirdParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
+                    SaveThirdPartyFolders();
+                    Output.Write($"Finished scanning 3rd party folder {folder}", Output.Level.Status);
+                }
+                catch (TargetInvocationException error)
+                {
+                    Output.Write($"Error source: {error.InnerException.Source}", Output.Level.Error);
+                    Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+                }
+                catch (OperationCanceledException)
+                {
+                    Output.Write($"Scanning 3rd party folder task canceled.", Output.Level.Status);
+                }
+                finally
+                {
+                    OtherPartyToken.Dispose();
+                }
+            }
+        }
+
+        public void RemoveThirdPartyFolder(int index)
+        {
+            ThirdParty.RemoveFolder(index);
+            SaveThirdPartyFolders();
+        }
+
+        private void SaveThirdPartyFolders()
+        {
+            var option = new JsonSerializerOptions
+            {
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
+            };
+            var savePath = SaveFileLocation(otherFoldersJsonFile);
+            File.WriteAllText(savePath, JsonSerializer.Serialize(ThirdParty.Folders, option));
+
+            savePath = SaveFileLocation("temp.json");
+            File.WriteAllText(savePath, JsonSerializer.Serialize(ThirdParty.Files, option));
+
+        }
+
+        public void LoadThirdPartyFolders()
+        {
+            var saveFileLocation = SaveFileLocation(otherFoldersJsonFile);
+            try
+            {
+                var option = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    WriteIndented = true
+                };
+                using var jsonFile = File.OpenText(saveFileLocation);
+                try
+                {
+                    var folders = JsonSerializer.Deserialize<List<string>>(jsonFile.ReadToEnd(), option);
+                    jsonFile.Dispose();
+                    ThirdParty.Folders.AddRange(folders);
+
+                    saveFileLocation = SaveFileLocation("temp.json");
+                    using var jsonFile2 = File.OpenText(saveFileLocation);
+                    var files = JsonSerializer.Deserialize<List<OtherPartyFolder>>(jsonFile2.ReadToEnd(), option);
+                    ThirdParty.Files = files;
+                    jsonFile2.Dispose();
+                    UpdateThirdPartyView(); //TODO tidy up.
+                }
+                catch (JsonException)
+                {
+                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
+                    jsonFile.Dispose();
+                    File.Delete(saveFileLocation);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+            }
+        }
+        public CollectionViewSource ThirdPartyView { get; set; } = new();
+        private void UpdateThirdPartyView(object sender, PropertyChangedEventArgs e)
+        {
+            UpdateThirdPartyView();
+        }
+        private void UpdateThirdPartyView()
+        {
+            ThirdPartyView.Source = ThirdParty.AllFiles().ToList();
+        } 
+        #endregion
 
         #region Updating Packages
         private void ModelChangedHandler(object sender, PropertyChangedEventArgs e)
@@ -395,67 +404,56 @@ namespace Daz_Package_Manager
             TODO.Source = packages.ItemsCache.GetAssets(AssetTypes.TODO, settings.ToggleGeneration, settings.ToggleGender);
         }
 
-        public CollectionViewSource PackagesViewSource { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Accessories { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Attachments { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Characters { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Clothings { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Hairs { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Morphs { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Props { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Poses { get; set; } = new CollectionViewSource();
-        public CollectionViewSource Others { get; set; } = new CollectionViewSource();
-        public CollectionViewSource TODO { get; set; } = new CollectionViewSource();
+        public CollectionViewSource PackagesViewSource { get; set; } = new();
+        public CollectionViewSource Accessories { get; set; } = new();
+        public CollectionViewSource Attachments { get; set; } = new();
+        public CollectionViewSource Characters { get; set; } = new();
+        public CollectionViewSource Clothings { get; set; } = new();
+        public CollectionViewSource Hairs { get; set; } = new();
+        public CollectionViewSource Morphs { get; set; } = new();
+        public CollectionViewSource Props { get; set; } = new();
+        public CollectionViewSource Poses { get; set; } = new();
+        public CollectionViewSource Others { get; set; } = new();
+        public CollectionViewSource TODO { get; set; } = new();
 
-        private static readonly GenerationToStringConverter generationToStringConverter = new GenerationToStringConverter();
-        private static readonly GenerationGroupCompare generationGroupCompare = new GenerationGroupCompare();
-        private static readonly PropertyGroupDescription generationGrouping = new PropertyGroupDescription("Generations", generationToStringConverter)
+        private static readonly GenerationToStringConverter generationToStringConverter = new();
+        private static readonly GenerationGroupCompare generationGroupCompare = new();
+        private static readonly PropertyGroupDescription generationGrouping = new("Generations", generationToStringConverter)
         {
             CustomSort = generationGroupCompare
         };
 
-        private static readonly StringCompareHelper stringCompare = new StringCompareHelper();
-        private static readonly AssetToStringConverter installedPackageAssetTypeConverter = new AssetToStringConverter();
-        private static readonly PropertyGroupDescription itemAssetTypeGrouping = new PropertyGroupDescription("AssetTypes", installedPackageAssetTypeConverter)
+        private static readonly StringCompareHelper stringCompare = new();
+        private static readonly AssetToStringConverter installedPackageAssetTypeConverter = new();
+        private static readonly PropertyGroupDescription itemAssetTypeGrouping = new("AssetTypes", installedPackageAssetTypeConverter)
         {
             CustomSort = stringCompare
         };
 
-        private static readonly GenderToStringConverter genderToStringConverter = new GenderToStringConverter();
-        private static readonly PropertyGroupDescription genderGrouping = new PropertyGroupDescription("Genders", genderToStringConverter)
+        private static readonly GenderToStringConverter genderToStringConverter = new();
+        private static readonly PropertyGroupDescription genderGrouping = new("Genders", genderToStringConverter)
         {
             CustomSort = stringCompare
         };
 
-        private static readonly ContentTypeToDisplayConverter installedItemContentTypeConverter = new ContentTypeToDisplayConverter();
-        private static readonly PropertyGroupDescription itemContentGrouping = new PropertyGroupDescription("ContentType", installedItemContentTypeConverter)
+        private static readonly ContentTypeToDisplayConverter installedItemContentTypeConverter = new();
+        private static readonly PropertyGroupDescription itemContentGrouping = new("ContentType", installedItemContentTypeConverter)
         {
             CustomSort = stringCompare
         };
 
-        private static readonly CategoriesConverter installedItemCategoriesConverter = new CategoriesConverter();
-        private static readonly PropertyGroupDescription itemCategoriesGrouping = new PropertyGroupDescription("Categories", installedItemCategoriesConverter)
+        private static readonly CategoriesConverter installedItemCategoriesConverter = new();
+        private static readonly PropertyGroupDescription itemCategoriesGrouping = new("Categories", installedItemCategoriesConverter)
         {
             CustomSort = stringCompare
         };
-        #endregion
-        #region Other Party View
-        public CollectionViewSource OtherPartyView { get; set; } = new();
-        private void UpdateOtherPartyView(object sender, PropertyChangedEventArgs e)
-        {
-            UpdateOtherPartyView();
-        }
-        private void UpdateOtherPartyView()
-        {
-            OtherPartyView.Source = OtherParty.AllFiles().ToList();
-        }
-
         #endregion
 
         #region Gui Settings
-        private GUISettings settings = new ();
-        public GUISettings Settings {
-            get { return settings; }
+        private GUISettings settings = new();
+        public GUISettings Settings
+        {
+            get => settings;
             set
             {
                 if (value != settings)
@@ -482,6 +480,5 @@ namespace Daz_Package_Manager
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
         #endregion
-
     }
 }

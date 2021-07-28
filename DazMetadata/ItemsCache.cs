@@ -8,34 +8,34 @@ namespace DazPackage
 {
     public class AssetCache
     {
-        public Dictionary<AssetTypes, GenerationCache> cache { get; set; } = new Dictionary<AssetTypes, GenerationCache>();
+        public Dictionary<AssetTypes, GenerationCache> Cache { get; set; } = new Dictionary<AssetTypes, GenerationCache>();
 
         public IEnumerable<InstalledFile> GetAssets(AssetTypes assetType, Generation generation = Generation.All, Gender gender = Gender.All)
         {
-            return cache.Where(x => x.Key.CheckFlag(assetType)).SelectMany(x => x.Value.GetAssets(generation, gender));
+            return Cache.Where(x => x.Key.CheckFlag(assetType)).SelectMany(x => x.Value.GetAssets(generation, gender));
         }
 
         public void AddAsset(InstalledFile file, AssetTypes assetType, Generation generation, Gender gender)
         {
-            if (!cache.TryGetValue(assetType, out GenerationCache gen))
+            if (!Cache.TryGetValue(assetType, out GenerationCache gen))
             {
                 gen = new GenerationCache();
-                cache.Add(assetType, gen);
+                Cache.Add(assetType, gen);
             }
             gen.AddAsset(file, generation, gender);
         }
 
         public void Merge(AssetCache other)
         {
-            foreach (var (key, value) in other.cache)
+            foreach (var (key, value) in other.Cache)
             {
-                cache.GetValueOrDefault(key).Merge(value);
+                Cache.GetValueOrDefault(key).Merge(value);
             }
         }
 
         public void Clear()
         {
-            cache.Clear();
+            Cache.Clear();
         }
 
         public static AssetCache MergeAllBags(ConcurrentBag<AssetCache> items)
@@ -51,48 +51,48 @@ namespace DazPackage
 
     public class GenerationCache
     {
-        public Dictionary<Generation, GenderCache> cache { get; set; } = new Dictionary<Generation, GenderCache>();
+        public Dictionary<Generation, GenderCache> Cache { get; set; } = new Dictionary<Generation, GenderCache>();
 
         public IEnumerable<InstalledFile> GetAssets(Generation generation, Gender gender = Gender.All)
         {
-            return cache.Where(x => x.Key.CheckFlag(generation)).SelectMany(x => x.Value.GetAssets(gender));
+            return Cache.Where(x => x.Key.CheckFlag(generation)).SelectMany(x => x.Value.GetAssets(gender));
         }
         public void AddAsset(InstalledFile file, Generation generation, Gender gender)
         {
-            if (!cache.TryGetValue(generation, out GenderCache gen))
+            if (!Cache.TryGetValue(generation, out GenderCache gen))
             {
                 gen = new GenderCache();
-                cache.Add(generation, gen);
+                Cache.Add(generation, gen);
             }
             gen.AddAsset(file, gender);
         }
 
         public void Merge(GenerationCache other)
         {
-            foreach (var (key, value) in other.cache)
+            foreach (var (key, value) in other.Cache)
             {
-                cache.GetValueOrDefault(key).Merge(value);
+                Cache.GetValueOrDefault(key).Merge(value);
             }
         }
     }
 
     public class GenderCache
     {
-        public MultiValueDictionary<Gender, InstalledFile> cache { get; set; } = new MultiValueDictionary<Gender, InstalledFile>();
+        public MultiValueDictionary<Gender, InstalledFile> Cache { get; set; } = new MultiValueDictionary<Gender, InstalledFile>();
 
         public IEnumerable<InstalledFile> GetAssets(Gender gender)
         {
-            return cache.Where(x => x.Key.CheckFlag(gender)).SelectMany(x => x.Value);
+            return Cache.Where(x => x.Key.CheckFlag(gender)).SelectMany(x => x.Value);
         }
 
         public void AddAsset(InstalledFile file, Gender gender)
         {
-            cache.Add(gender, file);
+            Cache.Add(gender, file);
         }
 
         public void Merge(GenderCache other)
         {
-            cache.Merge(other.cache);
+            Cache.Merge(other.Cache);
         }
     }
     public static class CacheSelect

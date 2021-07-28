@@ -101,9 +101,7 @@ namespace Helpers
 
         private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
         {
-            var tabControl = e.OriginalSource as TabControl;
-
-            if (tabControl != null)
+            if (e.OriginalSource is TabControl)
             {
                 var tabItem = e.AddedItems[0] as TabItem;
                 Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);

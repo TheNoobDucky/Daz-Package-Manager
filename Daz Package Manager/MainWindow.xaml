@@ -458,7 +458,7 @@
             </TabItem>
 
             <TabItem Header="3rd Party">
-                <DataGrid Name="OtherPartyFiles" ItemsSource="{Binding OtherPartyView.View}" IsReadOnly="False"
+                <DataGrid Name="OtherPartyFiles" ItemsSource="{Binding ThirdPartyView.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"

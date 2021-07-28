@@ -2,7 +2,6 @@
 using Helpers;
 using OsHelper;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 
@@ -28,7 +27,7 @@ namespace Daz_Package_Manager
             modelView.LoadPackagesCache();
         }
 
-        private readonly ModelView modelView = new ();
+        private readonly ModelView modelView = new();
         private const string waitText = "Cancel";
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
@@ -40,7 +39,7 @@ namespace Daz_Package_Manager
             modelView.GenerateVirtualInstallFolder(destination, makeCopy, warnMissingFile);
         }
 
-        private string InstallFolder ()
+        private static string InstallFolder()
         {
             var destination = Properties.Settings.Default.OutputFolder;
             if (Properties.Settings.Default.UseSceneSubfolder)
@@ -50,7 +49,7 @@ namespace Daz_Package_Manager
             return destination;
         }
 
-        private string SceneName ()
+        private static string SceneName()
         {
             return Path.GetFileNameWithoutExtension(Properties.Settings.Default.SceneFile);
         }
@@ -58,8 +57,6 @@ namespace Daz_Package_Manager
         private void GenerateInstallScript(object sender, RoutedEventArgs e)
         {
             var virtualFolder = InstallFolder();
-            var sceneLocation = Properties.Settings.Default.SceneFile;
-
 
             var scene = Properties.Settings.Default.SceneFile;
             var sceneRoot = Directory.GetParent(scene);
@@ -154,7 +151,7 @@ namespace Daz_Package_Manager
         {
             modelView.UnselectAll();
         }
-        private static TraceSource ts = new TraceSource("TraceTest");
+        //private static readonly TraceSource ts = new("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
@@ -168,20 +165,20 @@ namespace Daz_Package_Manager
 
         private async void Add3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            await modelView.Add3rdPartyFolder();
+            await modelView.AddThirdPartyFolder();
         }
 
         private void Remove3rdPartyFolder(object sender, RoutedEventArgs e)
         {
             //var selected = OtherPartyFolders.SelectedItems;
             var index = OtherPartyFolders.SelectedIndex;
-            modelView.Remove3rdPartyFolder(index);
+            modelView.RemoveThirdPartyFolder(index);
 
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            modelView.Load3rdPartyFolders();
+            modelView.LoadThirdPartyFolders();
         }
     }
 }
