@@ -109,38 +109,26 @@ namespace Daz_Package_Manager
 
                 if (remainingFiles.Count > 0)
                 {
-                    //TODO tidy up
-                    var otherPartyFiles = ThirdParty.AllFiles();
-                    var foundFiles = otherPartyFiles.Where(x =>
-                    {
-                        var relativePath = Path.GetRelativePath(x.BasePath, x.Path).ToLower().Replace('\\', '/');
-                        var result = remainingFiles.Contains(relativePath);
-                        return result;
-                    });
-
+                    var (foundFiles, missingFiles) = ThirdParty.GetFiles(remainingFiles);
                     if (foundFiles.Any())
                     {
                         Output.Write("3rd Party files Selected:", Output.Level.Status);
                         foreach (var file in foundFiles)
                         {
-                            file.Selected = true;
+                            file.Folder.Selected = true;
                             Output.Write(file.Path, Output.Level.Info);
-                            var relativePath = Path.GetRelativePath(file.BasePath, file.Path).ToLower().Replace('\\', '/');
-                            _ = remainingFiles.Remove(relativePath);
                         }
                     }
-
-                }
-
-                if (remainingFiles.Count > 0)
-                {
-                    Output.Write("Unable to find reference for the following files:", Output.Level.Status);
-                    remainingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
+                    if (missingFiles.Count > 0)
+                    {
+                        Output.Write("Unable to find reference for the following files:", Output.Level.Status);
+                        missingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
+                    }
                 }
             }
             catch (CorruptFileException error)
             {
-                Output.Write("Invalid scene file: " + error.Message, Output.Level.Error);
+                Output.Write($"Invalid scene file: {error.Message}", Output.Level.Error);
             }
             catch (ArgumentException)
             {
@@ -245,7 +233,7 @@ namespace Daz_Package_Manager
             {
                 try
                 {
-                    Output.Write($"Scanning 3rd party folder: {folder}.", Output.Level.Status);
+                    Output.Write($"Scanning 3rd party folder: {folder}.\n Please Wait.", Output.Level.Status);
                     OtherPartyToken = new();
                     await Task.Run(() => ThirdParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
                     SaveThirdPartyFolders();
@@ -331,7 +319,7 @@ namespace Daz_Package_Manager
 
                     saveFileLocation = SaveFileLocation(thirdPartyFilesJsonFile);
                     using var jsonFile2 = File.OpenText(saveFileLocation);
-                    var files = JsonSerializer.Deserialize<List<OtherPartyFolder>>(jsonFile2.ReadToEnd(), option);
+                    var files = JsonSerializer.Deserialize<List<ThirdPartyFolder>>(jsonFile2.ReadToEnd(), option);
                     ThirdParty.Files = files;
                     jsonFile2.Dispose();
                     UpdateThirdPartyView(); //TODO tidy up.
@@ -356,7 +344,7 @@ namespace Daz_Package_Manager
         private void UpdateThirdPartyView()
         {
             ThirdPartyView.Source = ThirdParty.AllFiles().ToList();
-        } 
+        }
         #endregion
 
         #region Updating Packages
