@@ -179,7 +179,7 @@ namespace Daz_Package_Manager
                     button.Content = waitText;
                     ReloadThirdPartyButton.Content = waitText;
                     RemoveThirdPartyButton.Content = waitText;
-                    await modelView.ReloadThirdPartyFolder();
+                    await modelView.AddThirdPartyFolder();
                     button.Content = prevText;
                     ReloadThirdPartyButton.Content = reloadContent;
                     RemoveThirdPartyButton.Content = removeContent;
