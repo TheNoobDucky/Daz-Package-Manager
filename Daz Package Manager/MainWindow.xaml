@@ -465,14 +465,25 @@
             </TabItem>
 
             <TabItem Header="3rd Party">
-                <DataGrid Name="OtherPartyFiles" ItemsSource="{Binding ThirdPartyView.View}" IsReadOnly="False"
-                        AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
-                                CellTemplate="{StaticResource SelectCheckbox}" SortMemberPath="Selected" />
-                        <DataGridTextColumn Header="File Location" Binding="{Binding Path}" IsReadOnly="True" />
-                    </DataGrid.Columns>
-                </DataGrid>
+                <TreeView x:Name="OtherPartyFiles" ItemsSource="{Binding ThirdPartyView.View}">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type DazPackage:ThirdPartyFolder}"
+                                ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Width="Auto"
+                                        IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding Path=FolderName}" />
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                        <DataTemplate DataType="{x:Type DazPackage:ThirdPartyEntry}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox Width="Auto"
+                                        IsChecked="{Binding Path=Selected, UpdateSourceTrigger=PropertyChanged}" />
+                                <TextBlock Text="{Binding Path=Location}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </TreeView.Resources>
+                </TreeView>
             </TabItem>
 
             <TabItem Header="Accessories Gallery">

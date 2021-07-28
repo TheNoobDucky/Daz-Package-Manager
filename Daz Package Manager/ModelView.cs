@@ -75,7 +75,7 @@ namespace Daz_Package_Manager
             packages.PropertyChanged += ModelChangedHandler;
             settings.PropertyChanged += GuiSettingChangedHandler;
 
-            ThirdParty.PropertyChanged += UpdateThirdPartyView;
+            ThirdPartyView.Source = ThirdParty.Files;
         }
 
         public void SelectPackagesBasedOnFolder(string location)
@@ -115,8 +115,8 @@ namespace Daz_Package_Manager
                         Output.Write("3rd Party files Selected:", Output.Level.Status);
                         foreach (var file in foundFiles)
                         {
-                            file.Folder.Selected = true;
-                            Output.Write(file.Path, Output.Level.Info);
+                            file.ParentFolder.Selected = true;
+                            Output.Write(file.Location, Output.Level.Info);
                         }
                     }
                     if (missingFiles.Count > 0)
@@ -166,9 +166,8 @@ namespace Daz_Package_Manager
             {
                 try
                 {
-                    var filename = Path.GetRelativePath(file.BasePath, file.Path);
-                    Output.Write($"Installing: {filename}", Output.Level.Info);
-                    VirtualPackage.Install(filename, file.BasePath, destination, makeCopy, warnMissingFile);
+                    Output.Write($"Installing: {file.RelativePath}", Output.Level.Info);
+                    VirtualPackage.Install(file.RelativePath, file.ParentFolder.BasePath, destination, makeCopy, warnMissingFile);
                 }
                 catch (SymLinkerError error)
                 {
@@ -205,7 +204,7 @@ namespace Daz_Package_Manager
                         WriteIndented = true
                     };
                     var selectedPackages = SelectedPackages().Select(x => x.ProductName).ToList();
-                    var selectedFiles = SelectedThirdPartyFiles().Select(x => x.Path).ToList();
+                    var selectedFiles = SelectedThirdPartyFiles().Select(x => x.Location).ToList();
                     var records = new SelectionRecords() { PackageNames = selectedPackages, ThirdPartyFilenames = selectedFiles };
                     File.WriteAllText(file, JsonSerializer.Serialize(records, option));
                 }
@@ -396,9 +395,9 @@ namespace Daz_Package_Manager
                     saveFileLocation = SaveFileLocation(thirdPartyFilesJsonFile);
                     using var jsonFile2 = File.OpenText(saveFileLocation);
                     var files = JsonSerializer.Deserialize<List<ThirdPartyFolder>>(jsonFile2.ReadToEnd(), option);
-                    ThirdParty.Files = files;
+                    ThirdParty.Files.Clear();
+                    ThirdParty.Files.AddRange(files);
                     jsonFile2.Dispose();
-                    UpdateThirdPartyView(); //TODO tidy up.
                 }
                 catch (JsonException)
                 {
@@ -413,14 +412,6 @@ namespace Daz_Package_Manager
         }
 
         public CollectionViewSource ThirdPartyView { get; set; } = new();
-        private void UpdateThirdPartyView(object sender, PropertyChangedEventArgs e)
-        {
-            UpdateThirdPartyView();
-        }
-        private void UpdateThirdPartyView()
-        {
-            ThirdPartyView.Source = ThirdParty.AllFiles().ToList();
-        }
         #endregion
 
         #region Updating Packages
