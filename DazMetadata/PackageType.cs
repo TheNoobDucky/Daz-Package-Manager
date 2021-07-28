@@ -185,6 +185,16 @@ namespace DazPackage
         Shape = 1 << 17,
         Support = 1 << 18,
         //Tear = 1 << 19,
+
+
+
+        Animal = 1 << 20,
+        Environment = 1 << 21,
+        Vehicle = 1 << 22,
+        Poser = 1 << 23, // TODO CHECK WHAT THIS IS USED FOR.
+        General = 1 << 24,
+        Anatomy = 1 << 25,
+
         Missing = 1 << 30,
         Skipped = 1 << 31,
         TODO = 1 << 29,
@@ -196,6 +206,8 @@ namespace DazPackage
         NotProcessed = Material | Skipped | Support | Missing | HIDDEN_ASSET_GROUP,
         Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
         Categories = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
+        Private = Animal | Environment | Vehicle | Poser | General | Anatomy,
+
         All = ~None,
     }
     public class AssetToStringConverter : IValueConverter
@@ -252,10 +264,10 @@ namespace DazPackage
 
     public class PackageType
     {
-        public CharacterContentFlags CharacterContent { get; set; } = new CharacterContentFlags();
-        public OtherContentFlags OtherContents { get; set; } = new OtherContentFlags();
-        public GenerationFlag Generation { get; set; } = new GenerationFlag();
-        public GenderFlag Gender { get; set; } = new GenderFlag();
+        public AssetTypes CharacterContent { get; set; } = AssetTypes.None;
+        public AssetTypes OtherContents { get; set; } = AssetTypes.None;
+        public Generation Generation { get; set; } = Generation.None;
+        public Gender Gender { get; set; } = Gender.None;
         public bool ImpactLoadSpeed { get; set; } = false;
         public bool IsPeople { get; set; } = false;
         public bool MissingDirectory { get; set; } = true;
@@ -277,34 +289,5 @@ namespace DazPackage
         public bool Unknown { get; set; } = false;
     }
 
-    public class OtherContentFlags
-    {
-        public bool Props { get; set; } = false;
-        public bool Animals { get; set; } = false;
-        public bool Animations { get; set; } = false;
-        public bool Environments { get; set; } = false;
-        public bool Vehicles { get; set; } = false;
-        public bool Materials { get; set; } = false;
-        public bool Lights { get; set; } = false;
-        public bool Scripts { get; set; } = false;
-        public bool Posers { get; set; } = false;
-        public bool Scenes { get; set; } = false;
-        public bool General { get; set; } = false;
-        public bool Cameras { get; set; } = false;
-    }
 
-    public class GenerationFlag
-    {
-        public bool Genesis1 { get; set; } = false;
-        public bool Genesis2 { get; set; } = false;
-        public bool Genesis3 { get; set; } = false;
-        public bool Genesis8 { get; set; } = false;
-    }
-
-    public class GenderFlag
-    {
-        public bool Female { get; set; } = false;
-        public bool Male { get; set; } = false;
-        public bool Both { get; set; } = false;
-    }
 }

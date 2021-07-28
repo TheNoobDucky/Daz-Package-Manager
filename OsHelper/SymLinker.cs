@@ -6,7 +6,7 @@ namespace OsHelper
 {
     public class SymLinker
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, UInt32 dwFlags);
 
         /// <summary>
@@ -23,8 +23,7 @@ namespace OsHelper
             {
                 var error = DecodeErrorCode(errorCode);
                 throw new SymLinkerError(
-                    "Failed to create symlink, please check developer mode is turned on or run as administrator.\n" +
-                            "Win32 Error Message: " + error);
+                    message: $"Failed to create symlink, please check developer mode is turned on or run as administrator.\nWin32 Error Message: {error}. \nFile:{source}");
             }
         }
 
@@ -41,8 +40,8 @@ namespace OsHelper
         public enum SymbolicLink : UInt32
         {
             AllowUnprevileged = 0x2,
-            File = (0x0 | AllowUnprevileged),
-            Directory = (0x1 | AllowUnprevileged),
+            File = 0x0 | AllowUnprevileged,
+            Directory = 0x1 | AllowUnprevileged,
         }
 
         public static string DecodeErrorCode(int errorCode)

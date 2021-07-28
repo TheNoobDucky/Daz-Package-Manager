@@ -8,9 +8,17 @@
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<PackageId>DazPackageManager</PackageId>
-	<Version>1.5.0</Version>
+	<Version>1.6.0</Version>
 	<Configurations>Debug;Release;Shipping</Configurations>
 	<ApplicationIcon>ducks.ico</ApplicationIcon>
+	<PackageProjectUrl></PackageProjectUrl>
+	<PackageIcon></PackageIcon>
+	<PackageIconUrl />
+	<RepositoryUrl>https://github.com/TheNoobDucky/Daz-Package-Manager</RepositoryUrl>
+	<SignAssembly>false</SignAssembly>
+	<AssemblyName />
+	<Authors>Quack</Authors>
+	<Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">
@@ -19,6 +27,18 @@
     <Optimize>true</Optimize>
     <OutputPath></OutputPath>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <OutputPath />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ducks.ico" />
+    <None Remove="ducks.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DazMetadata\DazPackage.csproj" />

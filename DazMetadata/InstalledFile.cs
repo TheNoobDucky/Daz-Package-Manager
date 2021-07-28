@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows.Data;
-using Helpers;
 
 namespace DazPackage
 {
@@ -19,7 +18,7 @@ namespace DazPackage
         public string ContentType { get; set; }
         public Generation Generations { get; set; } = Generation.Unknown;
         public Gender Genders { get; set; } = Gender.Unknown;
-        private InstalledPackage package = new InstalledPackage();
+        private InstalledPackage package = new();
         public List<string> Categories { get; set; } = null;
         public InstalledPackage Package
         {
@@ -58,7 +57,7 @@ namespace DazPackage
 
             if (AssetTypes.Categories.HasFlag(AssetType))
             {
-                Categories = asset.Categories?.Select(x => x.Replace('/', ' ')).ToList();
+                Categories = asset.Categories?.ToList();
             }
         }
 
@@ -390,7 +389,7 @@ namespace DazPackage
         {
             if (value is string str && str != null)
             {
-                return str.Replace("/", " ");
+                return str;
             }
             return null;
         }
