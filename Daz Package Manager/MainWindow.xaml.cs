@@ -151,7 +151,6 @@ namespace Daz_Package_Manager
         {
             modelView.UnselectAll();
         }
-        //private static readonly TraceSource ts = new("TraceTest");
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
@@ -165,20 +164,74 @@ namespace Daz_Package_Manager
 
         private async void Add3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            await modelView.AddThirdPartyFolder();
+            if (sender is System.Windows.Controls.Button button)
+            {
+                if (button.Content is string prevText)
+                {
+                    if (prevText == waitText)
+                    {
+                        modelView.CancelThirdPartyProcess();
+                        return;
+                    }
+                    var reloadContent = ReloadThirdPartyButton.Content;
+                    var removeContent = RemoveThirdPartyButton.Content;
+
+                    button.Content = waitText;
+                    ReloadThirdPartyButton.Content = waitText;
+                    RemoveThirdPartyButton.Content = waitText;
+                    await modelView.ReloadThirdPartyFolder();
+                    button.Content = prevText;
+                    ReloadThirdPartyButton.Content = reloadContent;
+                    RemoveThirdPartyButton.Content = removeContent;
+                }
+            }
         }
 
         private void Remove3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            //var selected = OtherPartyFolders.SelectedItems;
-            var index = OtherPartyFolders.SelectedIndex;
-            modelView.RemoveThirdPartyFolder(index);
-
+            if (sender is System.Windows.Controls.Button button)
+            {
+                if (button.Content is string prevText)
+                {
+                    if (prevText == waitText)
+                    {
+                        modelView.CancelThirdPartyProcess();
+                        return;
+                    }
+                    var index = OtherPartyFolders.SelectedIndex;
+                    modelView.RemoveThirdPartyFolder(index);
+                }
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             modelView.LoadThirdPartyFolders();
+        }
+
+        private async void Reload3rdPartyFolder(object sender, RoutedEventArgs e)
+        {
+            if (sender is System.Windows.Controls.Button button)
+            {
+                if (button.Content is string prevText)
+                {
+                    if (prevText == waitText)
+                    {
+                        modelView.CancelThirdPartyProcess();
+                        return;
+                    }
+                    var addContent = AddThirdPartyButton.Content;
+                    var removeContent = RemoveThirdPartyButton.Content;
+
+                    button.Content = waitText;
+                    AddThirdPartyButton.Content = waitText;
+                    RemoveThirdPartyButton.Content = waitText;
+                    await modelView.ReloadThirdPartyFolder();
+                    button.Content = prevText;
+                    AddThirdPartyButton.Content = addContent;
+                    RemoveThirdPartyButton.Content = removeContent;
+                }
+            }
         }
     }
 }

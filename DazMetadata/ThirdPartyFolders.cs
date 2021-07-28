@@ -112,7 +112,20 @@ namespace DazPackage
         {
             foreach (var folder in folders)
             {
-                AddFolder(folder, token);
+                _ = AddFolder(folder, token);
+            }
+            return Task.CompletedTask;
+        }
+
+        public Task ReloadFolders(CancellationToken token)
+        {
+            var folders = new List<string>(Folders);
+            Application.Current.Dispatcher.Invoke(() => Folders.Clear());
+            Files.Clear();
+            OnPropertyChanged();
+            foreach (var folder in folders)
+            {
+                _ = AddFolder(folder, token);
             }
             return Task.CompletedTask;
         }

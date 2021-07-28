@@ -85,7 +85,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
-               
+                <ColumnDefinition Width="*" />
+
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="{StaticResource DefaultMargin}" />
@@ -186,13 +187,14 @@
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
 
-            <Button Grid.Row="3" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+            <Button Name="AddThirdPartyButton" Grid.Row="3" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Add 3rd Party Folder" />
-            <Button Grid.Row="3" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+            <Button Name="RemoveThirdPartyButton" Grid.Row="3" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Remove 3rd Party Folder" />
-            <ListBox Name="OtherPartyFolders" Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="2" Grid.RowSpan="3"
-                    ItemsSource="{Binding OtherParty.Folders}"/>
-
+            <Button Name="ReloadThirdPartyButton" Grid.Row="3" Grid.Column="7" Click="Reload3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+                    Content="Reload 3rd Party Folder" />
+            <ListBox Name="OtherPartyFolders" Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="3"
+                    ItemsSource="{Binding ThirdParty.Folders}"/>
         </Grid>
 
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">

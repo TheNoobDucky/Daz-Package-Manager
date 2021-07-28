@@ -232,7 +232,11 @@ namespace Daz_Package_Manager
         public ThirdPartyFolders ThirdParty { get; private set; } = new();
 
         private CancellationTokenSource OtherPartyToken = null;
-
+        public void CancelThirdPartyProcess()
+        {
+            Output.Write("Canceling processing 3rd party folders.", Output.Level.Status);
+            OtherPartyToken.Cancel();
+        }
         public async Task AddThirdPartyFolder()
         {
             var (success, folder) = SelectFolder.AskForLocation();
@@ -240,11 +244,11 @@ namespace Daz_Package_Manager
             {
                 try
                 {
-                    Output.Write($"Scanning 3rd party folder {folder}", Output.Level.Status);
+                    Output.Write($"Scanning 3rd party folder: {folder}.", Output.Level.Status);
                     OtherPartyToken = new();
                     await Task.Run(() => ThirdParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
                     SaveThirdPartyFolders();
-                    Output.Write($"Finished scanning 3rd party folder {folder}", Output.Level.Status);
+                    Output.Write($"Finished scanning 3rd party folder: {folder}.", Output.Level.Status);
                 }
                 catch (TargetInvocationException error)
                 {
@@ -261,6 +265,30 @@ namespace Daz_Package_Manager
                 }
             }
         }
+        public async Task ReloadThirdPartyFolder()
+        {
+            try
+            {
+                Output.Write($"Reloading 3rd party folders.", Output.Level.Status);
+                OtherPartyToken = new();
+                await Task.Run(() => ThirdParty.ReloadFolders(OtherPartyToken.Token), OtherPartyToken.Token);
+                SaveThirdPartyFolders();
+                Output.Write($"Finished reloading 3rd party folders.", Output.Level.Status);
+            }
+            catch (TargetInvocationException error)
+            {
+                Output.Write($"Error source: {error.InnerException.Source}", Output.Level.Error);
+                Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+                Output.Write($"Scanning 3rd party folder task canceled.", Output.Level.Status);
+            }
+            finally
+            {
+                OtherPartyToken.Dispose();
+            }
+        }
 
         public void RemoveThirdPartyFolder(int index)
         {
@@ -275,17 +303,16 @@ namespace Daz_Package_Manager
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
-            var savePath = SaveFileLocation(otherFoldersJsonFile);
+            var savePath = SaveFileLocation(thirdPartyFolderJsonFile);
             File.WriteAllText(savePath, JsonSerializer.Serialize(ThirdParty.Folders, option));
 
-            savePath = SaveFileLocation("temp.json");
+            savePath = SaveFileLocation(thirdPartyFilesJsonFile);
             File.WriteAllText(savePath, JsonSerializer.Serialize(ThirdParty.Files, option));
-
         }
 
         public void LoadThirdPartyFolders()
         {
-            var saveFileLocation = SaveFileLocation(otherFoldersJsonFile);
+            var saveFileLocation = SaveFileLocation(thirdPartyFolderJsonFile);
             try
             {
                 var option = new JsonSerializerOptions
@@ -300,7 +327,7 @@ namespace Daz_Package_Manager
                     jsonFile.Dispose();
                     ThirdParty.Folders.AddRange(folders);
 
-                    saveFileLocation = SaveFileLocation("temp.json");
+                    saveFileLocation = SaveFileLocation(thirdPartyFilesJsonFile);
                     using var jsonFile2 = File.OpenText(saveFileLocation);
                     var files = JsonSerializer.Deserialize<List<OtherPartyFolder>>(jsonFile2.ReadToEnd(), option);
                     ThirdParty.Files = files;
@@ -318,6 +345,7 @@ namespace Daz_Package_Manager
             {
             }
         }
+
         public CollectionViewSource ThirdPartyView { get; set; } = new();
         private void UpdateThirdPartyView(object sender, PropertyChangedEventArgs e)
         {
@@ -380,7 +408,8 @@ namespace Daz_Package_Manager
         }
 
         private const string archiveJsonFile = "Archive.json";
-        private const string otherFoldersJsonFile = "3rdPartyFolder.json";
+        private const string thirdPartyFolderJsonFile = "3rdPartyFolders.json";
+        private const string thirdPartyFilesJsonFile = "3rdPartyFiles.json";
 
         private static string SaveFileLocation(string filename)
         {
