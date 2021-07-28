@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -37,22 +35,8 @@ namespace DazPackage
                 var installedTypes = content.Element("InstallTypes")?.Attribute("VALUE")?.Value;
                 if (installedTypes == "Content")
                 {
-                    var fileEntries = content.Elements("File")?.Attributes("VALUE");
-
-                    // Trim "content/" from the path since DIM will skip top level folder.
-                    Files = content.Elements("File")?.Select(x =>
-                    {
-                        var path = x.Attribute("VALUE")?.Value;
-                        var target = x.Attribute("TARGET")?.Value.Length + 1; // +1 for "/" at the of path
-                        Debug.Assert(target < path.Length, "Incorrect substring processing in InstallManifestFile");
-                        return path[target.Value..]; //TODO this part does not work for plugin type.
-                    }).ToList();
-
-                    MetadataFiles = Files.Where(x =>
-                    {
-                        var y = x.ToLower();
-                        return y.StartsWith("runtime/support/") && y.EndsWith(".dsx");
-                    }).ToList();
+                    Files = PackageManifestFile.GetFiles(content);
+                    MetadataFiles = PackageManifestFile.FindMetadataFile(Files);
                 }
             }
             catch (XmlException)

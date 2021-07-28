@@ -6,13 +6,13 @@ namespace Helpers
 {
     public class StringCompareHelper : IComparer
     {
-        private static StringComparer comparer = StringComparer.Ordinal;
+        private static readonly StringComparer comparer = StringComparer.Ordinal;
 
         public int Compare(object x, object y)
         {
             if (x is CollectionViewGroup xg && y is CollectionViewGroup yg)
             {
-                if (xg.Name == null )
+                if (xg.Name == null)
                 {
                     return 1;
                 }

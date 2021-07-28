@@ -27,6 +27,29 @@ namespace Helpers
             }
         }
 
+        public static void MoveFolder(string source, string destination)
+        {
+            try
+            {
+                var parent = new FileInfo(destination).Directory;
+                if (!parent.Exists)
+                {
+                    parent.Create();
+                }
+
+                Directory.Move(source, destination);
+            }
+            catch (Exception e)
+            {
+                Output.Write(e.Message, Output.Level.Error);
+            }
+        }
+
+        public static void SafeMove(string source, string destination)
+        {
+            SafeMove(new FileInfo(source), destination);
+        }
+
         public static void SafeMove(FileInfo source, string destination)
         {
             if (!File.Exists(destination))
@@ -78,9 +101,7 @@ namespace Helpers
 
         private void TabChangeHandler(object sender, SelectionChangedEventArgs e)
         {
-            var tabControl = e.OriginalSource as TabControl;
-
-            if (tabControl != null)
+            if (e.OriginalSource is TabControl)
             {
                 var tabItem = e.AddedItems[0] as TabItem;
                 Helper.TriggerFilterRefresh(tabItem.Content as ItemsControl);

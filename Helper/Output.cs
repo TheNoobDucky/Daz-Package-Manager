@@ -23,6 +23,7 @@ namespace Helpers
         {
             Output.debugField = debugField;
         }
+
         public static void Write(string debugText, Level level, double indent = 0.0)
         {
             var brush = level switch
@@ -37,14 +38,13 @@ namespace Helpers
                 _ => Brushes.White,
             };
 
-            if (level == Level.Info)
+            if (level == Level.Info && indent == 0.0)
             {
                 indent = 20.0;
             }
 
             Write(debugText, brush, indent);
         }
-
 
         private static void Write(string debugText, Brush brush = null, double indent = 0.0)
         {
