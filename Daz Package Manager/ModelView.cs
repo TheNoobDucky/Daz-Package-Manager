@@ -237,6 +237,7 @@ namespace Daz_Package_Manager
             Output.Write("Canceling processing 3rd party folders.", Output.Level.Status);
             OtherPartyToken.Cancel();
         }
+
         public async Task AddThirdPartyFolder()
         {
             var (success, folder) = SelectFolder.AskForLocation();
@@ -265,6 +266,7 @@ namespace Daz_Package_Manager
                 }
             }
         }
+
         public async Task ReloadThirdPartyFolder()
         {
             try
