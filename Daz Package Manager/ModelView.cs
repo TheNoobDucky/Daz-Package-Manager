@@ -179,7 +179,7 @@ namespace Daz_Package_Manager
             Output.Write("Install to virtual folder complete.", Output.Level.Status);
         }
 
-        private IEnumerable<InstalledPackage> SelectedPackages ()
+        private IEnumerable<InstalledPackage> SelectedPackages()
         {
             return packages.Packages.Where(x => x.Selected);
         }
@@ -193,7 +193,7 @@ namespace Daz_Package_Manager
             public List<string> PackageNames { get; set; }
             public List<string> ThirdPartyFilenames { get; set; }
         }
-        public  void SaveSelectionsToFile ()
+        public void SaveSelectionsToFile()
         {
             var (success, file) = SelectFile.AskForSaveLocation();
             if (success)
@@ -216,7 +216,7 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void LoadSelectionsFromFile ()
+        public void LoadSelectionsFromFile()
         {
             var (success, file) = SelectFile.AskForOpenLocation();
             if (success)
