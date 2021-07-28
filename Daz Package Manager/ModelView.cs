@@ -146,7 +146,7 @@ namespace Daz_Package_Manager
 
             Output.Write("Installing to virtual folder location: " + destination, Output.Level.Status);
 
-            var packagesToSave = packages.Packages.Where(x => x.Selected);
+            var packagesToSave = SelectedPackages();
             foreach (var package in packagesToSave)
             {
                 Output.Write("Installing: " + package.ProductName, Output.Level.Info);
@@ -161,8 +161,8 @@ namespace Daz_Package_Manager
                 }
             }
 
-            var files = ThirdParty.AllSelected();
-            foreach (var file in files)
+            var thirdPartyFiles = SelectedThirdPartyFiles();
+            foreach (var file in thirdPartyFiles)
             {
                 try
                 {
@@ -176,8 +176,84 @@ namespace Daz_Package_Manager
                     _ = MessageBox.Show(error.Message);
                 }
             }
-
             Output.Write("Install to virtual folder complete.", Output.Level.Status);
+        }
+
+        private IEnumerable<InstalledPackage> SelectedPackages ()
+        {
+            return packages.Packages.Where(x => x.Selected);
+        }
+        private IEnumerable<ThirdPartyEntry> SelectedThirdPartyFiles()
+        {
+            return ThirdParty.AllSelected();
+        }
+
+        public class SelectionRecords
+        {
+            public List<string> PackageNames { get; set; }
+            public List<string> ThirdPartyFilenames { get; set; }
+        }
+        public  void SaveSelectionsToFile ()
+        {
+            var (success, file) = SelectFile.AskForSaveLocation();
+            if (success)
+            {
+                try
+                {
+                    var option = new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    };
+                    var selectedPackages = SelectedPackages().Select(x => x.ProductName).ToList();
+                    var selectedFiles = SelectedThirdPartyFiles().Select(x => x.Path).ToList();
+                    var records = new SelectionRecords() { PackageNames = selectedPackages, ThirdPartyFilenames = selectedFiles };
+                    File.WriteAllText(file, JsonSerializer.Serialize(records, option));
+                }
+                catch (IOException error)
+                {
+                    Output.Write($"Unable to write to {file}. Error: {error.Message}", Output.Level.Error);
+                }
+            }
+        }
+
+        public void LoadSelectionsFromFile ()
+        {
+            var (success, file) = SelectFile.AskForOpenLocation();
+            if (success)
+            {
+                try
+                {
+                    Output.Write($"Reading selections from {file}", Output.Level.Status);
+                    var option = new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    };
+                    using var jsonFile = File.OpenText(file);
+                    var records = JsonSerializer.Deserialize<SelectionRecords>(jsonFile.ReadToEnd(), option);
+                    packages.SelectPackages(records.PackageNames);
+                    ThirdParty.SelectFiles(records.ThirdPartyFilenames);
+                    foreach (var name in records.PackageNames)
+                    {
+                        Output.Write($"{name}", Output.Level.Info);
+                    }
+                    foreach (var name in records.ThirdPartyFilenames)
+                    {
+                        Output.Write($"{name}", Output.Level.Info);
+                    }
+
+                }
+                catch (JsonException)
+                {
+                    Output.Write($"Unable load from {file}.", Output.Level.Warning);
+                }
+                catch (FileNotFoundException)
+                {
+                }
+                catch (IOException error)
+                {
+                    Output.Write($"Unable to read {file}. Error: {error.Message}", Output.Level.Error);
+                }
+            }
         }
 
         #region DAZ Folders

@@ -136,25 +136,22 @@
 
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Cache Location" />
-            <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="100" Name="CacheLocation" IsReadOnly="True"
+            <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2" Name="CacheLocation" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding CacheLocation}" />
 
-            <Button Grid.Row="1" Grid.Column="3" Click="ClearPackageSelection" Margin="{StaticResource DefaultMargin}"
-                    Content="Clear Package Selection" />
-
-            <CheckBox Grid.Row="1" Grid.Column="4" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
+            <CheckBox Grid.Row="0" Grid.Column="6" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding MakeCopy}" Content="Copy Files Instead" />
             
-            <CheckBox Grid.Row="1" Grid.Column="5" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
+            <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding WarnMissingFile}" Content="Ignore Missing File" />
             
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="{StaticResource DefaultMargin}"
                     Visibility="Hidden" Content="Reload Cache" />
 
-            <Grid Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="100" Grid.RowSpan="2">
+            <Grid Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="100" Grid.RowSpan="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -167,7 +164,7 @@
                         Maximum="500" SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
             </Grid>
 
-            <StackPanel Grid.Row="3" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
+            <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen0}" Content="Unknown" />
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen4}" Content="Gen 4" />
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen5}" Content="Genesis 1" />
@@ -176,7 +173,7 @@
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen8}" Content="Genesis 8" />
             </StackPanel>
 
-            <StackPanel Grid.Row="3" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="100">
+            <StackPanel Grid.Row="2" Grid.Column="4" Orientation="Vertical" Grid.RowSpan="2">
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleUnknownGender}" Content="Unknown"
                         Margin="5 1" />
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleFemale}" Content="Female" Margin="5 1" />
@@ -187,14 +184,22 @@
                     Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
                     IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
 
-            <Button Name="AddThirdPartyButton" Grid.Row="3" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+            <Button Name="AddThirdPartyButton" Grid.Row="2" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Add 3rd Party Folder" />
-            <Button Name="RemoveThirdPartyButton" Grid.Row="3" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+            <Button Name="RemoveThirdPartyButton" Grid.Row="2" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Remove 3rd Party Folder" />
-            <Button Name="ReloadThirdPartyButton" Grid.Row="3" Grid.Column="7" Click="Reload3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
+            <Button Name="ReloadThirdPartyButton" Grid.Row="2" Grid.Column="7" Click="Reload3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Reload 3rd Party Folder" />
-            <ListBox Name="OtherPartyFolders" Grid.Row="4" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="3"
+            <ListBox Name="OtherPartyFolders" Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="4"
                     ItemsSource="{Binding ThirdParty.Folders}"/>
+            
+
+            <Button Grid.Row="4" Grid.Column="4" Click="SaveSelection"
+                    Margin="{StaticResource DefaultMargin}" Content="Save Selection" />
+            <Button Grid.Row="5" Grid.Column="4" Click="LoadSelection"
+                    Margin="{StaticResource DefaultMargin}" Content="Load Selection" /> 
+            <Button Grid.Row="6" Grid.Column="4" Click="ClearPackageSelection" Margin="{StaticResource DefaultMargin}"
+                    Content="Clear Package Selection" />
         </Grid>
 
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
