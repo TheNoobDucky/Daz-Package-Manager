@@ -1,36 +1,35 @@
 ﻿using Helpers;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 
 namespace DazPackage
 {
     public class ThirdPartyEntry : INotifyPropertyChanged
     {
-        public string Path { get; set; }
-        public string BasePath { get; set; }
+        public string Location { get; set; }
+        public string RelativePath { get; set; }
 
         private bool selected = false;
-        public bool IsDirectory { get; set; } = false;
+        [JsonIgnore]
         public bool Selected
         {
             get => selected;
             set
             {
-                if (IsDirectory && Folder != null)
-                {
-                    Folder.Selected = value;
-                }
                 selected = value;
                 OnPropertyChanged();
             }
         }
-        public ThirdPartyFolder Folder { get; set; }
+        public ThirdPartyFolder ParentFolder { get; set; }
 
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,98 +40,105 @@ namespace DazPackage
         #endregion
     }
 
-    public class ThirdPartyFolder
+    public class ThirdPartyFolder : INotifyPropertyChanged
     {
+        private bool selected = false;
+        [JsonIgnore]
         public bool Selected
         {
+            get => selected;
             set
             {
                 foreach (var folder in Folders)
                 {
-                    folder.SelfEntry.Selected = value;
+                    folder.Selected = value;
+                    //folder.selected = value;
                 }
 
                 foreach (var file in Files)
                 {
                     file.Selected = value;
                 }
+                selected = value;
+                OnPropertyChanged();
             }
         }
 
-        public List<ThirdPartyEntry> Self { get; set; } = new();
-        public ThirdPartyEntry SelfEntry { get => Self[0]; set => Self[0] = value; }
         public List<ThirdPartyEntry> Files { get; set; } = new();
         public List<ThirdPartyFolder> Folders { get; set; } = new();
-        public string Folder { get; set; }
+        public string Location { get; set; }
+        public string FolderName { get; set; }
         public string BasePath { get; set; }
 
         public Task ScanFiles(CancellationToken token)
         {
-            Self.Add(new ThirdPartyEntry { Folder = this, Path = Folder, BasePath = BasePath, IsDirectory = true });
-            var subFolders = Directory.EnumerateDirectories(Folder);
+            var subFolders = Directory.EnumerateDirectories(Location);
             foreach (var subFolder in subFolders)
             {
-                var newFolder = new ThirdPartyFolder { Folder = subFolder, BasePath = BasePath };
+                var folderName = Path.GetRelativePath(Location, subFolder);
+                var newFolder = new ThirdPartyFolder { Location = subFolder, FolderName = folderName, BasePath = BasePath };
                 Folders.Add(newFolder);
-                newFolder.ScanFiles(token);
+                _ = newFolder.ScanFiles(token);
             }
 
-            var files = Directory.EnumerateFiles(Folder);
+            var files = Directory.EnumerateFiles(Location);
             foreach (var file in files)
             {
                 token.ThrowIfCancellationRequested();
-                Files.Add(item: new ThirdPartyEntry { Folder = this, Path = file, BasePath = BasePath, IsDirectory = false });
-
+                var relativePath = Path.GetRelativePath(BasePath, file);
+                Files.Add(item: new ThirdPartyEntry { ParentFolder = this, Location = file, RelativePath = relativePath });
             }
             return Task.CompletedTask;
         }
 
         public IEnumerable<ThirdPartyEntry> GetAllFiles()
         {
-            return Self.Concat(Folders.SelectMany(x => x.GetAllFiles())).Concat(Files);
+            return Folders.SelectMany(x => x.GetAllFiles()).Concat(Files);
         }
+        [JsonIgnore]
+        public IList Children => new CompositeCollection()
+            {
+                new CollectionContainer() { Collection = Folders },
+                new CollectionContainer() { Collection = Files }
+            };
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+        #endregion
     }
 
-    public class ThirdPartyFolders : INotifyPropertyChanged
+    public class ThirdPartyFolders
     {
         public ObservableCollection<string> Folders { get; set; } = new();
-        public List<ThirdPartyFolder> Files { get; set; } = new();
+        public ObservableCollection<ThirdPartyFolder> Files { get; set; } = new();
 
         public Task AddFolder(string folder, CancellationToken token)
         {
             Application.Current.Dispatcher.Invoke(() => Folders.Add(folder));
-            var newFiles = new ThirdPartyFolder { Folder = folder, BasePath = folder };
-            Files.Add(newFiles);
-            newFiles.ScanFiles(token);
-            OnPropertyChanged();
-            return Task.CompletedTask;
-        }
-
-        public Task AddFolders(List<string> folders, CancellationToken token)
-        {
-            foreach (var folder in folders)
-            {
-                _ = AddFolder(folder, token);
-            }
+            var newFiles = new ThirdPartyFolder { Location = folder, FolderName = folder, BasePath = folder };
+            _ = newFiles.ScanFiles(token);
+            Application.Current.Dispatcher.Invoke(() => Files.Add(newFiles));
             return Task.CompletedTask;
         }
 
         public void SelectFiles(List<string> selection)
         {
-            var files = AllFiles().Where(x=>selection.Contains(x.Path));
+            var files = AllFiles().Where(x => selection.Contains(x.Location));
             foreach (var file in files)
             {
                 file.Selected = true;
             }
         }
 
-
         public Task ReloadFolders(CancellationToken token)
         {
             var folders = new List<string>(Folders);
             Application.Current.Dispatcher.Invoke(() => Folders.Clear());
             Files.Clear();
-            OnPropertyChanged();
             foreach (var folder in folders)
             {
                 _ = AddFolder(folder, token);
@@ -146,7 +152,6 @@ namespace DazPackage
             {
                 Folders.RemoveAt(index);
                 Files.RemoveAt(index);
-                OnPropertyChanged();
             }
         }
 
@@ -157,15 +162,15 @@ namespace DazPackage
 
         public IEnumerable<ThirdPartyEntry> AllSelected()
         {
-            return AllFiles().Where(x => x.Selected && !x.IsDirectory);
+            return AllFiles().Where(x => x.Selected);
         }
 
-        public (List<ThirdPartyEntry> foundFiles, List<string>remainingFiles) GetFiles(List<string> files)
+        public (List<ThirdPartyEntry> foundFiles, List<string> remainingFiles) GetFiles(List<string> files)
         {
             var otherPartyFiles = AllFiles();
-            var foundFiles = otherPartyFiles.Where(x =>
+            var foundFiles = otherPartyFiles.Where(file =>
             {
-                var relativePath = Path.GetRelativePath(x.BasePath, x.Path).ToLower().Replace('\\', '/');
+                var relativePath = file.RelativePath.ToLower().Replace('\\', '/');
                 var result = files.Contains(relativePath);
                 return result;
             });
@@ -173,19 +178,11 @@ namespace DazPackage
             var remainingFiles = new List<string>(files);
             foreach (var file in foundFiles)
             {
-                var relativePath = Path.GetRelativePath(file.BasePath, file.Path).ToLower().Replace('\\', '/');
+                var relativePath = file.RelativePath.ToLower().Replace('\\', '/');
                 _ = remainingFiles.Remove(relativePath);
             }
 
             return (foundFiles.ToList(), remainingFiles);
         }
-
-        #region INotifyPropertyChanged
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            Application.Current.Dispatcher.Invoke(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
-        }
-        #endregion
     }
 }
