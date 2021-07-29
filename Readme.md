@@ -6,11 +6,12 @@ This program lets you load Daz figures quicker by limiting the amount of product
 If you got too many characters and morphs installed, Daz Studio figure loading process becomes tediously slow. The only way to speed to process up is by selectively include files you want Daz to load. Fortunately, Daz only "see" files in folders you included as Base Directory. By only including folders containing contents you want to use, the character load process will be fast. However, manually managing which product to include is practical, especially when switching between scenes. This program automates the process by creating a "Virtual Folder" containing links to files you want to include, thus can be used as a Base Directory in Daz Studio. 
 
 The advantages of this program are:
-1. Space efficient, the virtual folder contains only links to the actual files, thus take a negligible amount of space.
-2. Permanent, multiple virtual folders can be created for different scenes, allowing easy switch between scenes and come back to the scene later.
-3. Repeatable, products are selected based on the content of a scene file. The generated virtual folder can be deleted and recreated later.
+1. Space efficient. The virtual folder contains only links to the actual files, thus take a negligible amount of space.
+2. Permanent. Multiple virtual folders can be created for different scenes, allowing easy switch between scenes and come back to the scene later.
+3. Repeatable. Products are selected based on the content of a scene file. The generated virtual folder can be deleted and recreated later.
 4. (For DIM installed product) Files from the same product also included, automatically including corrective morphs and other files that items in the scene might need*.
 *Note transitive dependencies are not handled, but nearly all Daz products should be standalone and work correctly.
+5. Nondestructive. Does not modify daz product installation. Original files can still be used and DIM will keep working.
 
 
 ## How To Use
