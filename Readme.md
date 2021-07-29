@@ -16,7 +16,7 @@ The advantages of this program are:
 ## How To Use
 ### Install
 1. Download program file [here](https://github.com/TheNoobDucky/Daz-Package-Manager/releases/tag/V1.6.0)
-2. May also need to install ".NET Desktop Runtime 5" [Download here](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries)
+2. May also need to install [.net 5 Desktop Runtime x64 download link](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-5.0.8-windows-x64-installer)
 3. Either turn developer mode on windows 10 or run the program as administrator. [How to turn developer mode on](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)
 4. Run Daz Package Manager.exe.
 
@@ -78,8 +78,7 @@ After opening a scene using Virtual folder, texture images might be resolved usi
 
 * Only run on Windows 10 and later.
 
-* Require .NET Desktop Runtime 5 at [https://dotnet.microsoft.com/download/dotnet/5.0](https://dotnet.microsoft.com/download/dotnet/5.0)
-Download link:[https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.0.5-windows-x64-binaries)
+* Require [.net 5 download link](https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-5.0.8-windows-x64-installer)
 
 * Need to run with developer mode or admin privilege. 
 [Due to the permission required to create symbolic link](https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createsymboliclinka)
