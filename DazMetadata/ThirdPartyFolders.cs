@@ -138,7 +138,7 @@ namespace DazPackage
         {
             var folders = new List<string>(Folders);
             Application.Current.Dispatcher.Invoke(() => Folders.Clear());
-            Files.Clear();
+            Application.Current.Dispatcher.Invoke(() => Files.Clear());
             foreach (var folder in folders)
             {
                 _ = AddFolder(folder, token);

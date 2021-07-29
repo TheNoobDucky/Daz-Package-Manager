@@ -90,7 +90,27 @@ Download link:[https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-5.
 
 
 ## Version Log
+Change Log:
 
+V1.8.1
+* Fix 3rd party crash
+
+V1.8
+* Better 3rd party tab presentation and internal changes.
+
+V1.7
+* Add ability to save/load selection to file.
+
+V1.6.1 
+* add 3rd party folder button now work correctly.
+* select the whole folder when selecting a 3rd party file in case other files in the folder are transitively referenced.
+* Improved GUI text.
+
+V 1.6.0:
+* Add ability to handle files not installed using DIM.
+* Refactor to use async.
+* Better error handling.
+*
 V 1.6.0:
 * Add ability to handle files not installed using DIM.
 * Refactor to use async.
