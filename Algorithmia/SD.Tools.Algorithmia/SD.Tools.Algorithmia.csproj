@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
+    <AssemblyName>SD.Tools.Algorithmia</AssemblyName>
+    <RootNamespace>SD.Tools.Algorithmia</RootNamespace>
+    <Version>1.4.0</Version>
+    <AssemblyVersion>1.4.0.0</AssemblyVersion>
+    <SignAssembly>true</SignAssembly>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Authors>Solutions Design bv</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageLicenseUrl>https://github.com/SolutionsDesign/Algorithmia/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://solutionsdesign.github.io/Algorithmia/</PackageProjectUrl>
+    <PackageTags>Algorithm Data Structure class library graph heap command queue</PackageTags>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\SD.Tools.Algorithmia.xml</DocumentationFile>
+    <AssemblyOriginatorKeyFile>AlgorithmiaStrongKey.snk</AssemblyOriginatorKeyFile>
+    <DelaySign>false</DelaySign>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release;Shipping</Configurations>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Shipping|netstandard2.0|AnyCPU'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Shipping|netstandard2.0|x64'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <Compile Remove="GeneralDataStructures\PropertyEditing\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="obj" />
+    <Compile Remove="bin" />
+    <PackageReference Include="SD.Tools.BCLExtensions" Version="1.2.2" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net452'">
+    <Reference Include="System.Drawing.Design" />
+  </ItemGroup>
+</Project>
