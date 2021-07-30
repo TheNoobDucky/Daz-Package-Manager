@@ -39,12 +39,6 @@ namespace DazPackage
                     var files = PackageManifestFile.GetFiles(packageXML);
                     metadataFiles = PackageManifestFile.FindMetadataFile(files);
 
-
-                    //var metadataFileEntries = archive.Entries.Where(
-                    //x =>
-                    //(x.FullName.StartsWith("Content/Runtime/Support/") || x.FullName.StartsWith("Content/runtime/Support/"))
-                    //&& x.FullName.EndsWith(".dsx"));
-
                     var numberOfMetadataFiles = metadataFiles.Count;
                     MissingMetadata = numberOfMetadataFiles == 0;
                     MultipleMetadataFiles = numberOfMetadataFiles != 1;
