@@ -7,11 +7,12 @@ using System.Text.Json;
 
 namespace DazPackage
 {
-    public class SceneFile
+    // Represents duf file.
+    public class DufFile
     {
-        public static (List<InstalledPackage> packagesInScene, List<string> remainingFiles) PackagesInScene(FileInfo sceneLocation, IEnumerable<InstalledPackage> packages)
+        public static (List<InstalledPackage> packagesInScene, List<string> remainingFiles) PackagesInFile(FileInfo sceneLocation, IEnumerable<InstalledPackage> packages)
         {
-            var filesInSceneLowerCase = ProcessSceneContent(sceneLocation);
+            var filesInSceneLowerCase = ExtractReferencedFiles(sceneLocation);
 
             // Look for packages that contain file the scene referenced.
             var packagesInScene = packages.Where(x => x.Files.Any(files => filesInSceneLowerCase.Contains(files.ToLower()))).ToList();
@@ -23,33 +24,33 @@ namespace DazPackage
             return (packagesInScene, remainingFiles);
         }
 
-        private static HashSet<string> ProcessSceneContent(FileInfo sceneLocation)
+        public static HashSet<string> ExtractReferencedFiles(FileInfo location)
         {
             try
             {
                 try
                 {
-                    var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
-                    return ProcessSceneContent_Imple(sceneContent);
+                    var sceneContent = Helper.ReadJsonFromGZfile(location);
+                    return ExtractFilesFromJsonFile(sceneContent);
                 }
                 catch (InvalidDataException)
                 {
                     // Try open file as plain text.
-                    var sceneContent = Helper.ReadJsonFromTextFile(sceneLocation);
-                    return ProcessSceneContent_Imple(sceneContent);
+                    var sceneContent = Helper.ReadJsonFromTextFile(location);
+                    return ExtractFilesFromJsonFile(sceneContent);
                 }
             }
             catch (InvalidDataException)
             {
-                throw new CorruptFileException(sceneLocation.FullName);
+                throw new CorruptFileException(location.FullName);
             }
         }
 
-        private static HashSet<string> ProcessSceneContent_Imple (JsonDocument sceneContent)
+        private static HashSet<string> ExtractFilesFromJsonFile(JsonDocument file)
         {
             var filesInSceneLowerCase = new HashSet<string>();
 
-            var root = sceneContent.RootElement;
+            var root = file.RootElement;
 
             var imageLibrary = new JsonElement();
             if (root.TryGetProperty("image_library", out imageLibrary))
@@ -89,6 +90,7 @@ namespace DazPackage
         {
             return element.TryGetProperty("url", out var result) ? result.ToString().ToLower() : "";
         }
+
         private static string GetUVSet(JsonElement element)
         {
             return element.TryGetProperty("uv_set", out var result) ? result.ToString().ToLower() : "";

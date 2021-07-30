@@ -99,7 +99,7 @@ namespace Daz_Package_Manager
             try
             {
                 var sceneFileInfo = new FileInfo(sceneLocation);
-                var (packagesInScene, remainingFiles) = SceneFile.PackagesInScene(sceneFileInfo, packages.Packages);
+                var (packagesInScene, remainingFiles) = DufFile.PackagesInFile(sceneFileInfo, packages.Packages);
                 Output.Write("Packages Selected:", Output.Level.Status);
                 packagesInScene.ForEach(package =>
                 {
