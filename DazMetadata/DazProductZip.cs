@@ -74,7 +74,7 @@ namespace DazPackage
                 {
                 }
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException e)
             {
                 // Missing metadata file or metadata file is corrupt i think.
                 //throw new CorruptFileException($"{e.Message} {file.FullName}"); // TODO check what is causing this.

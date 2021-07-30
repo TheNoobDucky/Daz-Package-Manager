@@ -205,7 +205,7 @@ namespace DazPackage
         Handled = Shown | Other | HIDDEN_ASSET_GROUP,
         NotProcessed = Material | Skipped | Support | Missing | HIDDEN_ASSET_GROUP,
         Generation = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
-        Categories = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP,
+        Categoriesed = Accessory | Attachment | Character | Clothing | Hair | Morph | Pose | Prop | HIDDEN_ASSET_GROUP | 1 << 27,
         Private = Animal | Environment | Vehicle | Poser | General | Anatomy,
 
         All = ~None,
