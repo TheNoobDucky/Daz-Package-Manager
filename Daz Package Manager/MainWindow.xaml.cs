@@ -13,6 +13,8 @@ namespace Daz_Package_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly Backend backend = new();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -24,7 +26,7 @@ namespace Daz_Package_Manager
             }
             InfoBox.RegisterDebugField(DebugText);
             InfoBox.WriteDebug = true;
-            DataContext = modelView;
+            DataContext = backend;
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -34,24 +36,22 @@ namespace Daz_Package_Manager
             var ThirdPartyContent = AddThirdPartyButton.Content;
             AddThirdPartyButton.Content = Helper.WaitText;
 
-            await modelView.CacheManager.LoadAllCaches();
+            await backend.CacheManager.LoadAllCaches();
 
             ScanInstallManifestFolderButton.Content = scanContent;
             AddThirdPartyButton.Content = ThirdPartyContent;
         }
 
-        private readonly Backend modelView = new();
-
         private async void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
             await Helper.AsyncButton(sender, async () =>
-             {
-                 var destination = InstallFolder();
-                 var makeCopy = Properties.Settings.Default.MakeCopy;
-                 var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-                 await modelView.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
-             },
-                () => { modelView.VirtualFolderManager.Cancel() }
+            {
+                var destination = InstallFolder();
+                var makeCopy = Properties.Settings.Default.MakeCopy;
+                var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
+                await backend.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
+            },
+                () => backend.VirtualFolderManager.Cancel()
             );
         }
 
@@ -90,8 +90,8 @@ namespace Daz_Package_Manager
         private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
             await Helper.AsyncButton(sender,
-                async () => await modelView.ManifestScanner.Scan(),
-                () => modelView.ManifestScanner.Cancel());
+                async () => await backend.ManifestScanner.Scan(),
+                () => backend.ManifestScanner.Cancel());
         }
 
         private async void SelectPackagesBasedOnScene(object sender, RoutedEventArgs e)
@@ -101,14 +101,14 @@ namespace Daz_Package_Manager
                 {
                     if (Properties.Settings.Default.BatchProcessScene)
                     {
-                        await modelView.SelectPackages.BasedOnFolder(Properties.Settings.Default.SceneFile);
+                        await backend.SelectPackages.BasedOnFolder(Properties.Settings.Default.SceneFile);
                     }
                     else
                     {
-                        await modelView.SelectPackages.BasedOnScene(Properties.Settings.Default.SceneFile);
+                        await backend.SelectPackages.BasedOnScene(Properties.Settings.Default.SceneFile);
                     }
                 },
-                () => modelView.SelectPackages.Cancel()
+                () => backend.SelectPackages.Cancel()
             );
         }
 
@@ -164,14 +164,14 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            modelView.Packages.UnselectAll();
+            backend.Packages.UnselectAll();
         }
 
         private async void CallLoadCache(object sender, RoutedEventArgs e)
         {
             await Helper.AsyncButton(sender,
-                async () => await modelView.ManifestScanner.LoadCache(),
-                () => modelView.ManifestScanner.Cancel());
+                async () => await backend.ManifestScanner.LoadCache(),
+                () => backend.ManifestScanner.Cancel());
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
@@ -187,11 +187,11 @@ namespace Daz_Package_Manager
                 var removeContent = RemoveThirdPartyButton.Content;
                 ReloadThirdPartyButton.Content = Helper.WaitText;
                 RemoveThirdPartyButton.Content = Helper.WaitText;
-                await modelView.ThirdPartyScanner.AddFolder();
+                await backend.ThirdPartyScanner.AddFolder();
                 ReloadThirdPartyButton.Content = reloadContent;
                 RemoveThirdPartyButton.Content = removeContent;
             },
-                () => modelView.ThirdPartyScanner.Cancel()
+                () => backend.ThirdPartyScanner.Cancel()
             );
         }
 
@@ -203,11 +203,11 @@ namespace Daz_Package_Manager
                 {
                     if (prevText == Helper.WaitText)
                     {
-                        modelView.ThirdPartyScanner.Cancel();
+                        backend.ThirdPartyScanner.Cancel();
                         return;
                     }
                     var index = OtherPartyFolders.SelectedIndex;
-                    modelView.ThirdPartyScanner.RemoveFolder(index);
+                    backend.ThirdPartyScanner.RemoveFolder(index);
                 }
             }
         }
@@ -221,22 +221,22 @@ namespace Daz_Package_Manager
 
                 AddThirdPartyButton.Content = Helper.WaitText;
                 RemoveThirdPartyButton.Content = Helper.WaitText;
-                await modelView.ThirdPartyScanner.ReloadThirdPartyFolder();
+                await backend.ThirdPartyScanner.ReloadThirdPartyFolder();
                 AddThirdPartyButton.Content = addContent;
                 RemoveThirdPartyButton.Content = removeContent;
             },
-                () => modelView.ThirdPartyScanner.Cancel()
+                () => backend.ThirdPartyScanner.Cancel()
             );
         }
 
         private void SaveSelection(object sender, RoutedEventArgs e)
         {
-            modelView.CacheManager.SaveSelectionsToFile();
+            backend.CacheManager.SaveSelectionsToFile();
         }
 
         private void LoadSelection(object sender, RoutedEventArgs e)
         {
-            modelView.CacheManager.LoadSelectionsFromFile();
+            backend.CacheManager.LoadSelectionsFromFile();
         }
     }
 }
