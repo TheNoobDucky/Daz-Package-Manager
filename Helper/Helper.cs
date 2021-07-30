@@ -95,7 +95,6 @@ namespace Helpers
         public static JsonDocument ReadJsonFromTextFile(FileInfo file)
         {
             using var sceneStream = file.OpenRead();
-            //using var scene = new FileStream(sceneStream, CompressionMode.Decompress);
             return JsonDocument.Parse(sceneStream);
         }
 
