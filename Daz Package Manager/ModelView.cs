@@ -1,6 +1,7 @@
 ﻿using DazPackage;
 using Helpers;
 using OsHelper;
+using Output;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -99,12 +100,12 @@ namespace Daz_Package_Manager
             try
             {
                 var sceneFileInfo = new FileInfo(sceneLocation);
-                var (packagesInScene, remainingFiles) = SceneFile.PackagesInScene(sceneFileInfo, packages.Packages);
-                Output.Write("Packages Selected:", Output.Level.Status);
+                var (packagesInScene, remainingFiles) = DufFile.PackagesInFile(sceneFileInfo, packages.Packages);
+                InfoBox.Write("Packages Selected:", InfoBox.Level.Status);
                 packagesInScene.ForEach(package =>
                 {
                     package.Selected = true;
-                    Output.Write(package.ProductName, Output.Level.Info);
+                    InfoBox.Write(package.ProductName, InfoBox.Level.Info);
                 });
 
                 if (remainingFiles.Count > 0)
@@ -112,27 +113,27 @@ namespace Daz_Package_Manager
                     var (foundFiles, missingFiles) = ThirdParty.GetFiles(remainingFiles);
                     if (foundFiles.Any())
                     {
-                        Output.Write("3rd Party files Selected:", Output.Level.Status);
+                        InfoBox.Write("3rd Party files Selected:", InfoBox.Level.Status);
                         foreach (var file in foundFiles)
                         {
                             file.ParentFolder.Selected = true;
-                            Output.Write(file.Location, Output.Level.Info);
+                            InfoBox.Write(file.Location, InfoBox.Level.Info);
                         }
                     }
                     if (missingFiles.Count > 0)
                     {
-                        Output.Write("Unable to find reference for the following files:", Output.Level.Status);
-                        missingFiles.ForEach(file => Output.Write(file, Output.Level.Info));
+                        InfoBox.Write("Unable to find reference for the following files:", InfoBox.Level.Status);
+                        missingFiles.ForEach(file => InfoBox.Write(file, InfoBox.Level.Info));
                     }
                 }
             }
             catch (CorruptFileException error)
             {
-                Output.Write($"Invalid scene file: {error.Message}", Output.Level.Error);
+                InfoBox.Write($"Invalid scene file: {error.Message}", InfoBox.Level.Error);
             }
             catch (ArgumentException)
             {
-                Output.Write("Please select scene file.", Output.Level.Error);
+                InfoBox.Write("Please select scene file.", InfoBox.Level.Error);
             }
         }
 
@@ -140,23 +141,23 @@ namespace Daz_Package_Manager
         {
             if (destination == null || destination == "")
             {
-                Output.Write("Please select a location to install virtual packages to.", Output.Level.Error);
+                InfoBox.Write("Please select a location to install virtual packages to.", InfoBox.Level.Error);
                 return;
             }
 
-            Output.Write("Installing to virtual folder location: " + destination, Output.Level.Status);
+            InfoBox.Write("Installing to virtual folder location: " + destination, InfoBox.Level.Status);
 
             var packagesToSave = SelectedPackages();
             foreach (var package in packagesToSave)
             {
-                Output.Write("Installing: " + package.ProductName, Output.Level.Info);
+                InfoBox.Write("Installing: " + package.ProductName, InfoBox.Level.Info);
                 try
                 {
                     VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
                 }
                 catch (SymLinkerError error)
                 {
-                    Output.Write($"Unable to copy file {error.Message}", Output.Level.Error);
+                    InfoBox.Write($"Unable to copy file {error.Message}", InfoBox.Level.Error);
                     _ = MessageBox.Show(error.Message);
                 }
             }
@@ -166,16 +167,16 @@ namespace Daz_Package_Manager
             {
                 try
                 {
-                    Output.Write($"Installing: {file.RelativePath}", Output.Level.Info);
+                    InfoBox.Write($"Installing: {file.RelativePath}", InfoBox.Level.Info);
                     VirtualPackage.Install(file.RelativePath, file.ParentFolder.BasePath, destination, makeCopy, warnMissingFile);
                 }
                 catch (SymLinkerError error)
                 {
-                    Output.Write($"Unable to copy file {error.Message}", Output.Level.Error);
+                    InfoBox.Write($"Unable to copy file {error.Message}", InfoBox.Level.Error);
                     _ = MessageBox.Show(error.Message);
                 }
             }
-            Output.Write("Install to virtual folder complete.", Output.Level.Status);
+            InfoBox.Write("Install to virtual folder complete.", InfoBox.Level.Status);
         }
 
         private IEnumerable<InstalledPackage> SelectedPackages()
@@ -210,7 +211,7 @@ namespace Daz_Package_Manager
                 }
                 catch (IOException error)
                 {
-                    Output.Write($"Unable to write to {file}. Error: {error.Message}", Output.Level.Error);
+                    InfoBox.Write($"Unable to write to {file}. Error: {error.Message}", InfoBox.Level.Error);
                 }
             }
         }
@@ -222,7 +223,7 @@ namespace Daz_Package_Manager
             {
                 try
                 {
-                    Output.Write($"Reading selections from {file}", Output.Level.Status);
+                    InfoBox.Write($"Reading selections from {file}", InfoBox.Level.Status);
                     var option = new JsonSerializerOptions
                     {
                         WriteIndented = true
@@ -233,24 +234,24 @@ namespace Daz_Package_Manager
                     ThirdParty.SelectFiles(records.ThirdPartyFilenames);
                     foreach (var name in records.PackageNames)
                     {
-                        Output.Write($"{name}", Output.Level.Info);
+                        InfoBox.Write($"{name}", InfoBox.Level.Info);
                     }
                     foreach (var name in records.ThirdPartyFilenames)
                     {
-                        Output.Write($"{name}", Output.Level.Info);
+                        InfoBox.Write($"{name}", InfoBox.Level.Info);
                     }
 
                 }
                 catch (JsonException)
                 {
-                    Output.Write($"Unable load from {file}.", Output.Level.Warning);
+                    InfoBox.Write($"Unable load from {file}.", InfoBox.Level.Warning);
                 }
                 catch (FileNotFoundException)
                 {
                 }
                 catch (IOException error)
                 {
-                    Output.Write($"Unable to read {file}. Error: {error.Message}", Output.Level.Error);
+                    InfoBox.Write($"Unable to read {file}. Error: {error.Message}", InfoBox.Level.Error);
                 }
             }
         }
@@ -263,19 +264,19 @@ namespace Daz_Package_Manager
             ManifestScanToken = new CancellationTokenSource();
             try
             {
-                Helpers.Output.Write("Start processing.", Output.Level.Status, 0.0);
+                InfoBox.Write("Start processing.", InfoBox.Level.Status, 0.0);
                 var sourceFolder = Properties.Settings.Default.InstallManifestFolder;
                 await Task.Run(() => packages.ScanInBackground(sourceFolder, ManifestScanToken.Token), ManifestScanToken.Token);
-                Output.Write($"Finished scanning install manifest folder task finished.", Output.Level.Status);
+                InfoBox.Write($"Finished scanning install manifest folder task finished.", InfoBox.Level.Status);
             }
             catch (TargetInvocationException error)
             {
-                Output.Write($"Error source: {error.InnerException.Source}", Output.Level.Error);
-                Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+                InfoBox.Write($"Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+                InfoBox.Write($"Error error message: {error.InnerException.Message}", InfoBox.Level.Error);
             }
             catch (OperationCanceledException)
             {
-                Output.Write($"Manifest scan task canceled.", Output.Level.Status);
+                InfoBox.Write($"Manifest scan task canceled.", InfoBox.Level.Status);
             }
             finally
             {
@@ -285,7 +286,7 @@ namespace Daz_Package_Manager
 
         public void CancelManifestScan()
         {
-            Output.Write("Canceling manifest scan task.", Output.Level.Status);
+            InfoBox.Write("Canceling manifest scan task.", InfoBox.Level.Status);
             ManifestScanToken.Cancel();
         }
         #endregion
@@ -297,7 +298,7 @@ namespace Daz_Package_Manager
         private CancellationTokenSource OtherPartyToken = null;
         public void CancelThirdPartyProcess()
         {
-            Output.Write("Canceling processing 3rd party folders.", Output.Level.Status);
+            InfoBox.Write("Canceling processing 3rd party folders.", InfoBox.Level.Status);
             OtherPartyToken.Cancel();
         }
 
@@ -308,20 +309,20 @@ namespace Daz_Package_Manager
             {
                 try
                 {
-                    Output.Write($"Scanning 3rd party folder: {folder}.\n Please Wait.", Output.Level.Status);
+                    InfoBox.Write($"Scanning 3rd party folder: {folder}.\n Please Wait.", InfoBox.Level.Status);
                     OtherPartyToken = new();
                     await Task.Run(() => ThirdParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
                     SaveThirdPartyFolders();
-                    Output.Write($"Finished scanning 3rd party folder: {folder}.", Output.Level.Status);
+                    InfoBox.Write($"Finished scanning 3rd party folder: {folder}.", InfoBox.Level.Status);
                 }
                 catch (TargetInvocationException error)
                 {
-                    Output.Write($"Error source: {error.InnerException.Source}", Output.Level.Error);
-                    Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+                    InfoBox.Write($"Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+                    InfoBox.Write($"Error error message: {error.InnerException.Message}", InfoBox.Level.Error);
                 }
                 catch (OperationCanceledException)
                 {
-                    Output.Write($"Scanning 3rd party folder task canceled.", Output.Level.Status);
+                    InfoBox.Write($"Scanning 3rd party folder task canceled.", InfoBox.Level.Status);
                 }
                 finally
                 {
@@ -334,20 +335,20 @@ namespace Daz_Package_Manager
         {
             try
             {
-                Output.Write($"Reloading 3rd party folders.", Output.Level.Status);
+                InfoBox.Write($"Reloading 3rd party folders.", InfoBox.Level.Status);
                 OtherPartyToken = new();
                 await Task.Run(() => ThirdParty.ReloadFolders(OtherPartyToken.Token), OtherPartyToken.Token);
                 SaveThirdPartyFolders();
-                Output.Write($"Finished reloading 3rd party folders.", Output.Level.Status);
+                InfoBox.Write($"Finished reloading 3rd party folders.", InfoBox.Level.Status);
             }
             catch (TargetInvocationException error)
             {
-                Output.Write($"Error source: {error.InnerException.Source}", Output.Level.Error);
-                Output.Write($"Error error message: {error.InnerException.Message}", Output.Level.Error);
+                InfoBox.Write($"Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+                InfoBox.Write($"Error error message: {error.InnerException.Message}", InfoBox.Level.Error);
             }
             catch (OperationCanceledException)
             {
-                Output.Write($"Scanning 3rd party folder task canceled.", Output.Level.Status);
+                InfoBox.Write($"Scanning 3rd party folder task canceled.", InfoBox.Level.Status);
             }
             finally
             {
@@ -401,7 +402,7 @@ namespace Daz_Package_Manager
                 }
                 catch (JsonException)
                 {
-                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
+                    InfoBox.Write("Unable to load cache file. Clearing Cache.", InfoBox.Level.Warning);
                     jsonFile.Dispose();
                     File.Delete(saveFileLocation);
                 }
@@ -454,7 +455,7 @@ namespace Daz_Package_Manager
                 }
                 catch (JsonException)
                 {
-                    Output.Write("Unable to load cache file. Clearing Cache.", Output.Level.Warning);
+                    InfoBox.Write("Unable to load cache file. Clearing Cache.", InfoBox.Level.Warning);
                     packageJsonFile.Dispose();
                     File.Delete(saveFileLocation);
                 }

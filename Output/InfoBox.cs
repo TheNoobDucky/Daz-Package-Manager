@@ -3,9 +3,9 @@ using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace Helpers
+namespace Output
 {
-    public class Output
+    public class InfoBox
     {
         public enum Level
         {
@@ -21,7 +21,7 @@ namespace Helpers
 
         public static void RegisterDebugField(FlowDocument debugField)
         {
-            Output.debugField = debugField;
+            InfoBox.debugField = debugField;
         }
 
         public static void Write(string debugText, Level level, double indent = 0.0)

@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
     <Configurations>Debug;Release;Shipping</Configurations>
-    <Version>1.8.0</Version>
+    <Version>1.9.0</Version>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
@@ -23,6 +22,7 @@
     <ProjectReference Include="..\Algorithmia\SD.Tools.Algorithmia\SD.Tools.Algorithmia.csproj" />
     <ProjectReference Include="..\Helper\Helpers.csproj" />
     <ProjectReference Include="..\OsHelper\OsHelper.csproj" />
+    <ProjectReference Include="..\Output\Output.csproj" />
   </ItemGroup>
 
 </Project>

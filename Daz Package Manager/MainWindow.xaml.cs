@@ -1,5 +1,5 @@
 ﻿using DazPackage;
-using Helpers;
+using Output;
 using OsHelper;
 using System;
 using System.IO;
@@ -21,8 +21,8 @@ namespace Daz_Package_Manager
                 Properties.Settings.Default.CacheLocation = Path.Combine(userPath, "Daz Package Manager");
                 Directory.CreateDirectory(Properties.Settings.Default.CacheLocation);
             }
-            Output.RegisterDebugField(DebugText);
-            Output.WriteDebug = true;
+            InfoBox.RegisterDebugField(DebugText);
+            InfoBox.WriteDebug = true;
             DataContext = modelView;
             modelView.LoadPackagesCache();
         }

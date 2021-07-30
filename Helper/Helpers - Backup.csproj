@@ -1,21 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-	 <UseWindowsForms>true</UseWindowsForms>
-	 <Configurations>Debug;Release;Shipping</Configurations>
-	 <Version>1.9.0</Version>
-	 <Platforms>AnyCPU;x64</Platforms>
-  </PropertyGroup>
+    <UseWPF>true</UseWPF>
+	<Configurations>Debug;Release;Shipping</Configurations>
+	<Version>1.8.0</Version>
+	<Platforms>AnyCPU;x64</Platforms>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|AnyCPU'">

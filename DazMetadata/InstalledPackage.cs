@@ -1,4 +1,4 @@
-﻿using Helpers;
+﻿using Output;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -69,13 +69,13 @@ namespace DazPackage
                         }
                         else
                         {
-                            Output.Write(asset.ContentType + " : " + asset.Name, Output.Level.Debug);
+                            InfoBox.Write($"{asset.ContentType} : {asset.Name}", InfoBox.Level.Debug);
                         }
                     }
                 }
                 catch (FileNotFoundException)
                 {
-                    Output.Write("Missing metadatafile: " + metadataFilePath, Output.Level.Error);
+                    InfoBox.Write($"Missing metadatafile: {metadataFilePath}", InfoBox.Level.Error);
                 }
             }
             if ((Generations ^ Generation.Unknown) != Generation.None)

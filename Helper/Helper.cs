@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Output;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Helpers
             {
                 try
                 {
-                    Output.Write("Deleting empty folder: " + folder, Output.Level.Info, 60.0);
+                    InfoBox.Write("Deleting empty folder: " + folder, InfoBox.Level.Info, 60.0);
                     Directory.Delete(folder);
                 }
                 catch (UnauthorizedAccessException) { }
@@ -41,7 +42,7 @@ namespace Helpers
             }
             catch (Exception e)
             {
-                Output.Write(e.Message, Output.Level.Error);
+                InfoBox.Write(e.Message, InfoBox.Level.Error);
             }
         }
 
@@ -62,7 +63,7 @@ namespace Helpers
                 var destinationHash = CalculateMD5Hash(new FileInfo(destination));
                 if (sourceHash.SequenceEqual(destinationHash))
                 {
-                    Output.Write("Identical file, deleting: " + source.Name, Output.Level.Alert, 20.0);
+                    InfoBox.Write("Identical file, deleting: " + source.Name, InfoBox.Level.Alert, 20.0);
                     try
                     {
                         source.Delete();
@@ -72,7 +73,7 @@ namespace Helpers
                 }
                 else
                 {
-                    Output.Write("Non Identical file, skipping: " + source.Name, Output.Level.Warning, 0.0);
+                    InfoBox.Write("Non Identical file, skipping: " + source.Name, InfoBox.Level.Warning, 0.0);
                 }
             }
         }
@@ -89,6 +90,13 @@ namespace Helpers
             using var sceneStream = file.OpenRead();
             using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
             return JsonDocument.Parse(scene);
+        }
+
+        public static JsonDocument ReadJsonFromTextFile(FileInfo file)
+        {
+            using var sceneStream = file.OpenRead();
+            //using var scene = new FileStream(sceneStream, CompressionMode.Decompress);
+            return JsonDocument.Parse(sceneStream);
         }
 
         public static void TriggerFilterRefresh(ItemsControl dataGrid)

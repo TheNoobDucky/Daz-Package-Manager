@@ -59,8 +59,8 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="4*"/>
+            <RowDefinition Height="220" />
+            <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
 
         <FrameworkElement x:Name="DummyContext" Width="{Binding Settings.ImageSize}" Visibility="Collapsed" />
@@ -191,7 +191,7 @@
             <Button Name="ReloadThirdPartyButton" Grid.Row="2" Grid.Column="7" Click="Reload3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Reload 3rd Party Folder" />
             <ListBox Name="OtherPartyFolders" Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="4"
-                    ItemsSource="{Binding ThirdParty.Folders}"/>
+                    ItemsSource="{Binding ThirdParty.Folders}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
             
 
             <Button Grid.Row="4" Grid.Column="4" Click="SaveSelection"

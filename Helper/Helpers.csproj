@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
 	<Configurations>Debug;Release;Shipping</Configurations>
-	<Version>1.8.0</Version>
+	<Version>1.9.0</Version>
 	<Platforms>AnyCPU;x64</Platforms>
 
   </PropertyGroup>
@@ -19,5 +18,9 @@
     <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Output\Output.csproj" />
+  </ItemGroup>
 
 </Project>

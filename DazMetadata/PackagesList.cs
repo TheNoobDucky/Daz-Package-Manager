@@ -1,4 +1,4 @@
-﻿using Helpers;
+﻿using Output;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -23,19 +23,19 @@ namespace DazPackage
 
             if (folder is null or "")
             {
-                Output.Write("Please select install archive folder location", Output.Level.Error);
+                InfoBox.Write("Please select install archive folder location", InfoBox.Level.Error);
                 return Task.FromResult(newPackages);
             }
             newPackages = new List<InstalledPackage>();
 
-            Output.Write("Start processing install archive folder: " + folder, Output.Level.Status);
+            InfoBox.Write("Start processing install archive folder: " + folder, InfoBox.Level.Status);
             var files = Directory.EnumerateFiles(folder).ToList();
 
             var totalFiles = files.Count;
             var batchSize = 200;
             var processedFiles = 0;
             //var packages = new ConcurrentBag<InstalledPackage>();
-            Output.Write("Processing " + totalFiles + " files.", Output.Level.Status);
+            InfoBox.Write("Processing " + totalFiles + " files.", InfoBox.Level.Status);
 
             var timer = new Stopwatch();
             timer.Start();
@@ -52,13 +52,13 @@ namespace DazPackage
 
                 if (timer.Elapsed.TotalSeconds > 1)
                 {
-                    Output.Write($"{processedFiles} / {totalFiles} files processed:", Output.Level.Alert);
+                    InfoBox.Write($"{processedFiles} / {totalFiles} files processed:", InfoBox.Level.Alert);
 
                     timer.Restart();
                 }
             }
             Debug.Assert(processedFiles == totalFiles, "Batch processing implemented incorrectly, missed some packages.");
-            Output.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), Output.Level.Debug);
+            InfoBox.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), InfoBox.Level.Debug);
             Packages = newPackages;
             return Task.CompletedTask;
         }
@@ -75,11 +75,11 @@ namespace DazPackage
                 }
                 catch (DirectoryNotFoundException)
                 {
-                    Output.Write("Missing files for package: " + file, Output.Level.Error);
+                    InfoBox.Write("Missing files for package: " + file, InfoBox.Level.Error);
                 }
                 catch (CorruptFileException error)
                 {
-                    Output.Write(error.Message, Output.Level.Error);
+                    InfoBox.Write(error.Message, InfoBox.Level.Error);
                 }
             });
             return packages.ToList();
