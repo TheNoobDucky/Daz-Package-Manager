@@ -11,60 +11,61 @@ namespace DazPackage
     {
         public SceneFile(FileInfo sceneLocation)
         {
-            static string GetUrl(JsonElement element)
-            {
-                var result = new JsonElement();
-                return element.TryGetProperty("url", out result) ? result.ToString().ToLower() : "";
-            }
-
-            static JsonElement.ArrayEnumerator GetMap(JsonElement element)
-            {
-                var result = new JsonElement();
-                return element.TryGetProperty("map", out result) ? result.EnumerateArray() : new JsonElement.ArrayEnumerator();
-            }
-
             try
             {
-                var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
-                var root = sceneContent.RootElement;
-
-                var imageLibrary = new JsonElement();
-                if (root.TryGetProperty("image_library", out imageLibrary))
+                try
                 {
-                    var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
-                    FilesInSceneLowerCase.UnionWith(imageMaps.Select(GetUrl));
+                    var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
+                    ProcessSceneContent(sceneContent);
                 }
-
-                var scene = new JsonElement();
-                if (root.TryGetProperty("scene", out scene))
+                catch (InvalidDataException)
                 {
-                    var modifiers = new JsonElement();
-                    if (scene.TryGetProperty("modifiers", out modifiers))
-                    {
-                        FilesInSceneLowerCase.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
-                    }
-
-                    var nodes = new JsonElement();
-                    if (scene.TryGetProperty("nodes", out nodes))
-                    {
-                        // Find the url section of modifier. Get the first part of the string
-                        FilesInSceneLowerCase.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
-                    }
-
-                    /// TODO materials.
+                    // Try open file as plain text.
+                    var sceneContent = Helper.ReadJsonFromTextFile(sceneLocation);
+                    ProcessSceneContent(sceneContent);
                 }
-
-                FilesInSceneLowerCase.Remove("");
-                // unscape url and remove leading '/'
-                FilesInSceneLowerCase = FilesInSceneLowerCase.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
-
             }
             catch (InvalidDataException)
             {
                 throw new CorruptFileException(sceneLocation.FullName);
             }
-
         }
+
+        private void ProcessSceneContent (JsonDocument sceneContent)
+        {
+            var root = sceneContent.RootElement;
+
+            var imageLibrary = new JsonElement();
+            if (root.TryGetProperty("image_library", out imageLibrary))
+            {
+                var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
+                FilesInSceneLowerCase.UnionWith(imageMaps.Select(GetUrl));
+            }
+
+            var scene = new JsonElement();
+            if (root.TryGetProperty("scene", out scene))
+            {
+                var modifiers = new JsonElement();
+                if (scene.TryGetProperty("modifiers", out modifiers))
+                {
+                    FilesInSceneLowerCase.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                }
+
+                var nodes = new JsonElement();
+                if (scene.TryGetProperty("nodes", out nodes))
+                {
+                    // Find the url section of modifier. Get the first part of the string
+                    FilesInSceneLowerCase.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                }
+
+                /// TODO materials.
+            }
+
+            FilesInSceneLowerCase.Remove("");
+            // unscape url and remove leading '/'
+            FilesInSceneLowerCase = FilesInSceneLowerCase.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
+        }
+
         public HashSet<string> FilesInSceneLowerCase { get; private set; } = new HashSet<string>();
 
         public static (List<InstalledPackage> packagesInScene, List<string> remainingFiles) PackagesInScene(FileInfo sceneLocation, IEnumerable<InstalledPackage> packages)
@@ -79,6 +80,16 @@ namespace DazPackage
             filesInSceneLowerCase.ExceptWith(files);
             var remainingFiles = filesInSceneLowerCase.ToList();
             return (packagesInScene, remainingFiles);
+        }
+
+        private static string GetUrl(JsonElement element)
+        {
+            return element.TryGetProperty("url", out var result) ? result.ToString().ToLower() : "";
+        }
+
+        private static JsonElement.ArrayEnumerator GetMap(JsonElement element)
+        {
+            return element.TryGetProperty("map", out var result) ? result.EnumerateArray() : new JsonElement.ArrayEnumerator();
         }
     }
 }

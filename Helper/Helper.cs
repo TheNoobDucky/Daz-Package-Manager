@@ -91,6 +91,13 @@ namespace Helpers
             return JsonDocument.Parse(scene);
         }
 
+        public static JsonDocument ReadJsonFromTextFile(FileInfo file)
+        {
+            using var sceneStream = file.OpenRead();
+            //using var scene = new FileStream(sceneStream, CompressionMode.Decompress);
+            return JsonDocument.Parse(sceneStream);
+        }
+
         public static void TriggerFilterRefresh(ItemsControl dataGrid)
         {
             if (dataGrid != null && dataGrid.ItemsSource != null)
