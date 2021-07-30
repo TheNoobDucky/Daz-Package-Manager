@@ -9,20 +9,34 @@ namespace DazPackage
 {
     public class SceneFile
     {
-        public SceneFile(FileInfo sceneLocation)
+        public static (List<InstalledPackage> packagesInScene, List<string> remainingFiles) PackagesInScene(FileInfo sceneLocation, IEnumerable<InstalledPackage> packages)
+        {
+            var filesInSceneLowerCase = ProcessSceneContent(sceneLocation);
+
+            // Look for packages that contain file the scene referenced.
+            var packagesInScene = packages.Where(x => x.Files.Any(files => filesInSceneLowerCase.Contains(files.ToLower()))).ToList();
+
+            // Check for files that is not able to find reference to.
+            var files = packagesInScene.SelectMany(x => x.Files).Select(x => x.ToLower()).ToList();
+            filesInSceneLowerCase.ExceptWith(files);
+            var remainingFiles = filesInSceneLowerCase.ToList();
+            return (packagesInScene, remainingFiles);
+        }
+
+        private static HashSet<string> ProcessSceneContent(FileInfo sceneLocation)
         {
             try
             {
                 try
                 {
                     var sceneContent = Helper.ReadJsonFromGZfile(sceneLocation);
-                    ProcessSceneContent(sceneContent);
+                    return ProcessSceneContent_Imple(sceneContent);
                 }
                 catch (InvalidDataException)
                 {
                     // Try open file as plain text.
                     var sceneContent = Helper.ReadJsonFromTextFile(sceneLocation);
-                    ProcessSceneContent(sceneContent);
+                    return ProcessSceneContent_Imple(sceneContent);
                 }
             }
             catch (InvalidDataException)
@@ -31,60 +45,53 @@ namespace DazPackage
             }
         }
 
-        private void ProcessSceneContent (JsonDocument sceneContent)
+        private static HashSet<string> ProcessSceneContent_Imple (JsonDocument sceneContent)
         {
+            var filesInSceneLowerCase = new HashSet<string>();
+
             var root = sceneContent.RootElement;
 
             var imageLibrary = new JsonElement();
             if (root.TryGetProperty("image_library", out imageLibrary))
             {
                 var imageMaps = imageLibrary.EnumerateArray().SelectMany(x => GetMap(x));
-                FilesInSceneLowerCase.UnionWith(imageMaps.Select(GetUrl));
+                filesInSceneLowerCase.UnionWith(imageMaps.Select(GetUrl));
             }
 
             var scene = new JsonElement();
             if (root.TryGetProperty("scene", out scene))
             {
-                var modifiers = new JsonElement();
-                if (scene.TryGetProperty("modifiers", out modifiers))
+                if (scene.TryGetProperty("modifiers", out var modifiers))
                 {
-                    FilesInSceneLowerCase.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                    filesInSceneLowerCase.UnionWith(modifiers.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
                 }
 
-                var nodes = new JsonElement();
-                if (scene.TryGetProperty("nodes", out nodes))
+                if (scene.TryGetProperty("nodes", out var nodes))
                 {
                     // Find the url section of modifier. Get the first part of the string
-                    FilesInSceneLowerCase.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
+                    filesInSceneLowerCase.UnionWith(nodes.EnumerateArray().Select(x => GetUrl(x).Split('#')[0]));
                 }
 
-                /// TODO materials.
+                if (scene.TryGetProperty("materials", out var materials))
+                {
+                    // Find the url section of modifier. Get the first part of the string
+                    filesInSceneLowerCase.UnionWith(materials.EnumerateArray().Select(x => GetUVSet(x).Split('#')[0]));
+                }
             }
 
-            FilesInSceneLowerCase.Remove("");
+            _ = filesInSceneLowerCase.Remove("");
             // unscape url and remove leading '/'
-            FilesInSceneLowerCase = FilesInSceneLowerCase.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
-        }
-
-        public HashSet<string> FilesInSceneLowerCase { get; private set; } = new HashSet<string>();
-
-        public static (List<InstalledPackage> packagesInScene, List<string> remainingFiles) PackagesInScene(FileInfo sceneLocation, IEnumerable<InstalledPackage> packages)
-        {
-            var scene = new SceneFile(sceneLocation);
-            var filesInSceneLowerCase = scene.FilesInSceneLowerCase;
-            // Look for packages that contain file the scene referenced.
-            var packagesInScene = packages.Where(x => x.Files.Any(files => filesInSceneLowerCase.Contains(files.ToLower()))).ToList();
-
-            // Check for files that is not able to find reference to.
-            var files = packagesInScene.SelectMany(x => x.Files).Select(x=>x.ToLower()).ToList();
-            filesInSceneLowerCase.ExceptWith(files);
-            var remainingFiles = filesInSceneLowerCase.ToList();
-            return (packagesInScene, remainingFiles);
+            filesInSceneLowerCase = filesInSceneLowerCase.Select(x => Uri.UnescapeDataString(x)[1..]).ToHashSet();
+            return filesInSceneLowerCase;
         }
 
         private static string GetUrl(JsonElement element)
         {
             return element.TryGetProperty("url", out var result) ? result.ToString().ToLower() : "";
+        }
+        private static string GetUVSet(JsonElement element)
+        {
+            return element.TryGetProperty("uv_set", out var result) ? result.ToString().ToLower() : "";
         }
 
         private static JsonElement.ArrayEnumerator GetMap(JsonElement element)
