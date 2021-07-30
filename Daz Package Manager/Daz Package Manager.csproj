@@ -44,6 +44,7 @@
     <ProjectReference Include="..\DazMetadata\DazPackage.csproj" />
     <ProjectReference Include="..\Helper\Helpers.csproj" />
     <ProjectReference Include="..\OsHelper\OsHelper.csproj" />
+    <ProjectReference Include="..\Output\Output.csproj" />
   </ItemGroup>
 
   <ItemGroup>

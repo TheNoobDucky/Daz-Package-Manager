@@ -1,4 +1,4 @@
-﻿using Helpers;
+﻿using Output;
 using OsHelper;
 using System.IO;
 
@@ -31,7 +31,7 @@ namespace DazPackage
             {
                 if (warnMissingFile)
                 {
-                    Output.Write($"File missing: {sourcePath}", Output.Level.Warning);
+                    InfoBox.Write($"File missing: {sourcePath}", InfoBox.Level.Warning);
                 }
                 return;
             }
@@ -46,7 +46,7 @@ namespace DazPackage
                 {
                     if (error.HResult != -2147024816) // ignore fileExist 0x80070050
                     {
-                        Output.Write($"{file} : {error.Message}", Output.Level.Warning);
+                        InfoBox.Write($"{file} : {error.Message}", InfoBox.Level.Warning);
                     }
                 }
             }

@@ -30,4 +30,8 @@
     <Optimize>true</Optimize>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Output\Output.csproj" />
+  </ItemGroup>
+
 </Project>
