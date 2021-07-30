@@ -5,6 +5,7 @@ using Output;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,23 +22,40 @@ namespace Daz_Package_Manager
 
         public async Task BasedOnFolder(string location)
         {
-            var folder = Path.GetDirectoryName(location);
-            await Task.Run(()=>SelectPackagesInFolder(folder));
+            try
+            {
+                tokenSource = new();
+                var folder = Path.GetDirectoryName(location);
+                await Task.Run(() => SelectPackagesInFolder(folder, tokenSource.Token), tokenSource.Token);
+            }
+            catch (TargetInvocationException error)
+            {
+                InfoBox.Write($"Invoke error Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                tokenSource.Dispose();
+            }
         }
 
-        private void SelectPackagesInFolder(string folder)
+        private Task SelectPackagesInFolder(string folder, CancellationToken token)
         {
             var files = Directory.EnumerateFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
             foreach (var file in files)
             {
+                token.ThrowIfCancellationRequested();
                 Select_Imple(file);
             }
 
             var subfolders = Directory.EnumerateDirectories(folder);
             foreach (var subfolder in subfolders)
             {
-                SelectPackagesInFolder(subfolder);
+                _ = SelectPackagesInFolder(subfolder, token);
             }
+            return Task.CompletedTask;
         }
 
         public async Task BasedOnScene(string location)

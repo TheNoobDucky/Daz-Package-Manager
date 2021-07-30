@@ -44,14 +44,15 @@ namespace Daz_Package_Manager
 
         private async void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
-            await Helper.AsyncButton(sender,async ()=> 
-            
-            {
-                var destination = InstallFolder();
-                var makeCopy = Properties.Settings.Default.MakeCopy;
-                var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-                await modelView.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
-            }, ()=> { });
+            await Helper.AsyncButton(sender, async () =>
+             {
+                 var destination = InstallFolder();
+                 var makeCopy = Properties.Settings.Default.MakeCopy;
+                 var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
+                 await modelView.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
+             },
+                () => { modelView.VirtualFolderManager.Cancel() }
+            );
         }
 
         private static string InstallFolder()
@@ -88,8 +89,8 @@ namespace Daz_Package_Manager
 
         private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            await Helper.AsyncButton(sender, 
-                async () => await modelView.ManifestScanner.Scan(), 
+            await Helper.AsyncButton(sender,
+                async () => await modelView.ManifestScanner.Scan(),
                 () => modelView.ManifestScanner.Cancel());
         }
 
