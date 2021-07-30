@@ -4,6 +4,7 @@ using OsHelper;
 using System;
 using System.IO;
 using System.Windows;
+using Helpers;
 
 namespace Daz_Package_Manager
 {
@@ -15,20 +16,31 @@ namespace Daz_Package_Manager
         public MainWindow()
         {
             InitializeComponent();
-            if (Properties.Settings.Default.CacheLocation == String.Empty)
+            if (Properties.Settings.Default.CacheLocation == string.Empty)
             {
                 var userPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 Properties.Settings.Default.CacheLocation = Path.Combine(userPath, "Daz Package Manager");
-                Directory.CreateDirectory(Properties.Settings.Default.CacheLocation);
+                _ = Directory.CreateDirectory(Properties.Settings.Default.CacheLocation);
             }
             InfoBox.RegisterDebugField(DebugText);
             InfoBox.WriteDebug = true;
             DataContext = modelView;
-            modelView.ManifestScanner.LoadCache();
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            var scanContent = ScanInstallManifestFolderButton.Content;
+            ScanInstallManifestFolderButton.Content = Helper.WaitText;
+            var ThirdPartyContent = AddThirdPartyButton.Content;
+            AddThirdPartyButton.Content = Helper.WaitText;
+
+            await modelView.CacheManager.LoadAllCaches();
+
+            ScanInstallManifestFolderButton.Content = scanContent;
+            AddThirdPartyButton.Content = ThirdPartyContent;
         }
 
         private readonly Backend modelView = new();
-        private const string waitText = "Cancel";
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
@@ -68,48 +80,27 @@ namespace Daz_Package_Manager
 
         private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
-            {
-                if (button.Content is string prev_text)
-                {
-                    if (prev_text == waitText)
-                    {
-                        modelView.ManifestScanner.Cancel();
-                        return;
-                    }
-
-                    button.Content = waitText;
-                    await modelView.ManifestScanner.Scan();
-                    button.Content = prev_text;
-                }
-            }
+            await Helper.AsyncButton(sender, 
+                async () => await modelView.ManifestScanner.Scan(), 
+                () => modelView.ManifestScanner.Cancel());
         }
 
-        private void SelectPackagesBasedOnScene(object sender, RoutedEventArgs e)
+        private async void SelectPackagesBasedOnScene(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
-            {
-                if (button.Content is string prev_text)
+            await Helper.AsyncButton(sender,
+                async () =>
                 {
-                    if (prev_text == waitText)
-                    {
-                        modelView.SelectPackages.Cancel();
-                        return;
-                    }
-
-                    button.Content = waitText;
                     if (Properties.Settings.Default.BatchProcessScene)
                     {
-                        modelView.SelectPackages.BasedOnFolder(Properties.Settings.Default.SceneFile);
+                        await modelView.SelectPackages.BasedOnFolder(Properties.Settings.Default.SceneFile);
                     }
                     else
                     {
-                        modelView.SelectPackages.BasedOnScene(Properties.Settings.Default.SceneFile);
+                        await modelView.SelectPackages.BasedOnScene(Properties.Settings.Default.SceneFile);
                     }
-                    button.Content = prev_text;
-                }
-            }
-
+                },
+                () => modelView.SelectPackages.Cancel()
+            );
         }
 
         // Below are boring functions.
@@ -167,9 +158,11 @@ namespace Daz_Package_Manager
             modelView.Packages.UnselectAll();
         }
 
-        private void CallLoadCache(object sender, RoutedEventArgs e)
+        private async void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            modelView.ManifestScanner.LoadCache();
+            await Helper.AsyncButton(sender,
+                async () => await modelView.ManifestScanner.LoadCache(),
+                () => modelView.ManifestScanner.Cancel());
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
@@ -179,27 +172,18 @@ namespace Daz_Package_Manager
 
         private async void Add3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
+            await Helper.AsyncButton(sender, async () =>
             {
-                if (button.Content is string prevText)
-                {
-                    if (prevText == waitText)
-                    {
-                        modelView.ThirdPartyScanner.Cancel();
-                        return;
-                    }
-                    var reloadContent = ReloadThirdPartyButton.Content;
-                    var removeContent = RemoveThirdPartyButton.Content;
-
-                    button.Content = waitText;
-                    ReloadThirdPartyButton.Content = waitText;
-                    RemoveThirdPartyButton.Content = waitText;
-                    await modelView.ThirdPartyScanner.AddFolder();
-                    button.Content = prevText;
-                    ReloadThirdPartyButton.Content = reloadContent;
-                    RemoveThirdPartyButton.Content = removeContent;
-                }
-            }
+                var reloadContent = ReloadThirdPartyButton.Content;
+                var removeContent = RemoveThirdPartyButton.Content;
+                ReloadThirdPartyButton.Content = Helper.WaitText;
+                RemoveThirdPartyButton.Content = Helper.WaitText;
+                await modelView.ThirdPartyScanner.AddFolder();
+                ReloadThirdPartyButton.Content = reloadContent;
+                RemoveThirdPartyButton.Content = removeContent;
+            },
+                () => modelView.ThirdPartyScanner.Cancel()
+            );
         }
 
         private void Remove3rdPartyFolder(object sender, RoutedEventArgs e)
@@ -208,7 +192,7 @@ namespace Daz_Package_Manager
             {
                 if (button.Content is string prevText)
                 {
-                    if (prevText == waitText)
+                    if (prevText == Helper.WaitText)
                     {
                         modelView.ThirdPartyScanner.Cancel();
                         return;
@@ -219,34 +203,21 @@ namespace Daz_Package_Manager
             }
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            modelView.ThirdPartyScanner.LoadCache();
-        }
-
         private async void Reload3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
+            await Helper.AsyncButton(sender, async () =>
             {
-                if (button.Content is string prevText)
-                {
-                    if (prevText == waitText)
-                    {
-                        modelView.ThirdPartyScanner.Cancel();
-                        return;
-                    }
-                    var addContent = AddThirdPartyButton.Content;
-                    var removeContent = RemoveThirdPartyButton.Content;
+                var addContent = AddThirdPartyButton.Content;
+                var removeContent = RemoveThirdPartyButton.Content;
 
-                    button.Content = waitText;
-                    AddThirdPartyButton.Content = waitText;
-                    RemoveThirdPartyButton.Content = waitText;
-                    await modelView.ThirdPartyScanner.ReloadThirdPartyFolder();
-                    button.Content = prevText;
-                    AddThirdPartyButton.Content = addContent;
-                    RemoveThirdPartyButton.Content = removeContent;
-                }
-            }
+                AddThirdPartyButton.Content = Helper.WaitText;
+                RemoveThirdPartyButton.Content = Helper.WaitText;
+                await modelView.ThirdPartyScanner.ReloadThirdPartyFolder();
+                AddThirdPartyButton.Content = addContent;
+                RemoveThirdPartyButton.Content = removeContent;
+            },
+                () => modelView.ThirdPartyScanner.Cancel()
+            );
         }
 
         private void SaveSelection(object sender, RoutedEventArgs e)

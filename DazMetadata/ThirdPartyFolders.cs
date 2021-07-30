@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Data;
 
 namespace DazPackage
@@ -118,10 +117,10 @@ namespace DazPackage
 
         public Task AddFolder(string folder, CancellationToken token)
         {
-            Application.Current.Dispatcher.Invoke(() => Folders.Add(folder));
+            Helper.UIInvoke(() => Folders.Add(folder));
             var newFiles = new ThirdPartyFolder { Location = folder, FolderName = folder, BasePath = folder };
             _ = newFiles.ScanFiles(token);
-            Application.Current.Dispatcher.Invoke(() => Files.Add(newFiles));
+            Helper.UIInvoke(() => Files.Add(newFiles));
             return Task.CompletedTask;
         }
 
@@ -137,8 +136,8 @@ namespace DazPackage
         public Task ReloadFolders(CancellationToken token)
         {
             var folders = new List<string>(Folders);
-            Application.Current.Dispatcher.Invoke(() => Folders.Clear());
-            Application.Current.Dispatcher.Invoke(() => Files.Clear());
+            Helper.UIInvoke(() => Folders.Clear());
+            Helper.UIInvoke(() => Files.Clear());
             foreach (var folder in folders)
             {
                 _ = AddFolder(folder, token);

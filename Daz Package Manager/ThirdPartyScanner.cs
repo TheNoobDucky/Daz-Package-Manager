@@ -1,4 +1,5 @@
 ﻿using DazPackage;
+using Helpers;
 using OsHelper;
 using Output;
 using System;
@@ -32,8 +33,8 @@ namespace Daz_Package_Manager
                 try
                 {
                     InfoBox.Write($"Scanning 3rd party folder: {folder}.\n Please Wait.", InfoBox.Level.Status);
-                    OtherPartyToken = new();
-                    await Task.Run(() => model.ThirdParty.AddFolder(folder, OtherPartyToken.Token), OtherPartyToken.Token);
+                    tokenSource = new();
+                    await Task.Run(() => model.ThirdParty.AddFolder(folder, tokenSource.Token), tokenSource.Token);
                     SaveCache();
                     InfoBox.Write($"Finished scanning 3rd party folder: {folder}.", InfoBox.Level.Status);
                 }
@@ -48,7 +49,7 @@ namespace Daz_Package_Manager
                 }
                 finally
                 {
-                    OtherPartyToken.Dispose();
+                    tokenSource.Dispose();
                 }
             }
         }
@@ -58,8 +59,8 @@ namespace Daz_Package_Manager
             try
             {
                 InfoBox.Write($"Reloading 3rd party folders.", InfoBox.Level.Status);
-                OtherPartyToken = new();
-                await Task.Run(() => model.ThirdParty.ReloadFolders(OtherPartyToken.Token), OtherPartyToken.Token);
+                tokenSource = new();
+                await Task.Run(() => model.ThirdParty.ReloadFolders(tokenSource.Token), tokenSource.Token);
                 SaveCache();
                 InfoBox.Write($"Finished reloading 3rd party folders.", InfoBox.Level.Status);
             }
@@ -74,7 +75,7 @@ namespace Daz_Package_Manager
             }
             finally
             {
-                OtherPartyToken.Dispose();
+                tokenSource.Dispose();
             }
         }
 
@@ -98,7 +99,27 @@ namespace Daz_Package_Manager
             File.WriteAllText(savePath, JsonSerializer.Serialize(model.ThirdParty.Files, option));
         }
 
-        public void LoadCache()
+        public async Task LoadCache()
+        {
+            try
+            {
+                tokenSource = new();
+                await Task.Run(() => LoadCache_Imple());
+            }
+            catch (TargetInvocationException error)
+            {
+                InfoBox.Write($"Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                tokenSource.Dispose();
+            }
+        }
+
+        public void LoadCache_Imple()
         {
             var saveFileLocation = CacheManager.SaveFileLocation(thirdPartyFolderJsonFile);
             try
@@ -113,13 +134,13 @@ namespace Daz_Package_Manager
                 {
                     var folders = JsonSerializer.Deserialize<List<string>>(jsonFile.ReadToEnd(), option);
                     jsonFile.Dispose();
-                    model.ThirdParty.Folders.AddRange(folders);
+                    Helper.UIInvoke(() => model.ThirdParty.Folders.AddRange(folders));
 
                     saveFileLocation = CacheManager.SaveFileLocation(thirdPartyFilesJsonFile);
                     using var jsonFile2 = File.OpenText(saveFileLocation);
                     var files = JsonSerializer.Deserialize<List<ThirdPartyFolder>>(jsonFile2.ReadToEnd(), option);
-                    model.ThirdParty.Files.Clear();
-                    model.ThirdParty.Files.AddRange(files);
+                    Helper.UIInvoke(()=>model.ThirdParty.Files.Clear());
+                    Helper.UIInvoke(()=>model.ThirdParty.Files.AddRange(files));
                     jsonFile2.Dispose();
                 }
                 catch (JsonException)
@@ -134,11 +155,11 @@ namespace Daz_Package_Manager
             }
         }
 
-        private CancellationTokenSource OtherPartyToken = null;
+        private CancellationTokenSource tokenSource = null;
         public void Cancel()
         {
             InfoBox.Write("Canceling processing 3rd party folders.", InfoBox.Level.Status);
-            OtherPartyToken.Cancel();
+            tokenSource.Cancel();
         }
     }
 }

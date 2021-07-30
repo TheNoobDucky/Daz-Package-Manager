@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Daz_Package_Manager
 {
@@ -19,6 +20,13 @@ namespace Daz_Package_Manager
         {
             return Path.Combine(Properties.Settings.Default.CacheLocation, filename);
         }
+
+        public async Task LoadAllCaches ()
+        {
+            Task[] tasks = { model.ManifestScanner.LoadCache(), model.ThirdPartyScanner.LoadCache() };
+            await Task.WhenAll(tasks);
+        }
+
 
         public void LoadSelectionsFromFile()
         {

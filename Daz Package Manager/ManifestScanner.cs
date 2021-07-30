@@ -57,7 +57,27 @@ namespace Daz_Package_Manager
             File.WriteAllText(savePath, JsonSerializer.Serialize(model.Packages.Packages, option));
         }
 
-        public void LoadCache()
+        public async Task LoadCache()
+        {
+            try
+            {
+                tokenSource = new();
+                await Task.Run(() => LoadCache_Imple(), tokenSource.Token);
+            }
+            catch (TargetInvocationException error)
+            {
+                InfoBox.Write($"Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                tokenSource.Dispose();
+            }
+        }
+
+        private void LoadCache_Imple ()
         {
             var saveFileLocation = CacheManager.SaveFileLocation(archiveJsonFile);
             try

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Daz_Package_Manager
 {
@@ -18,10 +19,10 @@ namespace Daz_Package_Manager
             this.model = model;
         }
 
-        public void BasedOnFolder(string location)
+        public async Task BasedOnFolder(string location)
         {
             var folder = Path.GetDirectoryName(location);
-            SelectPackagesInFolder(folder);
+            await Task.Run(()=>SelectPackagesInFolder(folder));
         }
 
         private void SelectPackagesInFolder(string folder)
@@ -29,7 +30,7 @@ namespace Daz_Package_Manager
             var files = Directory.EnumerateFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
             foreach (var file in files)
             {
-                BasedOnScene(file);
+                Select_Imple(file);
             }
 
             var subfolders = Directory.EnumerateDirectories(folder);
@@ -39,7 +40,13 @@ namespace Daz_Package_Manager
             }
         }
 
-        public void BasedOnScene(string sceneLocation)
+        public async Task BasedOnScene(string location)
+        {
+            var folder = Path.GetDirectoryName(location);
+            await Task.Run(() => Select_Imple(folder));
+        }
+
+        private void Select_Imple (string sceneLocation)
         {
             try
             {

@@ -10,7 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace DazPackage
 {
@@ -141,7 +140,7 @@ namespace DazPackage
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            Application.Current.Dispatcher.Invoke(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
+            Helper.UIInvoke(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
         }
         #endregion
     }

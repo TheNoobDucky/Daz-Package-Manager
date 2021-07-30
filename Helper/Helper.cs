@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -11,6 +12,36 @@ namespace Helpers
 {
     public class Helper
     {
+        public delegate void InvokeTask();
+
+        public static void UIInvoke (InvokeTask del)
+        {
+            Application.Current.Dispatcher.Invoke(del);
+        }
+
+        public delegate Task MainTask();
+        public delegate void CancelTask();
+
+        public const string WaitText = "Cancel";
+
+        public static async Task AsyncButton(object sender, MainTask mainTask, CancelTask cancelTaks, string waitText=WaitText)
+        {
+            if (sender is Button button)
+            {
+                if (button.Content is string prevText)
+                {
+                    if (prevText == waitText)
+                    {
+                        cancelTaks();
+                        return;
+                    }
+                    button.Content = waitText;
+                    await mainTask();
+                    button.Content = prevText;
+                }
+            }
+        }
+
         public static void DeleteEmptyFolder(string folder)
         {
             if (!Directory.EnumerateFileSystemEntries(folder).Any())
