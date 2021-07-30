@@ -42,18 +42,26 @@ namespace Daz_Package_Manager
 
         private readonly Backend modelView = new();
 
-        private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
+        private async void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
-            var destination = InstallFolder();
-            Directory.CreateDirectory(destination);
-            var makeCopy = Properties.Settings.Default.MakeCopy;
-            var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-            modelView.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
+            await Helper.AsyncButton(sender,async ()=> 
+            
+            {
+                var destination = InstallFolder();
+                var makeCopy = Properties.Settings.Default.MakeCopy;
+                var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
+                await modelView.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
+            }, ()=> { });
         }
 
         private static string InstallFolder()
         {
             var destination = Properties.Settings.Default.OutputFolder;
+            if (destination is null or "")
+            {
+                return null;
+            }
+
             if (Properties.Settings.Default.UseSceneSubfolder)
             {
                 destination = Path.Combine(destination, SceneName());

@@ -1,6 +1,11 @@
 ﻿using DazPackage;
 using OsHelper;
 using Output;
+using System;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Daz_Package_Manager
@@ -13,19 +18,42 @@ namespace Daz_Package_Manager
         {
             this.model = model;
         }
-        public void Install(string destination, bool makeCopy = false, bool warnMissingFile = false)
+        public async Task Install(string destination, bool makeCopy = false, bool warnMissingFile = false)
+        {
+            try
+            {
+                tokenSource = new();
+                await Task.Run(() => Install_Imple(destination, tokenSource.Token, makeCopy, warnMissingFile), tokenSource.Token);
+            }
+            catch (TargetInvocationException error)
+            {
+                InfoBox.Write($"Invoke error Error source: {error.InnerException.Source}", InfoBox.Level.Error);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                tokenSource.Dispose();
+            }
+        }
+
+        private Task Install_Imple (string destination, CancellationToken token, bool makeCopy = false, bool warnMissingFile = false)
         {
             if (destination is null or "")
             {
                 InfoBox.Write("Please select a location to install virtual packages to.", InfoBox.Level.Error);
-                return;
+                return Task.CompletedTask;
             }
+
+            _ = Directory.CreateDirectory(destination);
 
             InfoBox.Write("Installing to virtual folder location: " + destination, InfoBox.Level.Status);
 
             var packagesToSave = model.Packages.AllSelected();
             foreach (var package in packagesToSave)
             {
+                token.ThrowIfCancellationRequested();
                 InfoBox.Write("Installing: " + package.ProductName, InfoBox.Level.Info);
                 try
                 {
@@ -41,6 +69,7 @@ namespace Daz_Package_Manager
             var thirdPartyFiles = model.ThirdParty.AllSelected();
             foreach (var file in thirdPartyFiles)
             {
+                token.ThrowIfCancellationRequested();
                 try
                 {
                     InfoBox.Write($"Installing: {file.RelativePath}", InfoBox.Level.Info);
@@ -53,6 +82,14 @@ namespace Daz_Package_Manager
                 }
             }
             InfoBox.Write("Install to virtual folder complete.", InfoBox.Level.Status);
+            return Task.CompletedTask;
+        }
+
+        private CancellationTokenSource tokenSource = null;
+        public void Cancel()
+        {
+            InfoBox.Write("Canceling installing virtual folder task.", InfoBox.Level.Status);
+            tokenSource.Cancel();
         }
     }
 }
