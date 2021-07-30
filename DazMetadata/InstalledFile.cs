@@ -55,7 +55,7 @@ namespace DazPackage
                 }
             }
 
-            if (AssetTypes.Categories.HasFlag(AssetType))
+            if (AssetTypes.Categoriesed.HasFlag(AssetType))
             {
                 Categories = asset.Categories?.ToList();
             }
