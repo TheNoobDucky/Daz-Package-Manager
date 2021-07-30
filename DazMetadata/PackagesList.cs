@@ -1,4 +1,5 @@
-﻿using Output;
+﻿using Helpers;
+using Output;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -83,6 +84,16 @@ namespace DazPackage
                 }
             });
             return packages.ToList();
+        }
+
+        public IEnumerable<InstalledPackage> AllSelected()
+        {
+            return Packages.Where(x => x.Selected);
+        }
+
+        public void UnselectAll()
+        {
+            UnselectPackages(Packages);
         }
 
         public static void UnselectPackages(List<InstalledPackage> packages)

@@ -24,10 +24,10 @@ namespace Daz_Package_Manager
             InfoBox.RegisterDebugField(DebugText);
             InfoBox.WriteDebug = true;
             DataContext = modelView;
-            modelView.LoadPackagesCache();
+            modelView.ManifestScanner.LoadCache();
         }
 
-        private readonly ModelView modelView = new();
+        private readonly Backend modelView = new();
         private const string waitText = "Cancel";
 
         private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
@@ -36,7 +36,7 @@ namespace Daz_Package_Manager
             Directory.CreateDirectory(destination);
             var makeCopy = Properties.Settings.Default.MakeCopy;
             var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-            modelView.GenerateVirtualInstallFolder(destination, makeCopy, warnMissingFile);
+            modelView.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
         }
 
         private static string InstallFolder()
@@ -74,27 +74,42 @@ namespace Daz_Package_Manager
                 {
                     if (prev_text == waitText)
                     {
-                        modelView.CancelManifestScan();
+                        modelView.ManifestScanner.Cancel();
                         return;
                     }
 
                     button.Content = waitText;
-                    await modelView.ScanManifestFolder();
+                    await modelView.ManifestScanner.Scan();
                     button.Content = prev_text;
                 }
             }
         }
 
-        private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
+        private void SelectPackagesBasedOnScene(object sender, RoutedEventArgs e)
         {
-            if (Properties.Settings.Default.BatchProcessScene)
+            if (sender is System.Windows.Controls.Button button)
             {
-                modelView.SelectPackagesBasedOnFolder(Properties.Settings.Default.SceneFile);
+                if (button.Content is string prev_text)
+                {
+                    if (prev_text == waitText)
+                    {
+                        modelView.SelectPackages.Cancel();
+                        return;
+                    }
+
+                    button.Content = waitText;
+                    if (Properties.Settings.Default.BatchProcessScene)
+                    {
+                        modelView.SelectPackages.BasedOnFolder(Properties.Settings.Default.SceneFile);
+                    }
+                    else
+                    {
+                        modelView.SelectPackages.BasedOnScene(Properties.Settings.Default.SceneFile);
+                    }
+                    button.Content = prev_text;
+                }
             }
-            else
-            {
-                modelView.SelectPackagesBasedOnScene(Properties.Settings.Default.SceneFile);
-            }
+
         }
 
         // Below are boring functions.
@@ -149,12 +164,12 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            modelView.UnselectAll();
+            modelView.Packages.UnselectAll();
         }
 
         private void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            modelView.LoadPackagesCache();
+            modelView.ManifestScanner.LoadCache();
         }
 
         private void SaveUserSetting(object sender, RoutedEventArgs e)
@@ -170,7 +185,7 @@ namespace Daz_Package_Manager
                 {
                     if (prevText == waitText)
                     {
-                        modelView.CancelThirdPartyProcess();
+                        modelView.ThirdPartyScanner.Cancel();
                         return;
                     }
                     var reloadContent = ReloadThirdPartyButton.Content;
@@ -179,7 +194,7 @@ namespace Daz_Package_Manager
                     button.Content = waitText;
                     ReloadThirdPartyButton.Content = waitText;
                     RemoveThirdPartyButton.Content = waitText;
-                    await modelView.AddThirdPartyFolder();
+                    await modelView.ThirdPartyScanner.AddFolder();
                     button.Content = prevText;
                     ReloadThirdPartyButton.Content = reloadContent;
                     RemoveThirdPartyButton.Content = removeContent;
@@ -195,18 +210,18 @@ namespace Daz_Package_Manager
                 {
                     if (prevText == waitText)
                     {
-                        modelView.CancelThirdPartyProcess();
+                        modelView.ThirdPartyScanner.Cancel();
                         return;
                     }
                     var index = OtherPartyFolders.SelectedIndex;
-                    modelView.RemoveThirdPartyFolder(index);
+                    modelView.ThirdPartyScanner.RemoveFolder(index);
                 }
             }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            modelView.LoadThirdPartyFolders();
+            modelView.ThirdPartyScanner.LoadCache();
         }
 
         private async void Reload3rdPartyFolder(object sender, RoutedEventArgs e)
@@ -217,7 +232,7 @@ namespace Daz_Package_Manager
                 {
                     if (prevText == waitText)
                     {
-                        modelView.CancelThirdPartyProcess();
+                        modelView.ThirdPartyScanner.Cancel();
                         return;
                     }
                     var addContent = AddThirdPartyButton.Content;
@@ -226,7 +241,7 @@ namespace Daz_Package_Manager
                     button.Content = waitText;
                     AddThirdPartyButton.Content = waitText;
                     RemoveThirdPartyButton.Content = waitText;
-                    await modelView.ReloadThirdPartyFolder();
+                    await modelView.ThirdPartyScanner.ReloadThirdPartyFolder();
                     button.Content = prevText;
                     AddThirdPartyButton.Content = addContent;
                     RemoveThirdPartyButton.Content = removeContent;
@@ -236,12 +251,12 @@ namespace Daz_Package_Manager
 
         private void SaveSelection(object sender, RoutedEventArgs e)
         {
-            modelView.SaveSelectionsToFile();
+            modelView.CacheManager.SaveSelectionsToFile();
         }
 
         private void LoadSelection(object sender, RoutedEventArgs e)
         {
-            modelView.LoadSelectionsFromFile();
+            modelView.CacheManager.LoadSelectionsFromFile();
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DazPackage
+namespace Helpers
 {
     /// <summary>
     /// Raised when a zip file contents are corrupt.

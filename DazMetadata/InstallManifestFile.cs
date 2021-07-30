@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Helpers;
+using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
@@ -29,7 +30,6 @@ namespace DazPackage
                 ProductName = content.Element("ProductName")?.Attribute("VALUE")?.Value;
                 ProductStoreID = content.Element("ProductStoreIDX")?.Attribute("VALUE")?.Value;
                 UserInstallPath = content.Element("UserInstallPath")?.Attribute("VALUE")?.Value;
-
 
                 // Only handle content packages not plugins.
                 var installedTypes = content.Element("InstallTypes")?.Attribute("VALUE")?.Value;

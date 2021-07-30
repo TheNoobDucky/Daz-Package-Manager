@@ -40,10 +40,14 @@ namespace DazPackage
                     return ExtractFilesFromJsonFile(sceneContent);
                 }
             }
-            catch (InvalidDataException)
+            catch (InvalidDataException e)
             {
-                throw new CorruptFileException(location.FullName);
+                throw new CorruptFileException($"{e.Message} file: {location.FullName}");
             }
+            //catch (JsonReaderException e)
+            //{
+            //    throw new CorruptFileException($"{e.Message} file: {location.FullName}");
+            //}
         }
 
         private static HashSet<string> ExtractFilesFromJsonFile(JsonDocument file)

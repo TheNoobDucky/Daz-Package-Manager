@@ -87,16 +87,29 @@ namespace Helpers
 
         public static JsonDocument ReadJsonFromGZfile(FileInfo file)
         {
-            using var sceneStream = file.OpenRead();
-            using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
-            return JsonDocument.Parse(scene);
+            try
+            {
+                using var sceneStream = file.OpenRead();
+                using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
+                return JsonDocument.Parse(scene);
+            }
+            catch (JsonException e)
+            {
+                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+            }
         }
 
         public static JsonDocument ReadJsonFromTextFile(FileInfo file)
         {
-            using var sceneStream = file.OpenRead();
-            //using var scene = new FileStream(sceneStream, CompressionMode.Decompress);
-            return JsonDocument.Parse(sceneStream);
+            try
+            {
+                using var sceneStream = file.OpenRead();
+                return JsonDocument.Parse(sceneStream);
+            }
+            catch (JsonException e)
+            {
+                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+            }
         }
 
         public static void TriggerFilterRefresh(ItemsControl dataGrid)

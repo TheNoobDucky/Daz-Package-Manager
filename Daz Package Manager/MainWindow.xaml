@@ -5,7 +5,7 @@
         xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
         xmlns:Helpers="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties"
-        d:DataContext="{d:DesignInstance Type=local:ModelView}" mc:Ignorable="d" Title="MainWindow" Height="1200"
+        d:DataContext="{d:DesignInstance Type=local:Backend}" mc:Ignorable="d" Title="MainWindow" Height="1200"
         Loaded="Window_Loaded"
         Width="1500">
     <Window.Resources>
@@ -109,7 +109,7 @@
                     Text="{Binding SceneFile}" />
 
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="{StaticResource DefaultMargin}" />
-            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene"
+            <Button Name="SelectPackagesButton" Grid.Row="3" Grid.Column="1" Click="SelectPackagesBasedOnScene"
                     Margin="{StaticResource DefaultMargin}" Padding="5,1"
                     Content="Select Package Based On Scene (Optional)" /> 
 
@@ -126,7 +126,7 @@
                     Text="{Binding OutputFolder}" />
 
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="{StaticResource DefaultMargin}" />
-            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder"
+            <Button Name="GeneateVirtualFolderButton" Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Virtual Install Folder" />
 
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Step 7: " Margin="{StaticResource DefaultMargin}" />
@@ -204,7 +204,7 @@
 
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <TabItem Header="Packages">
-                <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False"
+                <DataGrid Name="PackageDisplay" ItemsSource="{Binding ViewManager.Packages.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -225,7 +225,7 @@
             </TabItem>
 
             <TabItem Header="Accessories">
-                <DataGrid Name="AccessoriesDisplay" ItemsSource="{Binding Accessories.View}" IsReadOnly="False"
+                <DataGrid Name="AccessoriesDisplay" ItemsSource="{Binding ViewManager.Accessories.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -249,7 +249,7 @@
             </TabItem>
 
             <TabItem Header="Attachments">
-                <DataGrid Name="AttachmentsDisplay" ItemsSource="{Binding Attachments.View}" IsReadOnly="False"
+                <DataGrid Name="AttachmentsDisplay" ItemsSource="{Binding ViewManager.Attachments.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -273,7 +273,7 @@
             </TabItem>
 
             <TabItem Header="Characters">
-                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding Characters.View}" IsReadOnly="False"
+                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding ViewManager.Characters.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -297,7 +297,7 @@
             </TabItem>
 
             <TabItem Header="Clothings">
-                <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding Clothings.View}" IsReadOnly="False"
+                <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding ViewManager.Clothings.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -321,7 +321,7 @@
             </TabItem>
 
             <TabItem Header="Hairs">
-                <DataGrid Name="HairsDisplay" ItemsSource="{Binding Hairs.View}" IsReadOnly="False"
+                <DataGrid Name="HairsDisplay" ItemsSource="{Binding ViewManager.Hairs.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -345,7 +345,7 @@
             </TabItem>
 
             <TabItem Header="Morphs">
-                <DataGrid Name="MorphsDisplay" ItemsSource="{Binding Morphs.View}" IsReadOnly="False"
+                <DataGrid Name="MorphsDisplay" ItemsSource="{Binding ViewManager.Morphs.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -369,7 +369,7 @@
             </TabItem>
 
             <TabItem Header="Props">
-                <DataGrid Name="PropsDisplay" ItemsSource="{Binding Props.View}" IsReadOnly="False"
+                <DataGrid Name="PropsDisplay" ItemsSource="{Binding ViewManager.Props.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -393,7 +393,7 @@
             </TabItem>
 
             <TabItem Header="Poses">
-                <DataGrid Name="PosesDisplay" ItemsSource="{Binding Poses.View}" IsReadOnly="False"
+                <DataGrid Name="PosesDisplay" ItemsSource="{Binding ViewManager.Poses.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -417,7 +417,7 @@
             </TabItem>
 
             <TabItem Header="Others">
-                <DataGrid Name="OthersDisplay" ItemsSource="{Binding Others.View}" IsReadOnly="False"
+                <DataGrid Name="OthersDisplay" ItemsSource="{Binding ViewManager.Others.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -441,7 +441,7 @@
             </TabItem>
 
             <TabItem Header="Unassigned">
-                <DataGrid Name="TODODisplay" ItemsSource="{Binding TODO.View}" IsReadOnly="False"
+                <DataGrid Name="TODODisplay" ItemsSource="{Binding ViewManager.TODO.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -465,7 +465,7 @@
             </TabItem>
 
             <TabItem Header="3rd Party">
-                <TreeView x:Name="OtherPartyFiles" ItemsSource="{Binding ThirdPartyView.View}">
+                <TreeView x:Name="OtherPartyFiles" ItemsSource="{Binding ViewManager.ThirdPartyView.View}">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type DazPackage:ThirdPartyFolder}"
                                 ItemsSource="{Binding Children}">
@@ -487,7 +487,7 @@
             </TabItem>
 
             <TabItem Header="Accessories Gallery">
-                <ListBox Name="AccessoriesViewer" ItemsSource="{Binding Accessories.View}"
+                <ListBox Name="AccessoriesViewer" ItemsSource="{Binding ViewManager.Accessories.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -506,7 +506,7 @@
             </TabItem>
 
             <TabItem Header="Attachments Gallery">
-                <ListBox Name="AttachmentsViewer" ItemsSource="{Binding Attachments.View}"
+                <ListBox Name="AttachmentsViewer" ItemsSource="{Binding ViewManager.Attachments.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -525,7 +525,7 @@
             </TabItem>
             
             <TabItem Header="Characters Gallery">
-                <ListBox Name="CharactersViewer" ItemsSource="{Binding Characters.View}"
+                <ListBox Name="CharactersViewer" ItemsSource="{Binding ViewManager.Characters.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -544,7 +544,7 @@
             </TabItem>
             
             <TabItem Header="Clothings Gallery">
-                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
+                <ListBox Name="ClothingsViewer" ItemsSource="{Binding ViewManager.Clothings.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -563,7 +563,7 @@
             </TabItem>
 
             <TabItem Header="Hairs Gallery">
-                <ListBox Name="HairsViewer" ItemsSource="{Binding Hairs.View}"
+                <ListBox Name="HairsViewer" ItemsSource="{Binding ViewManager.Hairs.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -582,7 +582,7 @@
             </TabItem>
 
             <TabItem Header="Morphs Gallery">
-                <ListBox Name="MorphsViewer" ItemsSource="{Binding Morphs.View}"
+                <ListBox Name="MorphsViewer" ItemsSource="{Binding ViewManager.Morphs.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -601,7 +601,7 @@
             </TabItem>
 
             <TabItem Header="Props Gallery">
-                <ListBox Name="PropsView" ItemsSource="{Binding Props.View}"
+                <ListBox Name="PropsView" ItemsSource="{Binding ViewManager.Props.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -620,7 +620,7 @@
             </TabItem>
 
             <TabItem Header="Poses Gallery">
-                <ListBox Name="PosesViewer" ItemsSource="{Binding Poses.View}"
+                <ListBox Name="PosesViewer" ItemsSource="{Binding ViewManager.Poses.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
