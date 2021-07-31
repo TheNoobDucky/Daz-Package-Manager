@@ -53,8 +53,8 @@ namespace Daz_Package_Manager
             {
                 var destination = InstallFolder();
                 var makeCopy = Properties.Settings.Default.MakeCopy;
-                var ignoreMissingFile = Properties.Settings.Default.ignoreMissingFile;
-                await backend.VirtualFolderManager.Install(destination, makeCopy, ignoreMissingFile);
+                var warnMissingFile = Properties.Settings.Default.ignoreMissingFile;
+                await backend.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
             },
                 () => backend.VirtualFolderManager.Cancel()
             );
@@ -83,13 +83,20 @@ namespace Daz_Package_Manager
         private void GenerateInstallScript(object sender, RoutedEventArgs e)
         {
             var virtualFolder = InstallFolder();
+            try
+            {
+                var scene = Properties.Settings.Default.SceneFile;
+                var sceneRoot = Directory.GetParent(scene);
+                var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
+                var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
+                var clearBaseDirectories = Properties.Settings.Default.ClearBaseDirectories;
+                InfoBox.Write($"Creating install script. Script saved to {scriptLocation}.", InfoBox.Level.Status);
+                VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene, clearBaseDirectories);
+            }
+            catch (ArgumentException)
+            {
 
-            var scene = Properties.Settings.Default.SceneFile;
-            var sceneRoot = Directory.GetParent(scene);
-            var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
-            var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
-            var clearBaseDirectories = Properties.Settings.Default.ClearBaseDirectories;
-            VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene, clearBaseDirectories);
+            }
         }
 
         private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
