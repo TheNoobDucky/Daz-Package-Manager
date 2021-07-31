@@ -106,7 +106,7 @@ namespace Daz_Package_Manager
             }
         }
 
-        private CancellationTokenSource tokenSource = null;
+        private CancellationTokenSource tokenSource;
         public void Cancel()
         {
             InfoBox.Write("Canceling manifest scan task.", InfoBox.Level.Status);

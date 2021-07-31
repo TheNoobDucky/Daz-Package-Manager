@@ -12,16 +12,16 @@ namespace DazPackage
         /// <param name="package">Packages to be installed.</param>
         /// <param name="destination">Destination folder.</param>
         /// <exception cref="SymlinkError">Error when creating the virtual file link.</exception>
-        public static void Install(InstalledPackage package, string destinationBase, bool makeCopy = false, bool warnMissingFile = false)
+        public static void Install(InstalledPackage package, string destinationBase, bool makeCopy = false, bool ignoreMissingFile = false)
         {
             var basePath = package.InstalledLocation;
             foreach (var file in package.Files)
             {
-                Install(file, basePath, destinationBase, makeCopy, warnMissingFile);
+                Install(file, basePath, destinationBase, makeCopy, ignoreMissingFile);
             }
         }
 
-        public static void Install(string file, string source, string destinationBase, bool makeCopy = false, bool warnMissingFile = false)
+        public static void Install(string file, string source, string destinationBase, bool makeCopy = false, bool ignoreMissingFile = false)
         {
             var sourcePath = Path.GetFullPath(Path.Combine(source, file));
             var destinationPath = Path.GetFullPath(Path.Combine(destinationBase, file));
@@ -29,7 +29,7 @@ namespace DazPackage
 
             if (!File.Exists(sourcePath))
             {
-                if (warnMissingFile)
+                if (!ignoreMissingFile)
                 {
                     InfoBox.Write($"File missing: {sourcePath}", InfoBox.Level.Warning);
                 }

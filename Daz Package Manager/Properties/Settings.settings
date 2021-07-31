@@ -26,8 +26,8 @@
     <Setting Name="MakeCopy" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="WarnMissingFile" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+    <Setting Name="ignoreMissingFile" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ClearBaseDirectories" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

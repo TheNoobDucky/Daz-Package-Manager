@@ -155,7 +155,7 @@ namespace Daz_Package_Manager
             }
         }
 
-        private CancellationTokenSource tokenSource = null;
+        private CancellationTokenSource tokenSource;
         public void Cancel()
         {
             InfoBox.Write("Canceling processing 3rd party folders.", InfoBox.Level.Status);

@@ -165,7 +165,7 @@
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding MakeCopy}"
                     Content="Copy Files Instead" />
             <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}"
-                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding WarnMissingFile}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding ignoreMissingFile}"
                     Content="Ignore Missing File" />
             <!--#endregion-->
 

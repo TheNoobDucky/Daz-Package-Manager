@@ -18,12 +18,12 @@ namespace Daz_Package_Manager
         {
             this.model = model;
         }
-        public async Task Install(string destination, bool makeCopy = false, bool warnMissingFile = false)
+        public async Task Install(string destination, bool makeCopy = false, bool ignoreMissingFile = false)
         {
             try
             {
                 tokenSource = new();
-                await Task.Run(() => Install_Imple(destination, tokenSource.Token, makeCopy, warnMissingFile), tokenSource.Token);
+                await Task.Run(() => Install_Imple(destination, tokenSource.Token, makeCopy, ignoreMissingFile), tokenSource.Token);
             }
             catch (TargetInvocationException error)
             {
@@ -38,7 +38,7 @@ namespace Daz_Package_Manager
             }
         }
 
-        private Task Install_Imple(string destination, CancellationToken token, bool makeCopy = false, bool warnMissingFile = false)
+        private Task Install_Imple(string destination, CancellationToken token, bool makeCopy = false, bool ignoreMissingFile = false)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Daz_Package_Manager
                     InfoBox.Write("Installing: " + package.ProductName, InfoBox.Level.Info);
                     try
                     {
-                        VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
+                        VirtualPackage.Install(package, destination, makeCopy, ignoreMissingFile);
                     }
                     catch (SymLinkerError error)
                     {
@@ -75,7 +75,7 @@ namespace Daz_Package_Manager
                     try
                     {
                         InfoBox.Write($"Installing: {file.RelativePath}", InfoBox.Level.Info);
-                        VirtualPackage.Install(file.RelativePath, file.ParentFolder.BasePath, destination, makeCopy, warnMissingFile);
+                        VirtualPackage.Install(file.RelativePath, file.ParentFolder.BasePath, destination, makeCopy, ignoreMissingFile);
                     }
                     catch (SymLinkerError error)
                     {
@@ -93,12 +93,12 @@ namespace Daz_Package_Manager
             }
             catch (ArgumentException)
             {
-                InfoBox.Write("Please select a location to install virtual packages to.", InfoBox.Level.Error);
+                InfoBox.Write("Please select virtual package install location.", InfoBox.Level.Error);
             }
             return Task.CompletedTask;
         }
 
-        private CancellationTokenSource tokenSource = null;
+        private CancellationTokenSource tokenSource;
         public void Cancel()
         {
             InfoBox.Write("Canceling installing virtual folder task.", InfoBox.Level.Status);

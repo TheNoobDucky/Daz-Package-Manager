@@ -53,8 +53,8 @@ namespace Daz_Package_Manager
             {
                 var destination = InstallFolder();
                 var makeCopy = Properties.Settings.Default.MakeCopy;
-                var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-                await backend.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
+                var ignoreMissingFile = Properties.Settings.Default.ignoreMissingFile;
+                await backend.VirtualFolderManager.Install(destination, makeCopy, ignoreMissingFile);
             },
                 () => backend.VirtualFolderManager.Cancel()
             );
