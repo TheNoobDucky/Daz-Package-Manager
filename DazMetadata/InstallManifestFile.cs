@@ -1,6 +1,7 @@
 ﻿using Helpers;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -51,6 +52,9 @@ namespace DazPackage
         public string ProductName { get; set; }
         public string ProductStoreID { get; set; }
         public string UserInstallPath { get; set; }
+
+        public string ProductID => ProductStoreID.Split('-')[0];
+        public string PackageID => ProductStoreID.Split('-').Skip(1).FirstOrDefault();
 
         public List<string> Files { get; set; } = new List<string>();
         public List<string> MetadataFiles { get; set; } = new List<string>();

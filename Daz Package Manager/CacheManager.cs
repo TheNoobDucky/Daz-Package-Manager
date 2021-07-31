@@ -1,4 +1,5 @@
-﻿using OsHelper;
+﻿using DazPackage;
+using OsHelper;
 using Output;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +9,30 @@ using System.Threading.Tasks;
 
 namespace Daz_Package_Manager
 {
+    internal class PackagesSaveDetail
+    {
+        public string Name { get; set; }
+        public string ProductID { get; set; }
+        public string PackageID { get; set; }
+
+        public PackagesSaveDetail()
+        {
+
+        }
+        public PackagesSaveDetail(InstalledPackage package) 
+        {
+            Name = package.ProductName;
+            ProductID = package.ProductID;
+            PackageID = package.PackageID;
+        }
+    }
+
+    internal class SelectionRecords
+    {
+        public List<PackagesSaveDetail> Packages { get; set; }
+        public List<string> ThirdPartyFilenames { get; set; }
+    }
+
     internal class CacheManager
     {
         private readonly Backend model;
@@ -27,7 +52,6 @@ namespace Daz_Package_Manager
             await Task.WhenAll(tasks);
         }
 
-
         public void LoadSelectionsFromFile()
         {
             var (success, file) = SelectFile.AskForOpenLocation();
@@ -42,9 +66,9 @@ namespace Daz_Package_Manager
                     };
                     using var jsonFile = File.OpenText(file);
                     var records = JsonSerializer.Deserialize<SelectionRecords>(jsonFile.ReadToEnd(), option);
-                    model.Packages.SelectPackages(records.PackageNames);
+                    model.Packages.SelectPackages(records.Packages.Select(x => x.Name).ToList());
                     model.ThirdParty.SelectFiles(records.ThirdPartyFilenames);
-                    foreach (var name in records.PackageNames)
+                    foreach (var name in records.Packages)
                     {
                         InfoBox.Write($"{name}", InfoBox.Level.Info);
                     }
@@ -67,11 +91,6 @@ namespace Daz_Package_Manager
                 }
             }
         }
-        public class SelectionRecords
-        {
-            public List<string> PackageNames { get; set; }
-            public List<string> ThirdPartyFilenames { get; set; }
-        }
 
         public void SaveSelectionsToFile()
         {
@@ -84,9 +103,9 @@ namespace Daz_Package_Manager
                     {
                         WriteIndented = true
                     };
-                    var selectedPackages = model.Packages.AllSelected().Select(x => x.ProductName).ToList();
+                    var selectedPackages = model.Packages.AllSelected().Select(x => new PackagesSaveDetail(x)).ToList();
                     var selectedFiles = model.ThirdParty.AllSelected().Select(x => x.Location).ToList();
-                    var records = new SelectionRecords() { PackageNames = selectedPackages, ThirdPartyFilenames = selectedFiles };
+                    var records = new SelectionRecords() { Packages = selectedPackages, ThirdPartyFilenames = selectedFiles };
                     File.WriteAllText(file, JsonSerializer.Serialize(records, option));
                 }
                 catch (IOException error)

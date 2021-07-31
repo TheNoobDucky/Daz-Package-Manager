@@ -82,7 +82,6 @@ namespace DazPackage
             }
         }
 
-
         public string ProductId
         {
             get
@@ -98,7 +97,6 @@ namespace DazPackage
 
             }
         }
-
 
         private readonly FileInfo file;
         public readonly PackageMetadata packageMetadata;
