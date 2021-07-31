@@ -130,5 +130,17 @@ namespace Daz_Package_Manager.Properties {
                 this["WarnMissingFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ClearBaseDirectories {
+            get {
+                return ((bool)(this["ClearBaseDirectories"]));
+            }
+            set {
+                this["ClearBaseDirectories"] = value;
+            }
+        }
     }
 }

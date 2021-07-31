@@ -1,4 +1,5 @@
-﻿using Output;
+﻿using Helpers;
+using Output;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace DazPackage
 {
@@ -85,6 +85,16 @@ namespace DazPackage
             return packages.ToList();
         }
 
+        public IEnumerable<InstalledPackage> AllSelected()
+        {
+            return Packages.Where(x => x.Selected);
+        }
+
+        public void UnselectAll()
+        {
+            UnselectPackages(Packages);
+        }
+
         public static void UnselectPackages(List<InstalledPackage> packages)
         {
             packages.ForEach(x => x.Selected = false);
@@ -130,7 +140,7 @@ namespace DazPackage
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            Application.Current.Dispatcher.Invoke(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
+            Helper.InvokeAsUI(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
         }
         #endregion
     }
