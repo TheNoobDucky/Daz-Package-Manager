@@ -90,45 +90,61 @@
 
             </Grid.ColumnDefinitions>
 
+            <!--#region Step 1 Select Manifest Folder-->
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="0" Grid.Column="1" Click="SelectInstallManifestFolder"
                     Margin="{StaticResource DefaultMargin}" Content="Select Install Manifest Archive Folder" />
             <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding InstallManifestFolder}" />
+            <!--#endregion-->
 
+            <!--#region Step 2 Scan Manifest Folder-->
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="{StaticResource DefaultMargin}" />
             <Button Name="ScanInstallManifestFolderButton"  Grid.Row="1" Grid.Column="1"
                     Click="ScanInstallManifestFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Scan Install Manifest Archive" />
+            <!--#endregion-->
 
+            <!--#region Step 3 Select Scene File-->
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="{StaticResource DefaultMargin}"
-                    Content="Select Scene File(Optional)" />
+                    Content="Select Scene File (Optional)" />
             <TextBox Grid.Row="2" Grid.Column="2" Name="SceneFileLocation" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding SceneFile}" />
+            <!--#endregion-->
 
+            <!--#region Step 4 Select Contents-->
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="{StaticResource DefaultMargin}" />
             <Button Name="SelectPackagesButton" Grid.Row="3" Grid.Column="1" Click="SelectPackagesBasedOnScene"
                     Margin="{StaticResource DefaultMargin}" Padding="5,1"
-                    Content="Select Package Based On Scene (Optional)" />
+                    Content="Select Contents Based On Scene (Optional)" />
 
             <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding BatchProcessScene}"
                     Content="Batch process all scenes in the same folder" />
+            <!--#endregion-->
 
+            <!--#region Step 5 Select Output Folder-->
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="{StaticResource DefaultMargin}"
-                    Content="Select Output Folder Location" />
+                    Content="Select Output Folder" />
             <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding OutputFolder}" />
+            <!--#endregion-->
 
+            <!--#region Step 6 Generate Virtual Install-->
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="{StaticResource DefaultMargin}" />
             <Button Name="GeneateVirtualFolderButton" Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Virtual Install Folder" />
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
+                    Content="Create subfolder based on scene name" />
+            <!--#endregion-->
 
+            <!--#region Step 7 Generate Install Script-->
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Step 7: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="6" Grid.Column="1" Click="GenerateInstallScript"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Install Script (optional)" />
@@ -137,21 +153,23 @@
                 <CheckBox Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                         IsChecked="{Binding ClearBaseDirectories}" Content="Clear Base Directories" />
             </StackPanel>
+            <!--#endregion-->
 
+            <!--#region Cache Section-->
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Cache Location" />
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2" Name="CacheLocation" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding CacheLocation}" />
-
             <CheckBox Grid.Row="0" Grid.Column="6" Margin="{StaticResource DefaultMargin}"
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding MakeCopy}"
                     Content="Copy Files Instead" />
-
             <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}"
                     DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding WarnMissingFile}"
                     Content="Ignore Missing File" />
+            <!--#endregion-->
 
+            <!--#region Show Image -->
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="{StaticResource DefaultMargin}"
                     Visibility="Hidden" Content="Reload Cache" />
 
@@ -167,7 +185,9 @@
                 <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding Settings.ImageSize}" Minimum="0"
                         Maximum="500" SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
             </Grid>
+            <!--#endregion-->
 
+            <!--#region Filters-->
             <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen0}" Content="Unknown" />
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen4}" Content="Gen 4" />
@@ -183,11 +203,9 @@
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleFemale}" Content="Female" Margin="5 1" />
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleMale}" Content="Male" Margin="5 1" />
             </StackPanel>
+            <!--#endregion-->
 
-            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
-                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
-                    Content="Create subfolder based on scene name" />
-
+            <!--#region Third Party Section -->
             <Button Name="AddThirdPartyButton" Grid.Row="2" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Add 3rd Party Folder" />
             <Button Name="RemoveThirdPartyButton" Grid.Row="2" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
@@ -196,17 +214,20 @@
                     Content="Reload 3rd Party Folder" />
             <ListBox Name="OtherPartyFolders" Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="4"
                     ItemsSource="{Binding ThirdParty.Folders}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
-            
+            <!--#endregion-->
 
+            <!--#region Save/Load/Clear Selection -->
             <Button Grid.Row="4" Grid.Column="4" Click="SaveSelection"
                     Margin="{StaticResource DefaultMargin}" Content="Save Selection" />
             <Button Grid.Row="5" Grid.Column="4" Click="LoadSelection"
                     Margin="{StaticResource DefaultMargin}" Content="Load Selection" /> 
             <Button Grid.Row="6" Grid.Column="4" Click="ClearPackageSelection" Margin="{StaticResource DefaultMargin}"
                     Content="Clear Package Selection" />
+            <!--#endregion-->
         </Grid>
-
+        
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            
             <TabItem Header="Packages">
                 <DataGrid Name="PackageDisplay" ItemsSource="{Binding ViewManager.Packages.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
