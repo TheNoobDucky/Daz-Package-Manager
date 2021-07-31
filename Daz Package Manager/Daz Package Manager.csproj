@@ -8,7 +8,7 @@
 	<StartupObject></StartupObject>
 	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 	<PackageId>DazPackageManager</PackageId>
-	<Version>1.10.1</Version>
+	<Version>1.10.0</Version>
 	<Configurations>Debug;Release;Shipping</Configurations>
 	<ApplicationIcon>ducks.ico</ApplicationIcon>
 	<PackageProjectUrl></PackageProjectUrl>
