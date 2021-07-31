@@ -127,13 +127,17 @@ namespace Helpers
             }
             catch (JsonException e)
             {
-                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
             }
             catch (UnauthorizedAccessException e)
             {
-                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
             }
-        }
+            catch (IOException e)
+            {
+                throw new CorruptFileException(e.Message);
+            }
+        } 
 
         public static JsonDocument ReadJsonFromTextFile(FileInfo file)
         {
@@ -144,11 +148,15 @@ namespace Helpers
             }
             catch (JsonException e)
             {
-                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
             }
             catch (UnauthorizedAccessException e)
             {
-                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
+            }
+            catch (IOException e)
+            {
+                throw new CorruptFileException(e.Message);
             }
         }
 

@@ -17,49 +17,57 @@ namespace DazPackage
     {
         public Task ScanInBackground(string folder, CancellationToken token)
         {
-            var totalTime = new Stopwatch();
-            totalTime.Start();
-            List<InstalledPackage> newPackages = null;
-
-            if (folder is null or "")
+            try
             {
-                InfoBox.Write("Please select install archive folder location", InfoBox.Level.Error);
-                return Task.FromResult(newPackages);
-            }
-            newPackages = new List<InstalledPackage>();
+                var totalTime = new Stopwatch();
+                totalTime.Start();
+                List<InstalledPackage> newPackages = null;
 
-            InfoBox.Write("Start processing install archive folder: " + folder, InfoBox.Level.Status);
-            var files = Directory.EnumerateFiles(folder).ToList();
+                newPackages = new List<InstalledPackage>();
 
-            var totalFiles = files.Count;
-            var batchSize = 200;
-            var processedFiles = 0;
-            //var packages = new ConcurrentBag<InstalledPackage>();
-            InfoBox.Write("Processing " + totalFiles + " files.", InfoBox.Level.Status);
+                InfoBox.Write("Start processing install archive folder: " + folder, InfoBox.Level.Status);
+                var files = Directory.EnumerateFiles(folder).ToList();
 
-            var timer = new Stopwatch();
-            timer.Start();
+                var totalFiles = files.Count;
+                var batchSize = 200;
+                var processedFiles = 0;
 
-            for (var start = 0; start < totalFiles; start = processedFiles)
-            {
-                token.ThrowIfCancellationRequested();
+                InfoBox.Write("Processing " + totalFiles + " files.", InfoBox.Level.Status);
 
-                var numberOfFilesToProcess = Math.Min(start + batchSize, totalFiles) - start;
+                var timer = new Stopwatch();
+                timer.Start();
 
-                newPackages.AddRange(ProcessBundle(files.GetRange(start, numberOfFilesToProcess)));
-
-                processedFiles += numberOfFilesToProcess;
-
-                if (timer.Elapsed.TotalSeconds > 1)
+                for (var start = 0; start < totalFiles; start = processedFiles)
                 {
-                    InfoBox.Write($"{processedFiles} / {totalFiles} files processed:", InfoBox.Level.Alert);
+                    token.ThrowIfCancellationRequested();
 
-                    timer.Restart();
+                    var numberOfFilesToProcess = Math.Min(start + batchSize, totalFiles) - start;
+
+                    newPackages.AddRange(ProcessBundle(files.GetRange(start, numberOfFilesToProcess)));
+
+                    processedFiles += numberOfFilesToProcess;
+
+                    if (timer.Elapsed.TotalSeconds > 1)
+                    {
+                        InfoBox.Write($"{processedFiles} / {totalFiles} files processed:", InfoBox.Level.Alert);
+
+                        timer.Restart();
+                    }
                 }
+                Debug.Assert(processedFiles == totalFiles, "Batch processing implemented incorrectly, missed some packages.");
+                InfoBox.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), InfoBox.Level.Debug);
+                Packages = newPackages;
             }
-            Debug.Assert(processedFiles == totalFiles, "Batch processing implemented incorrectly, missed some packages.");
-            InfoBox.Write("Total runtime: " + totalTime.Elapsed.TotalSeconds.ToString(), InfoBox.Level.Debug);
-            Packages = newPackages;
+            catch (DirectoryNotFoundException e)
+            {
+                InfoBox.Write("Please select a valid install archive folder location", InfoBox.Level.Error);
+                InfoBox.Write(e.Message, InfoBox.Level.Error);
+            }
+            catch (ArgumentException)
+            {
+                InfoBox.Write("Please select a valid install archive folder location", InfoBox.Level.Error);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -100,9 +108,9 @@ namespace DazPackage
             packages.ForEach(x => x.Selected = false);
         }
 
-        public void SelectPackages (List<string> packageNames)
+        public void SelectPackages(List<string> packageNames)
         {
-            var selectedPackages = packages.Where(x => packageNames.Contains(x.ProductName)); 
+            var selectedPackages = packages.Where(x => packageNames.Contains(x.ProductName));
             foreach (var package in selectedPackages)
             {
                 package.Selected = true;

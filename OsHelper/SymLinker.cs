@@ -23,7 +23,7 @@ namespace OsHelper
             {
                 var error = DecodeErrorCode(errorCode);
                 throw new SymLinkerError(
-                    message: $"Failed to create symlink, please check developer mode is turned on or run as administrator.\nWin32 Error Message: {error}. \nFile:{source}");
+                    message: $"Failed to create symlink, please check developer mode is turned on or run as administrator. Vitual folder must be located on a local drive.\n\nWin32 Error Message: {error} \nFilename:{source}");
             }
         }
 

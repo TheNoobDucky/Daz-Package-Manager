@@ -38,50 +38,63 @@ namespace Daz_Package_Manager
             }
         }
 
-        private Task Install_Imple (string destination, CancellationToken token, bool makeCopy = false, bool warnMissingFile = false)
+        private Task Install_Imple(string destination, CancellationToken token, bool makeCopy = false, bool warnMissingFile = false)
         {
-            if (destination is null or "")
+            try
+            {
+                _ = Directory.CreateDirectory(destination);
+
+                InfoBox.Write("Installing to virtual folder location: " + destination, InfoBox.Level.Status);
+
+                var packagesToSave = model.Packages.AllSelected();
+                foreach (var package in packagesToSave)
+                {
+                    token.ThrowIfCancellationRequested();
+                    InfoBox.Write("Installing: " + package.ProductName, InfoBox.Level.Info);
+                    try
+                    {
+                        VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
+                    }
+                    catch (SymLinkerError error)
+                    {
+                        InfoBox.Write($"Unable to copy file {error.Message}", InfoBox.Level.Error);
+                        var buttons = MessageBoxButton.YesNo;
+                        var result = MessageBox.Show(error.Message + "\n\nAbort?", "Cancel Creating Virtual Folder?", buttons);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            InfoBox.Write($"Cancelling virtual folder operation.", InfoBox.Level.Error);
+                            return Task.CompletedTask;
+                        }
+                    }
+                }
+
+                var thirdPartyFiles = model.ThirdParty.AllSelected();
+                foreach (var file in thirdPartyFiles)
+                {
+                    token.ThrowIfCancellationRequested();
+                    try
+                    {
+                        InfoBox.Write($"Installing: {file.RelativePath}", InfoBox.Level.Info);
+                        VirtualPackage.Install(file.RelativePath, file.ParentFolder.BasePath, destination, makeCopy, warnMissingFile);
+                    }
+                    catch (SymLinkerError error)
+                    {
+                        InfoBox.Write($"Unable to copy file {error.Message}", InfoBox.Level.Error);
+                        var buttons = MessageBoxButton.YesNo;
+                        var result = MessageBox.Show(error.Message + "\n\nAbort?", "Cancel installing to virtual folder?", buttons);
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            InfoBox.Write($"Cancelling virtual folder operation.", InfoBox.Level.Error);
+                            return Task.CompletedTask;
+                        }
+                    }
+                }
+                InfoBox.Write("Install to virtual folder complete.", InfoBox.Level.Status);
+            }
+            catch (ArgumentException)
             {
                 InfoBox.Write("Please select a location to install virtual packages to.", InfoBox.Level.Error);
-                return Task.CompletedTask;
             }
-
-            _ = Directory.CreateDirectory(destination);
-
-            InfoBox.Write("Installing to virtual folder location: " + destination, InfoBox.Level.Status);
-
-            var packagesToSave = model.Packages.AllSelected();
-            foreach (var package in packagesToSave)
-            {
-                token.ThrowIfCancellationRequested();
-                InfoBox.Write("Installing: " + package.ProductName, InfoBox.Level.Info);
-                try
-                {
-                    VirtualPackage.Install(package, destination, makeCopy, warnMissingFile);
-                }
-                catch (SymLinkerError error)
-                {
-                    InfoBox.Write($"Unable to copy file {error.Message}", InfoBox.Level.Error);
-                    _ = MessageBox.Show(error.Message);
-                }
-            }
-
-            var thirdPartyFiles = model.ThirdParty.AllSelected();
-            foreach (var file in thirdPartyFiles)
-            {
-                token.ThrowIfCancellationRequested();
-                try
-                {
-                    InfoBox.Write($"Installing: {file.RelativePath}", InfoBox.Level.Info);
-                    VirtualPackage.Install(file.RelativePath, file.ParentFolder.BasePath, destination, makeCopy, warnMissingFile);
-                }
-                catch (SymLinkerError error)
-                {
-                    InfoBox.Write($"Unable to copy file {error.Message}", InfoBox.Level.Error);
-                    _ = MessageBox.Show(error.Message);
-                }
-            }
-            InfoBox.Write("Install to virtual folder complete.", InfoBox.Level.Status);
             return Task.CompletedTask;
         }
 

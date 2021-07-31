@@ -41,18 +41,30 @@ namespace Daz_Package_Manager
 
         private Task SelectPackagesInFolder(string folder, CancellationToken token)
         {
-            var files = Directory.EnumerateFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
-            foreach (var file in files)
+            if (folder is null or "") {
+                InfoBox.Write("Please select a scene file.", InfoBox.Level.Error);
+                return Task.CompletedTask;
+            }
+            try
             {
-                token.ThrowIfCancellationRequested();
-                Select_Imple(file);
+                var files = Directory.EnumerateFiles(folder).Where(file => Path.GetExtension(file) == ".duf");
+                foreach (var file in files)
+                {
+                    token.ThrowIfCancellationRequested();
+                    Select_Imple(file);
+                }
+
+                var subfolders = Directory.EnumerateDirectories(folder);
+                foreach (var subfolder in subfolders)
+                {
+                    _ = SelectPackagesInFolder(subfolder, token);
+                }
+            } 
+            catch (DirectoryNotFoundException e)
+            {
+                Output.InfoBox.Write($"{e.Message}", InfoBox.Level.Error);
             }
 
-            var subfolders = Directory.EnumerateDirectories(folder);
-            foreach (var subfolder in subfolders)
-            {
-                _ = SelectPackagesInFolder(subfolder, token);
-            }
             return Task.CompletedTask;
         }
 
@@ -64,6 +76,12 @@ namespace Daz_Package_Manager
 
         private void Select_Imple (string sceneLocation)
         {
+            if (sceneLocation is null or "")
+            {
+                InfoBox.Write("Please select a scene file.", InfoBox.Level.Error);
+                return;
+            }
+
             try
             {
                 var sceneFileInfo = new FileInfo(sceneLocation);
@@ -98,10 +116,10 @@ namespace Daz_Package_Manager
             {
                 InfoBox.Write($"Invalid scene file: {error.Message}", InfoBox.Level.Error);
             }
-            catch (ArgumentException)
-            {
-                InfoBox.Write("Please select scene file.", InfoBox.Level.Error);
-            }
+            //catch (ArgumentException)
+            //{
+            //    InfoBox.Write("Please select scene file.", InfoBox.Level.Error);
+            //}
         }
 
         private CancellationTokenSource tokenSource = null;
