@@ -4,6 +4,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -11,6 +13,36 @@ namespace Helpers
 {
     public class Helper
     {
+        public delegate void InvokeTask();
+
+        public static void InvokeAsUI(InvokeTask del)
+        {
+            Application.Current.Dispatcher.Invoke(del);
+        }
+
+        public delegate Task ButtonTask();
+        public delegate void CancelTask();
+
+        public const string WaitText = "Cancel";
+
+        public static async Task AsyncButton(object sender, ButtonTask mainTask, CancelTask cancelTaks, string waitText = WaitText)
+        {
+            if (sender is Button button)
+            {
+                if (button.Content is string prevText)
+                {
+                    if (prevText == waitText)
+                    {
+                        cancelTaks();
+                        return;
+                    }
+                    button.Content = waitText;
+                    await mainTask();
+                    button.Content = prevText;
+                }
+            }
+        }
+
         public static void DeleteEmptyFolder(string folder)
         {
             if (!Directory.EnumerateFileSystemEntries(folder).Any())
@@ -87,16 +119,45 @@ namespace Helpers
 
         public static JsonDocument ReadJsonFromGZfile(FileInfo file)
         {
-            using var sceneStream = file.OpenRead();
-            using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
-            return JsonDocument.Parse(scene);
-        }
+            try
+            {
+                using var sceneStream = file.OpenRead();
+                using var scene = new GZipStream(sceneStream, CompressionMode.Decompress);
+                return JsonDocument.Parse(scene);
+            }
+            catch (JsonException e)
+            {
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
+            }
+            catch (IOException e)
+            {
+                throw new CorruptFileException(e.Message);
+            }
+        } 
 
         public static JsonDocument ReadJsonFromTextFile(FileInfo file)
         {
-            using var sceneStream = file.OpenRead();
-            //using var scene = new FileStream(sceneStream, CompressionMode.Decompress);
-            return JsonDocument.Parse(sceneStream);
+            try
+            {
+                using var sceneStream = file.OpenRead();
+                return JsonDocument.Parse(sceneStream);
+            }
+            catch (JsonException e)
+            {
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                throw new CorruptFileException($"{file.FullName}\n{e.Message}");
+            }
+            catch (IOException e)
+            {
+                throw new CorruptFileException(e.Message);
+            }
         }
 
         public static void TriggerFilterRefresh(ItemsControl dataGrid)

@@ -4,6 +4,7 @@ using OsHelper;
 using System;
 using System.IO;
 using System.Windows;
+using Helpers;
 
 namespace Daz_Package_Manager
 {
@@ -12,36 +13,61 @@ namespace Daz_Package_Manager
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly Backend backend = new();
+
         public MainWindow()
         {
             InitializeComponent();
-            if (Properties.Settings.Default.CacheLocation == String.Empty)
+            if (Properties.Settings.Default.CacheLocation == string.Empty)
             {
                 var userPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 Properties.Settings.Default.CacheLocation = Path.Combine(userPath, "Daz Package Manager");
-                Directory.CreateDirectory(Properties.Settings.Default.CacheLocation);
+                _ = Directory.CreateDirectory(Properties.Settings.Default.CacheLocation);
             }
             InfoBox.RegisterDebugField(DebugText);
             InfoBox.WriteDebug = true;
-            DataContext = modelView;
-            modelView.LoadPackagesCache();
+            DataContext = backend;
         }
 
-        private readonly ModelView modelView = new();
-        private const string waitText = "Cancel";
-
-        private void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var destination = InstallFolder();
-            Directory.CreateDirectory(destination);
-            var makeCopy = Properties.Settings.Default.MakeCopy;
-            var warnMissingFile = Properties.Settings.Default.WarnMissingFile;
-            modelView.GenerateVirtualInstallFolder(destination, makeCopy, warnMissingFile);
+            var scanContent = ScanInstallManifestFolderButton.Content;
+            ScanInstallManifestFolderButton.Content = Helper.WaitText;
+            var ThirdPartyContent = AddThirdPartyButton.Content;
+            AddThirdPartyButton.Content = Helper.WaitText;
+
+            await backend.CacheManager.LoadAllCaches();
+
+            ScanInstallManifestFolderButton.Content = scanContent;
+            AddThirdPartyButton.Content = ThirdPartyContent;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
+        private async void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
+        {
+            await Helper.AsyncButton(sender, async () =>
+            {
+                var destination = InstallFolder();
+                var makeCopy = Properties.Settings.Default.MakeCopy;
+                var warnMissingFile = Properties.Settings.Default.ignoreMissingFile;
+                await backend.VirtualFolderManager.Install(destination, makeCopy, warnMissingFile);
+            },
+                () => backend.VirtualFolderManager.Cancel()
+            );
         }
 
         private static string InstallFolder()
         {
             var destination = Properties.Settings.Default.OutputFolder;
+            if (destination is null or "")
+            {
+                return null;
+            }
+
             if (Properties.Settings.Default.UseSceneSubfolder)
             {
                 destination = Path.Combine(destination, SceneName());
@@ -57,44 +83,45 @@ namespace Daz_Package_Manager
         private void GenerateInstallScript(object sender, RoutedEventArgs e)
         {
             var virtualFolder = InstallFolder();
+            try
+            {
+                var scene = Properties.Settings.Default.SceneFile;
+                var sceneRoot = Directory.GetParent(scene);
+                var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
+                var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
+                var clearBaseDirectories = Properties.Settings.Default.ClearBaseDirectories;
+                InfoBox.Write($"Creating install script. Script saved to {scriptLocation}.", InfoBox.Level.Status);
+                VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene, clearBaseDirectories);
+            }
+            catch (ArgumentException)
+            {
 
-            var scene = Properties.Settings.Default.SceneFile;
-            var sceneRoot = Directory.GetParent(scene);
-            var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
-            var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
-
-            VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene);
+            }
         }
 
         private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
-            {
-                if (button.Content is string prev_text)
-                {
-                    if (prev_text == waitText)
-                    {
-                        modelView.CancelManifestScan();
-                        return;
-                    }
-
-                    button.Content = waitText;
-                    await modelView.ScanManifestFolder();
-                    button.Content = prev_text;
-                }
-            }
+            await Helper.AsyncButton(sender,
+                async () => await backend.ManifestScanner.Scan(),
+                () => backend.ManifestScanner.Cancel());
         }
 
-        private void SelectFigureBasedOnScene(object sender, RoutedEventArgs e)
+        private async void SelectPackagesBasedOnScene(object sender, RoutedEventArgs e)
         {
-            if (Properties.Settings.Default.BatchProcessScene)
-            {
-                modelView.SelectPackagesBasedOnFolder(Properties.Settings.Default.SceneFile);
-            }
-            else
-            {
-                modelView.SelectPackagesBasedOnScene(Properties.Settings.Default.SceneFile);
-            }
+            await Helper.AsyncButton(sender,
+                async () =>
+                {
+                    if (Properties.Settings.Default.BatchProcessScene)
+                    {
+                        await backend.SelectPackages.BasedOnFolder(Properties.Settings.Default.SceneFile);
+                    }
+                    else
+                    {
+                        await backend.SelectPackages.BasedOnScene(Properties.Settings.Default.SceneFile);
+                    }
+                },
+                () => backend.SelectPackages.Cancel()
+            );
         }
 
         // Below are boring functions.
@@ -149,42 +176,30 @@ namespace Daz_Package_Manager
 
         private void ClearPackageSelection(object sender, RoutedEventArgs e)
         {
-            modelView.UnselectAll();
+            backend.Packages.UnselectAll();
         }
 
-        private void CallLoadCache(object sender, RoutedEventArgs e)
+        private async void CallLoadCache(object sender, RoutedEventArgs e)
         {
-            modelView.LoadPackagesCache();
-        }
-
-        private void SaveUserSetting(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.Save();
+            await Helper.AsyncButton(sender,
+                async () => await backend.ManifestScanner.LoadCache(),
+                () => backend.ManifestScanner.Cancel());
         }
 
         private async void Add3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
+            await Helper.AsyncButton(sender, async () =>
             {
-                if (button.Content is string prevText)
-                {
-                    if (prevText == waitText)
-                    {
-                        modelView.CancelThirdPartyProcess();
-                        return;
-                    }
-                    var reloadContent = ReloadThirdPartyButton.Content;
-                    var removeContent = RemoveThirdPartyButton.Content;
-
-                    button.Content = waitText;
-                    ReloadThirdPartyButton.Content = waitText;
-                    RemoveThirdPartyButton.Content = waitText;
-                    await modelView.AddThirdPartyFolder();
-                    button.Content = prevText;
-                    ReloadThirdPartyButton.Content = reloadContent;
-                    RemoveThirdPartyButton.Content = removeContent;
-                }
-            }
+                var reloadContent = ReloadThirdPartyButton.Content;
+                var removeContent = RemoveThirdPartyButton.Content;
+                ReloadThirdPartyButton.Content = Helper.WaitText;
+                RemoveThirdPartyButton.Content = Helper.WaitText;
+                await backend.ThirdPartyScanner.AddFolder();
+                ReloadThirdPartyButton.Content = reloadContent;
+                RemoveThirdPartyButton.Content = removeContent;
+            },
+                () => backend.ThirdPartyScanner.Cancel()
+            );
         }
 
         private void Remove3rdPartyFolder(object sender, RoutedEventArgs e)
@@ -193,55 +208,42 @@ namespace Daz_Package_Manager
             {
                 if (button.Content is string prevText)
                 {
-                    if (prevText == waitText)
+                    if (prevText == Helper.WaitText)
                     {
-                        modelView.CancelThirdPartyProcess();
+                        backend.ThirdPartyScanner.Cancel();
                         return;
                     }
                     var index = OtherPartyFolders.SelectedIndex;
-                    modelView.RemoveThirdPartyFolder(index);
+                    backend.ThirdPartyScanner.RemoveFolder(index);
                 }
             }
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            modelView.LoadThirdPartyFolders();
         }
 
         private async void Reload3rdPartyFolder(object sender, RoutedEventArgs e)
         {
-            if (sender is System.Windows.Controls.Button button)
+            await Helper.AsyncButton(sender, async () =>
             {
-                if (button.Content is string prevText)
-                {
-                    if (prevText == waitText)
-                    {
-                        modelView.CancelThirdPartyProcess();
-                        return;
-                    }
-                    var addContent = AddThirdPartyButton.Content;
-                    var removeContent = RemoveThirdPartyButton.Content;
+                var addContent = AddThirdPartyButton.Content;
+                var removeContent = RemoveThirdPartyButton.Content;
 
-                    button.Content = waitText;
-                    AddThirdPartyButton.Content = waitText;
-                    RemoveThirdPartyButton.Content = waitText;
-                    await modelView.ReloadThirdPartyFolder();
-                    button.Content = prevText;
-                    AddThirdPartyButton.Content = addContent;
-                    RemoveThirdPartyButton.Content = removeContent;
-                }
-            }
+                AddThirdPartyButton.Content = Helper.WaitText;
+                RemoveThirdPartyButton.Content = Helper.WaitText;
+                await backend.ThirdPartyScanner.ReloadThirdPartyFolder();
+                AddThirdPartyButton.Content = addContent;
+                RemoveThirdPartyButton.Content = removeContent;
+            },
+                () => backend.ThirdPartyScanner.Cancel()
+            );
         }
 
         private void SaveSelection(object sender, RoutedEventArgs e)
         {
-            modelView.SaveSelectionsToFile();
+            backend.CacheManager.SaveSelectionsToFile();
         }
 
         private void LoadSelection(object sender, RoutedEventArgs e)
         {
-            modelView.LoadSelectionsFromFile();
+            backend.CacheManager.LoadSelectionsFromFile();
         }
     }
 }

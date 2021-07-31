@@ -122,12 +122,24 @@ namespace Daz_Package_Manager.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool WarnMissingFile {
+        public bool ignoreMissingFile {
             get {
-                return ((bool)(this["WarnMissingFile"]));
+                return ((bool)(this["ignoreMissingFile"]));
             }
             set {
-                this["WarnMissingFile"] = value;
+                this["ignoreMissingFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ClearBaseDirectories {
+            get {
+                return ((bool)(this["ClearBaseDirectories"]));
+            }
+            set {
+                this["ClearBaseDirectories"] = value;
             }
         }
     }

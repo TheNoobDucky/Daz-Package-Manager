@@ -5,8 +5,9 @@
         xmlns:local="clr-namespace:Daz_Package_Manager" xmlns:DazPackage="clr-namespace:DazPackage;assembly=DazPackage"
         xmlns:Helpers="clr-namespace:Helpers;assembly=Helpers" xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties"
-        d:DataContext="{d:DesignInstance Type=local:ModelView}" mc:Ignorable="d" Title="MainWindow" Height="1200"
+        d:DataContext="{d:DesignInstance Type=local:Backend}" mc:Ignorable="d" Title="MainWindow" Height="1200"
         Loaded="Window_Loaded"
+        Closing="Window_Closing"
         Width="1500">
     <Window.Resources>
         <DataTemplate x:Key="SelectCheckbox">
@@ -89,65 +90,86 @@
 
             </Grid.ColumnDefinitions>
 
+            <!--#region Step 1 Select Manifest Folder-->
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Step 1: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="0" Grid.Column="1" Click="SelectInstallManifestFolder"
                     Margin="{StaticResource DefaultMargin}" Content="Select Install Manifest Archive Folder" />
             <TextBox Grid.Row="0" Grid.Column="2" Name="InstallManifestFolderBox" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding InstallManifestFolder}" />
+            <!--#endregion-->
 
+            <!--#region Step 2 Scan Manifest Folder-->
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Step 2: " Margin="{StaticResource DefaultMargin}" />
-            <Button Grid.Row="1" Grid.Column="1" Name="ScanInstallManifestFolderButton"
+            <Button Name="ScanInstallManifestFolderButton"  Grid.Row="1" Grid.Column="1"
                     Click="ScanInstallManifestFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Scan Install Manifest Archive" />
+            <!--#endregion-->
 
+            <!--#region Step 3 Select Scene File-->
             <TextBlock Grid.Row="2" Grid.Column="0" Text="Step 3: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="2" Grid.Column="1" Click="SelectSceneFile" Margin="{StaticResource DefaultMargin}"
-                    Content="Select Scene File(Optional)" />
+                    Content="Select Scene File (Optional)" />
             <TextBox Grid.Row="2" Grid.Column="2" Name="SceneFileLocation" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding SceneFile}" />
+            <!--#endregion-->
 
+            <!--#region Step 4 Select Contents-->
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="{StaticResource DefaultMargin}" />
-            <Button Grid.Row="3" Grid.Column="1" Click="SelectFigureBasedOnScene"
+            <Button Name="SelectPackagesButton" Grid.Row="3" Grid.Column="1" Click="SelectPackagesBasedOnScene"
                     Margin="{StaticResource DefaultMargin}" Padding="5,1"
-                    Content="Select Package Based On Scene (Optional)" /> 
+                    Content="Select Contents Based On Scene (Optional)" />
 
-            <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding BatchProcessScene}"
+            <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding BatchProcessScene}"
                     Content="Batch process all scenes in the same folder" />
+            <!--#endregion-->
 
+            <!--#region Step 5 Select Output Folder-->
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="4" Grid.Column="1" Click="SelectOutputFolder" Margin="{StaticResource DefaultMargin}"
-                    Content="Select Output Folder Location" />
+                    Content="Select Output Folder" />
             <TextBox Grid.Row="4" Grid.Column="2" Name="OutputFolder" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding OutputFolder}" />
+            <!--#endregion-->
 
+            <!--#region Step 6 Generate Virtual Install-->
             <TextBlock Grid.Row="5" Grid.Column="0" Text="Step 6: " Margin="{StaticResource DefaultMargin}" />
-            <Button Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder"
+            <Button Name="GeneateVirtualFolderButton" Grid.Row="5" Grid.Column="1" Click="GenerateVirtualInstallFolder"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Virtual Install Folder" />
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
+                    Content="Create subfolder based on scene name" />
+            <!--#endregion-->
 
+            <!--#region Step 7 Generate Install Script-->
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Step 7: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="6" Grid.Column="1" Click="GenerateInstallScript"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Install Script (optional)" />
-            <TextBlock Grid.Row="6" Grid.Column="2" Text="Will be saved to next to scene file" Margin="{StaticResource DefaultMargin}" />
+            <StackPanel Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <TextBlock Text="Will be saved to next to the scene file" Margin="{StaticResource DefaultMargin}" />
+                <CheckBox Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
+                        IsChecked="{Binding ClearBaseDirectories}" Content="Clear Base Directories" />
+            </StackPanel>
+            <!--#endregion-->
 
+            <!--#region Cache Section-->
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Cache Location" />
             <TextBox Grid.Row="0" Grid.Column="4" Grid.ColumnSpan="2" Name="CacheLocation" IsReadOnly="True"
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding CacheLocation}" />
+            <CheckBox Grid.Row="0" Grid.Column="6" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding MakeCopy}"
+                    Content="Copy Files Instead" />
+            <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding ignoreMissingFile}"
+                    Content="Ignore Missing File" />
+            <!--#endregion-->
 
-            <CheckBox Grid.Row="0" Grid.Column="6" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding MakeCopy}" Content="Copy Files Instead" />
-            
-            <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding WarnMissingFile}" Content="Ignore Missing File" />
-            
+            <!--#region Show Image -->
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="{StaticResource DefaultMargin}"
                     Visibility="Hidden" Content="Reload Cache" />
 
@@ -157,13 +179,15 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Margin="5 0" IsChecked="{Binding Settings.ImageVisible, Mode=TwoWay}"
+                <CheckBox Grid.Column="0" Margin="5 1" IsChecked="{Binding Settings.ImageVisible, Mode=TwoWay}"
                         Content="Show Images" />
                 <TextBlock Grid.Column="1" Margin="5, 0" Text="Image Size:" />
                 <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding Settings.ImageSize}" Minimum="0"
                         Maximum="500" SmallChange="25" LargeChange="50" TickPlacement="BottomRight" TickFrequency="25" />
             </Grid>
+            <!--#endregion-->
 
+            <!--#region Filters-->
             <StackPanel Grid.Row="2" Grid.Column="3" Orientation="Vertical" Grid.RowSpan="100">
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen0}" Content="Unknown" />
                 <CheckBox Grid.Row="5" Grid.Column="2" Margin="5 1" IsChecked="{Binding Settings.ToggleGen4}" Content="Gen 4" />
@@ -179,11 +203,9 @@
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleFemale}" Content="Female" Margin="5 1" />
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleMale}" Content="Male" Margin="5 1" />
             </StackPanel>
+            <!--#endregion-->
 
-            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
-
+            <!--#region Third Party Section -->
             <Button Name="AddThirdPartyButton" Grid.Row="2" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Add 3rd Party Folder" />
             <Button Name="RemoveThirdPartyButton" Grid.Row="2" Grid.Column="6" Click="Remove3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
@@ -192,19 +214,22 @@
                     Content="Reload 3rd Party Folder" />
             <ListBox Name="OtherPartyFolders" Grid.Row="3" Grid.Column="5" Grid.ColumnSpan="3" Grid.RowSpan="4"
                     ItemsSource="{Binding ThirdParty.Folders}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
-            
+            <!--#endregion-->
 
+            <!--#region Save/Load/Clear Selection -->
             <Button Grid.Row="4" Grid.Column="4" Click="SaveSelection"
                     Margin="{StaticResource DefaultMargin}" Content="Save Selection" />
             <Button Grid.Row="5" Grid.Column="4" Click="LoadSelection"
                     Margin="{StaticResource DefaultMargin}" Content="Load Selection" /> 
             <Button Grid.Row="6" Grid.Column="4" Click="ClearPackageSelection" Margin="{StaticResource DefaultMargin}"
                     Content="Clear Package Selection" />
+            <!--#endregion-->
         </Grid>
-
+        
         <TabControl Name="DisplayTab" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+            
             <TabItem Header="Packages">
-                <DataGrid Name="PackageDisplay" ItemsSource="{Binding PackagesViewSource.View}" IsReadOnly="False"
+                <DataGrid Name="PackageDisplay" ItemsSource="{Binding ViewManager.Packages.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -225,7 +250,7 @@
             </TabItem>
 
             <TabItem Header="Accessories">
-                <DataGrid Name="AccessoriesDisplay" ItemsSource="{Binding Accessories.View}" IsReadOnly="False"
+                <DataGrid Name="AccessoriesDisplay" ItemsSource="{Binding ViewManager.Accessories.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -249,7 +274,7 @@
             </TabItem>
 
             <TabItem Header="Attachments">
-                <DataGrid Name="AttachmentsDisplay" ItemsSource="{Binding Attachments.View}" IsReadOnly="False"
+                <DataGrid Name="AttachmentsDisplay" ItemsSource="{Binding ViewManager.Attachments.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -273,7 +298,7 @@
             </TabItem>
 
             <TabItem Header="Characters">
-                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding Characters.View}" IsReadOnly="False"
+                <DataGrid Name="CharactersDisplay" ItemsSource="{Binding ViewManager.Characters.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -297,7 +322,7 @@
             </TabItem>
 
             <TabItem Header="Clothings">
-                <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding Clothings.View}" IsReadOnly="False"
+                <DataGrid Name="ClothingsDisplay" ItemsSource="{Binding ViewManager.Clothings.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -321,7 +346,7 @@
             </TabItem>
 
             <TabItem Header="Hairs">
-                <DataGrid Name="HairsDisplay" ItemsSource="{Binding Hairs.View}" IsReadOnly="False"
+                <DataGrid Name="HairsDisplay" ItemsSource="{Binding ViewManager.Hairs.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -345,7 +370,7 @@
             </TabItem>
 
             <TabItem Header="Morphs">
-                <DataGrid Name="MorphsDisplay" ItemsSource="{Binding Morphs.View}" IsReadOnly="False"
+                <DataGrid Name="MorphsDisplay" ItemsSource="{Binding ViewManager.Morphs.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -369,7 +394,7 @@
             </TabItem>
 
             <TabItem Header="Props">
-                <DataGrid Name="PropsDisplay" ItemsSource="{Binding Props.View}" IsReadOnly="False"
+                <DataGrid Name="PropsDisplay" ItemsSource="{Binding ViewManager.Props.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -393,7 +418,7 @@
             </TabItem>
 
             <TabItem Header="Poses">
-                <DataGrid Name="PosesDisplay" ItemsSource="{Binding Poses.View}" IsReadOnly="False"
+                <DataGrid Name="PosesDisplay" ItemsSource="{Binding ViewManager.Poses.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -417,7 +442,7 @@
             </TabItem>
 
             <TabItem Header="Others">
-                <DataGrid Name="OthersDisplay" ItemsSource="{Binding Others.View}" IsReadOnly="False"
+                <DataGrid Name="OthersDisplay" ItemsSource="{Binding ViewManager.Others.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -441,7 +466,7 @@
             </TabItem>
 
             <TabItem Header="Unassigned">
-                <DataGrid Name="TODODisplay" ItemsSource="{Binding TODO.View}" IsReadOnly="False"
+                <DataGrid Name="TODODisplay" ItemsSource="{Binding ViewManager.TODO.View}" IsReadOnly="False"
                         AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Select" Width="Auto" IsReadOnly="True"
@@ -465,7 +490,7 @@
             </TabItem>
 
             <TabItem Header="3rd Party">
-                <TreeView x:Name="OtherPartyFiles" ItemsSource="{Binding ThirdPartyView.View}">
+                <TreeView x:Name="OtherPartyFiles" ItemsSource="{Binding ViewManager.ThirdPartyView.View}">
                     <TreeView.Resources>
                         <HierarchicalDataTemplate DataType="{x:Type DazPackage:ThirdPartyFolder}"
                                 ItemsSource="{Binding Children}">
@@ -487,7 +512,7 @@
             </TabItem>
 
             <TabItem Header="Accessories Gallery">
-                <ListBox Name="AccessoriesViewer" ItemsSource="{Binding Accessories.View}"
+                <ListBox Name="AccessoriesViewer" ItemsSource="{Binding ViewManager.Accessories.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -506,7 +531,7 @@
             </TabItem>
 
             <TabItem Header="Attachments Gallery">
-                <ListBox Name="AttachmentsViewer" ItemsSource="{Binding Attachments.View}"
+                <ListBox Name="AttachmentsViewer" ItemsSource="{Binding ViewManager.Attachments.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -525,7 +550,7 @@
             </TabItem>
             
             <TabItem Header="Characters Gallery">
-                <ListBox Name="CharactersViewer" ItemsSource="{Binding Characters.View}"
+                <ListBox Name="CharactersViewer" ItemsSource="{Binding ViewManager.Characters.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -544,7 +569,7 @@
             </TabItem>
             
             <TabItem Header="Clothings Gallery">
-                <ListBox Name="ClothingsViewer" ItemsSource="{Binding Clothings.View}"
+                <ListBox Name="ClothingsViewer" ItemsSource="{Binding ViewManager.Clothings.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -563,7 +588,7 @@
             </TabItem>
 
             <TabItem Header="Hairs Gallery">
-                <ListBox Name="HairsViewer" ItemsSource="{Binding Hairs.View}"
+                <ListBox Name="HairsViewer" ItemsSource="{Binding ViewManager.Hairs.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -582,7 +607,7 @@
             </TabItem>
 
             <TabItem Header="Morphs Gallery">
-                <ListBox Name="MorphsViewer" ItemsSource="{Binding Morphs.View}"
+                <ListBox Name="MorphsViewer" ItemsSource="{Binding ViewManager.Morphs.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -601,7 +626,7 @@
             </TabItem>
 
             <TabItem Header="Props Gallery">
-                <ListBox Name="PropsView" ItemsSource="{Binding Props.View}"
+                <ListBox Name="PropsView" ItemsSource="{Binding ViewManager.Props.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -620,7 +645,7 @@
             </TabItem>
 
             <TabItem Header="Poses Gallery">
-                <ListBox Name="PosesViewer" ItemsSource="{Binding Poses.View}"
+                <ListBox Name="PosesViewer" ItemsSource="{Binding ViewManager.Poses.View}"
                         ItemTemplate="{StaticResource ImageGalleryBox}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>

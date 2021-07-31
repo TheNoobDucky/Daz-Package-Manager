@@ -20,6 +20,8 @@ namespace DazPackage
         public AssetTypes AssetTypes { get; set; } = AssetTypes.Unknown;
         public Generation Generations { get; set; } = Generation.Unknown;
         public Gender Genders { get; set; } = Gender.Unknown;
+        public string ProductID { get; set; }
+        public string PackageID { get; set; }
 
         public List<InstalledFile> Items { get; set; } = new List<InstalledFile>();
         public List<InstalledFile> OtherItems { get; set; } = new List<InstalledFile>();
@@ -31,6 +33,8 @@ namespace DazPackage
             ProductName = installManifest.ProductName;
             InstalledLocation = installManifest.UserInstallPath;
             Files = installManifest.Files;
+            ProductID = installManifest.ProductID;
+            PackageID = installManifest.PackageID;
 
             foreach (var metadataFileLocation in installManifest.MetadataFiles)
             {
@@ -44,7 +48,7 @@ namespace DazPackage
                         var assetType = InstalledFile.MatchContentType(asset.ContentType);
                         if ((assetType & AssetTypes.Handled) != AssetTypes.None)
                         {
-                            var figureLocation = Path.Combine(this.InstalledLocation, asset.Name);
+                            var figureLocation = Path.Combine(InstalledLocation, asset.Name);
                             var figureImage = FindImage(figureLocation);
                             var item = new InstalledFile(this, asset)
                             {

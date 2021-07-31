@@ -28,21 +28,21 @@ namespace DazPackage
         {
             try
             {
-                try
-                {
-                    var sceneContent = Helper.ReadJsonFromGZfile(location);
-                    return ExtractFilesFromJsonFile(sceneContent);
-                }
-                catch (InvalidDataException)
-                {
-                    // Try open file as plain text.
-                    var sceneContent = Helper.ReadJsonFromTextFile(location);
-                    return ExtractFilesFromJsonFile(sceneContent);
-                }
+                var sceneContent = Helper.ReadJsonFromGZfile(location);
+                return ExtractFilesFromJsonFile(sceneContent);
             }
             catch (InvalidDataException)
             {
-                throw new CorruptFileException(location.FullName);
+                // Try open file as plain text.
+                try
+                {
+                    var sceneContent = Helper.ReadJsonFromTextFile(location);
+                    return ExtractFilesFromJsonFile(sceneContent);
+                }
+                catch (InvalidDataException e)
+                {
+                    throw new CorruptFileException($"{e.Message} file: {location.FullName}");
+                }
             }
         }
 
