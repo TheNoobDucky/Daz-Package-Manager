@@ -117,10 +117,10 @@ namespace DazPackage
 
         public Task AddFolder(string folder, CancellationToken token)
         {
-            Helper.UIInvoke(() => Folders.Add(folder));
+            Helper.InvokeAsUI(() => Folders.Add(folder));
             var newFiles = new ThirdPartyFolder { Location = folder, FolderName = folder, BasePath = folder };
             _ = newFiles.ScanFiles(token);
-            Helper.UIInvoke(() => Files.Add(newFiles));
+            Helper.InvokeAsUI(() => Files.Add(newFiles));
             return Task.CompletedTask;
         }
 
@@ -136,8 +136,8 @@ namespace DazPackage
         public Task ReloadFolders(CancellationToken token)
         {
             var folders = new List<string>(Folders);
-            Helper.UIInvoke(() => Folders.Clear());
-            Helper.UIInvoke(() => Files.Clear());
+            Helper.InvokeAsUI(() => Folders.Clear());
+            Helper.InvokeAsUI(() => Files.Clear());
             foreach (var folder in folders)
             {
                 _ = AddFolder(folder, token);

@@ -1,21 +1,19 @@
 ﻿using DazPackage;
 using Helpers;
-using OsHelper;
 using Output;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Daz_Package_Manager
 {
-    internal class SelectPackages
+    internal class SelectContents
     {
         private readonly Backend model;
-        public SelectPackages(Backend model)
+        public SelectContents(Backend model)
         {
             this.model = model;
         }

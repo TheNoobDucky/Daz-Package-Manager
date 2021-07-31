@@ -10,11 +10,11 @@ using System.Windows;
 
 namespace Daz_Package_Manager
 {
-    internal class VirtualFolderManager
+    internal class VirtualFolderInstaller
     {
         private readonly Backend model;
 
-        public VirtualFolderManager(Backend model)
+        public VirtualFolderInstaller(Backend model)
         {
             this.model = model;
         }

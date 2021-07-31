@@ -140,7 +140,7 @@ namespace DazPackage
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            Helper.UIInvoke(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
+            Helper.InvokeAsUI(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
         }
         #endregion
     }

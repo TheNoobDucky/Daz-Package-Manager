@@ -134,13 +134,13 @@ namespace Daz_Package_Manager
                 {
                     var folders = JsonSerializer.Deserialize<List<string>>(jsonFile.ReadToEnd(), option);
                     jsonFile.Dispose();
-                    Helper.UIInvoke(() => model.ThirdParty.Folders.AddRange(folders));
+                    Helper.InvokeAsUI(() => model.ThirdParty.Folders.AddRange(folders));
 
                     saveFileLocation = CacheManager.SaveFileLocation(thirdPartyFilesJsonFile);
                     using var jsonFile2 = File.OpenText(saveFileLocation);
                     var files = JsonSerializer.Deserialize<List<ThirdPartyFolder>>(jsonFile2.ReadToEnd(), option);
-                    Helper.UIInvoke(()=>model.ThirdParty.Files.Clear());
-                    Helper.UIInvoke(()=>model.ThirdParty.Files.AddRange(files));
+                    Helper.InvokeAsUI(()=>model.ThirdParty.Files.Clear());
+                    Helper.InvokeAsUI(()=>model.ThirdParty.Files.AddRange(files));
                     jsonFile2.Dispose();
                 }
                 catch (JsonException)

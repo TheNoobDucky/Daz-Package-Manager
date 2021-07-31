@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,17 +15,17 @@ namespace Helpers
     {
         public delegate void InvokeTask();
 
-        public static void UIInvoke (InvokeTask del)
+        public static void InvokeAsUI(InvokeTask del)
         {
             Application.Current.Dispatcher.Invoke(del);
         }
 
-        public delegate Task MainTask();
+        public delegate Task ButtonTask();
         public delegate void CancelTask();
 
         public const string WaitText = "Cancel";
 
-        public static async Task AsyncButton(object sender, MainTask mainTask, CancelTask cancelTaks, string waitText=WaitText)
+        public static async Task AsyncButton(object sender, ButtonTask mainTask, CancelTask cancelTaks, string waitText = WaitText)
         {
             if (sender is Button button)
             {

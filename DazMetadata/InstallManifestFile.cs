@@ -21,7 +21,7 @@ namespace DazPackage
                 var content = XElement.Load(filestream);
                 if (content.Name != "DAZInstallManifest")
                 {
-                    throw new CorruptFileException("Not install manifest file: " + file.FullName);
+                    throw new CorruptFileException($"Not install manifest file: {file.FullName}");
                 }
 
                 GlobalID = content.Element("GlobalID")?.Attribute("VALUE")?.Value;

@@ -26,10 +26,10 @@ namespace Daz_Package_Manager
         public PackagesList Packages = new();
         public ThirdPartyFolders ThirdParty { get; private set; } = new();
 
-        public SelectPackages SelectPackages { get; private set; }
+        public SelectContents SelectPackages { get; private set; }
         public ManifestScanner ManifestScanner { get; private set; }
         public ThirdPartyScanner ThirdPartyScanner { get; private set; }
-        public VirtualFolderManager VirtualFolderManager { get; private set; }
+        public VirtualFolderInstaller VirtualFolderManager { get; private set; }
         public CacheManager CacheManager { get; private set; }
         public ViewManager ViewManager { get; private set; }
         public GUISettings Settings { get; private set; } = new();
