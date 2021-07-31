@@ -28,26 +28,22 @@ namespace DazPackage
         {
             try
             {
+                var sceneContent = Helper.ReadJsonFromGZfile(location);
+                return ExtractFilesFromJsonFile(sceneContent);
+            }
+            catch (InvalidDataException)
+            {
+                // Try open file as plain text.
                 try
                 {
-                    var sceneContent = Helper.ReadJsonFromGZfile(location);
-                    return ExtractFilesFromJsonFile(sceneContent);
-                }
-                catch (InvalidDataException)
-                {
-                    // Try open file as plain text.
                     var sceneContent = Helper.ReadJsonFromTextFile(location);
                     return ExtractFilesFromJsonFile(sceneContent);
                 }
+                catch (InvalidDataException e)
+                {
+                    throw new CorruptFileException($"{e.Message} file: {location.FullName}");
+                }
             }
-            catch (InvalidDataException e)
-            {
-                throw new CorruptFileException($"{e.Message} file: {location.FullName}");
-            }
-            //catch (JsonReaderException e)
-            //{
-            //    throw new CorruptFileException($"{e.Message} file: {location.FullName}");
-            //}
         }
 
         private static HashSet<string> ExtractFilesFromJsonFile(JsonDocument file)
