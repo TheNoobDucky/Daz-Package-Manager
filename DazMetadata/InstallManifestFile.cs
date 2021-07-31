@@ -42,7 +42,12 @@ namespace DazPackage
             }
             catch (XmlException)
             {
-                throw new CorruptFileException("File maybe corrupt: " + file.FullName);
+                throw new CorruptFileException($"File maybe corrupt: {file.FullName}");
+            }
+            catch (IOException e)
+            {
+                throw new CorruptFileException($"{e.Message}\nFile:{file.FullName}");
+
             }
         }
 
