@@ -42,6 +42,11 @@ namespace Daz_Package_Manager
             AddThirdPartyButton.Content = ThirdPartyContent;
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Properties.Settings.Default.Save();
+        }
+
         private async void GenerateVirtualInstallFolder(object sender, RoutedEventArgs e)
         {
             await Helper.AsyncButton(sender, async () =>
@@ -83,8 +88,8 @@ namespace Daz_Package_Manager
             var sceneRoot = Directory.GetParent(scene);
             var scriptName = Path.GetFileNameWithoutExtension(scene) + "_load.dsa";
             var scriptLocation = Path.Combine(sceneRoot.FullName, scriptName);
-
-            VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene);
+            var clearBaseDirectories = Properties.Settings.Default.ClearBaseDirectories;
+            VirtualPackage.SaveInstallScript(scriptLocation, virtualFolder, scene, clearBaseDirectories);
         }
 
         private async void ScanInstallManifestFolder(object sender, RoutedEventArgs e)
@@ -172,11 +177,6 @@ namespace Daz_Package_Manager
             await Helper.AsyncButton(sender,
                 async () => await backend.ManifestScanner.LoadCache(),
                 () => backend.ManifestScanner.Cancel());
-        }
-
-        private void SaveUserSetting(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.Save();
         }
 
         private async void Add3rdPartyFolder(object sender, RoutedEventArgs e)

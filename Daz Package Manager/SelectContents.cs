@@ -58,8 +58,8 @@ namespace Daz_Package_Manager
 
         public async Task BasedOnScene(string location)
         {
-            var folder = Path.GetDirectoryName(location);
-            await Task.Run(() => Select_Imple(folder));
+            //var folder = Path.GetDirectoryName(location);
+            await Task.Run(() => Select_Imple(location));
         }
 
         private void Select_Imple (string sceneLocation)

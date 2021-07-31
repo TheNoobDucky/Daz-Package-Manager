@@ -129,6 +129,10 @@ namespace Helpers
             {
                 throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
             }
+            catch (UnauthorizedAccessException e)
+            {
+                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+            }
         }
 
         public static JsonDocument ReadJsonFromTextFile(FileInfo file)
@@ -139,6 +143,10 @@ namespace Helpers
                 return JsonDocument.Parse(sceneStream);
             }
             catch (JsonException e)
+            {
+                throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
+            }
+            catch (UnauthorizedAccessException e)
             {
                 throw new CorruptFileException($"{e.Message} \nFile: {file.FullName}");
             }

@@ -56,21 +56,25 @@ namespace DazPackage
             }
         }
 
-        public static void SaveInstallScript(string scriptLocation, string virtualFolder, string sceneFile)
+        public static void SaveInstallScript(string scriptLocation, string virtualFolder, string sceneFile, bool clearBaseDirectories =false)
         {
             virtualFolder = virtualFolder.Replace('\\', '/');
             sceneFile = sceneFile.Replace('\\', '/');
-            string script_template =
-                "(function() { \n" +
-                $"\tvar virtualFolder = \"{virtualFolder}\";\n" +
-                $"\tvar sceneFile = \"{sceneFile}\";\n" +
-                "\tvar contentManager = App.getContentMgr();\n" +
-                "\t//contentManager.removeAllContentDirectories();\n" +
-                "\tcontentManager.addContentDirectory(virtualFolder);\n" +
-                "\tcontentManager.openFile(sceneFile, false)\n" +
-                "})();";
+            // clearBaseDirectoriesString = clearBaseDirectories ? "//" : "";
 
-            File.WriteAllText(scriptLocation, script_template);
+            File.WriteAllText(scriptLocation,
+$@"(function() {{ 
+	var virtualFolder = ""{virtualFolder}"";
+	var sceneFile = ""{sceneFile}"";
+	var contentManager = App.getContentMgr();
+	var clearBaseDirectories = {clearBaseDirectories.ToString().ToLower()};
+	if (clearBaseDirectories) 
+	{{
+		contentManager.removeAllContentDirectories();
+	}}
+	contentManager.addContentDirectory(virtualFolder);
+	contentManager.openFile(sceneFile, false)
+}})();");
         }
     }
 

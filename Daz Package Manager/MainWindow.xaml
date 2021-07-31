@@ -7,6 +7,7 @@
         xmlns:properties="clr-namespace:Daz_Package_Manager.Properties"
         d:DataContext="{d:DesignInstance Type=local:Backend}" mc:Ignorable="d" Title="MainWindow" Height="1200"
         Loaded="Window_Loaded"
+        Closing="Window_Closing"
         Width="1500">
     <Window.Resources>
         <DataTemplate x:Key="SelectCheckbox">
@@ -111,11 +112,10 @@
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Step 4: " Margin="{StaticResource DefaultMargin}" />
             <Button Name="SelectPackagesButton" Grid.Row="3" Grid.Column="1" Click="SelectPackagesBasedOnScene"
                     Margin="{StaticResource DefaultMargin}" Padding="5,1"
-                    Content="Select Package Based On Scene (Optional)" /> 
+                    Content="Select Package Based On Scene (Optional)" />
 
-            <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding BatchProcessScene}"
+            <CheckBox Grid.Row="3" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding BatchProcessScene}"
                     Content="Batch process all scenes in the same folder" />
 
             <TextBlock Grid.Row="4" Grid.Column="0" Text="Step 5: " Margin="{StaticResource DefaultMargin}" />
@@ -132,7 +132,11 @@
             <TextBlock Grid.Row="6" Grid.Column="0" Text="Step 7: " Margin="{StaticResource DefaultMargin}" />
             <Button Grid.Row="6" Grid.Column="1" Click="GenerateInstallScript"
                     Margin="{StaticResource DefaultMargin}" Content="Generate Install Script (optional)" />
-            <TextBlock Grid.Row="6" Grid.Column="2" Text="Will be saved to next to scene file" Margin="{StaticResource DefaultMargin}" />
+            <StackPanel Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <TextBlock Text="Will be saved to next to the scene file" Margin="{StaticResource DefaultMargin}" />
+                <CheckBox Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
+                        IsChecked="{Binding ClearBaseDirectories}" Content="Clear Base Directories" />
+            </StackPanel>
 
             <Button Grid.Row="0" Grid.Column="3" Click="SelectCacheLocation" Margin="{StaticResource DefaultMargin}"
                     Content="Select Cache Location" />
@@ -140,14 +144,14 @@
                     Margin="{StaticResource DefaultMargin}" DataContext="{x:Static properties:Settings.Default}"
                     Text="{Binding CacheLocation}" />
 
-            <CheckBox Grid.Row="0" Grid.Column="6" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding MakeCopy}" Content="Copy Files Instead" />
-            
-            <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding WarnMissingFile}" Content="Ignore Missing File" />
-            
+            <CheckBox Grid.Row="0" Grid.Column="6" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding MakeCopy}"
+                    Content="Copy Files Instead" />
+
+            <CheckBox Grid.Row="0" Grid.Column="7" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding WarnMissingFile}"
+                    Content="Ignore Missing File" />
+
             <Button Grid.Row="1" Grid.Column="4" Click="CallLoadCache" Margin="{StaticResource DefaultMargin}"
                     Visibility="Hidden" Content="Reload Cache" />
 
@@ -157,7 +161,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Column="0" Margin="5 0" IsChecked="{Binding Settings.ImageVisible, Mode=TwoWay}"
+                <CheckBox Grid.Column="0" Margin="5 1" IsChecked="{Binding Settings.ImageVisible, Mode=TwoWay}"
                         Content="Show Images" />
                 <TextBlock Grid.Column="1" Margin="5, 0" Text="Image Size:" />
                 <Slider Grid.Column="2" Margin="5, 0" Orientation="Horizontal" Value="{Binding Settings.ImageSize}" Minimum="0"
@@ -180,9 +184,9 @@
                 <CheckBox Grid.Row="5" Grid.Column="2" IsChecked="{Binding Settings.ToggleMale}" Content="Male" Margin="5 1" />
             </StackPanel>
 
-            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}" Checked="SaveUserSetting"
-                    Unchecked="SaveUserSetting" DataContext="{x:Static properties:Settings.Default}"
-                    IsChecked="{Binding UseSceneSubfolder}" Content="Create subfolder based on scene name" />
+            <CheckBox Grid.Row="5" Grid.Column="2" Margin="{StaticResource DefaultMargin}"
+                    DataContext="{x:Static properties:Settings.Default}" IsChecked="{Binding UseSceneSubfolder}"
+                    Content="Create subfolder based on scene name" />
 
             <Button Name="AddThirdPartyButton" Grid.Row="2" Grid.Column="5" Click="Add3rdPartyFolder" Margin="{StaticResource DefaultMargin}"
                     Content="Add 3rd Party Folder" />
