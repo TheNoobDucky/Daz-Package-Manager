@@ -76,6 +76,7 @@ Third party contents can be accessed in the `3rd Party` tab. Checkbox next to a 
 
 In the middle of the screen, there are buttons for save selection, load selection and clear selection.
 
+#### Create Virtual Folder
 ![Save contents](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%206.jpg)
 
 One you have finished selecting all the files you want to include in the virtual folder, 
@@ -90,12 +91,13 @@ This way you can have multiple sets of selections you can swap over.
 
 To delete virtual folder, simply delete the virtual folder using windows explorer.
 
-
+#### 1 click load script
 `Step 7: Generate Install Script` can be used to generate a daz script that will add the virtual folder as a base directory and load the daz file.
 This script can be used to open 1 click load the scene. 
 By default, the virtual folder is simply to the base directories list, 
 all currently added base directories would still be visible to Daz Studio and any morphs in it will be loaded. 
 Check `Clear Base Directories` to include a step that will clearing all base directories before adding virtual folder.
+
 
 ## Background Info
 The approach taken is to create a virtual folder containing Symlink references to all the files needed by a scene.
