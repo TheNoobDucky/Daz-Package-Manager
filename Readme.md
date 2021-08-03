@@ -11,7 +11,7 @@ The advantages of this program are:
 3. Repeatable. Products are selected based on the content of a scene file. The generated virtual folder can be deleted and recreated later.
 4. (For DIM installed product) Files from the same product also included, automatically including corrective morphs and other files that items in the scene might need*.
 *Note transitive dependencies are not handled, but nearly all Daz products should be standalone and work correctly.
-5. Nondestructive. Does not modify daz product installation. Original files can still be used and DIM will keep working.
+5. Non-destructive. Does not modify daz product installation. Original files can still be used and DIM will keep working.
 
 
 ## How To Use
@@ -21,41 +21,84 @@ The advantages of this program are:
 3. Either turn developer mode on windows 10 or run the program as administrator. [How to turn developer mode on](https://docs.microsoft.com/en-us/windows/apps/get-started/enable-your-device-for-development)
 4. Run Daz Package Manager.exe.
 
-#### Use
+### Use
 Step 0: Set Windows to developer mode or run the program as admin.
 
-Step 1: Press "Select Install Manifest Archive Folder" button to select the folder where DIM save install manifest files. 
-You can find them by going to DIM -> advanced setting -> Installation -> Manifest Archive. 
+#### Import Contents:
 
-Step 2a: Press "Scan Install Manifest Archive" button. 
-A list of installed packages should show up in "Log Output" tab. 
-The results are cached and will persist over program sessions.
-Only need to rerun this step after installing new content.
+![Import contents](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%201.jpg)
 
-Step 2b: Add other folders containing Daz file that is not installed via DIM/Central such as 3rd party stores by using the "Add 3rd Party Folder" button. 
+To start, add all daz contents you want to manage, either by automatically find files installed by DIM/Central, or manually add folders.
+The scanning process might take sometime but the result is cached, 
+you only need to repeat the step if you have added new contents that you want to manage through this program.
 
-Optional Step 3: Press "Select Scene File" button to select a scene file.
+For contents installed by DIM/Central, you can use `Step 1` and `Step 2` on upper left corner to the program to select the Daz install manifest folder. 
+To find where the install manifest folder is located, go to DIM -> advanced setting -> Installation -> Manifest Archive.
+Rerun step 2 to refresh the cache. 
 
-Optional Step 4a: Press "Select Packages Based on Scene" button to select packages based on files referenced by the selected scene. It is also possible to bulk process all scene files in the same folder.
 
-Step 4b: Select additional packages you want to include.
-There is a "Clear Package Selection" button to unselect all. 
+Alternatively for any Daz content, you can just add the folder it is in as a 3rd party folder using the buttons on the right side.
+Use reload button to rescan the 3rd party folders.
 
-Step 5: Press "Select Output Folder Location" button to select where to save the virtual folder. 
-Virtual folder need to be on a local drive, 
-it does not work with network drive.
-However, source files can be on network drive.
+#### Select Contents:
 
-Step 6: Press "Generate Virtual Install Folder" to generate the virtual folder.
-There is an option to create it in a subfolder with scene file name, allowing you to create a virtual folder per scene so you can switch between different scenes.
+![Select contents](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%202.jpg)
 
-Step 7: Add the virtual folder as a base folder in Daz Studio. 
-Remove base folders that contains contents you dont want daz to see.
-Optionally use "Generate Install Script" button to create a Dazscript that will automatically include the virtual folder and open the scene (Dazscript can only handle paths with English letters).
+You can either have the program find all files referenced in a scene file, batch process a whole folder, or select contents manually.
+To automatically automatically select contents, use `Step 3` and `Step 4`. Tick `Batch process all scens in the same folder` process all the files in the same folder or subfolders. 
+All `duf` file should work including scene file, scene subset, and characters.
+Both compressed and uncompressed files are supported.
 
+When selecting contents, contents installed by DIM, selecting one item will automatically select every other files in the same package, third party contents will be selected at folder level (automatically select other files in the same folder). 
+
+To make manual selection, select packages by using checkbox as indicated in the red box.
+
+![Select using list view](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%203.jpg)
+
+Individual contents can be browsed in list view as the above image show. Select using the red box area indicated on the left hand side.
+
+Items are generally sorted by order of Type -> Generation -> Gender -> Default installed to location.
+This is done using parsing metadata, some file might not be sorted correctly.
+Contents can by filtered by generation or gender by using the checkbox indicated in the middile of the screen.
+Hiding preview image may improve program performance.
+
+![Select using gallery view](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%204.jpg)
+
+`Gallery` tab give you a compact view of preview images only. 
+Hover over the image to get the file name.
+
+Image size can be adjusted by the image size slider. 
+The btool tip image is used when possible that give better resolution, otherwise preview image is used.
+
+![Select 3rd party contents](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%205.jpg)
+
+Third party contents can be accessed in the `3rd Party` tab. Checkbox next to a file only select that individual file, checkbox for a folder select everything in the folder.
+
+In the middle of the screen, there are buttons for save selection, load selection and clear selection.
+
+![Save contents](https://raw.githubusercontent.com/TheNoobDucky/Daz-Package-Manager/main/Images/image%206.jpg)
+
+One you have finished selecting all the files you want to include in the virtual folder, 
+use "Step 5" and "Step 6" to create a folder containing virtual lines to the selected files.
+This folder can be used as a base directory, allowing you to only include files you want to use in Daz studio.
+
+Make sure you have selected a folder on a local drive, network drive does not work.
+The location should be seperate from folders containing daz contents.
+
+Select `Create subfolder based on scene name` to group the selection based on the file name selected in `Step 5`. 
+This way you can have multiple sets of selections you can swap over.
+
+To delete virtual folder, simply delete the virtual folder using windows explorer.
+
+
+`Step 7: Generate Install Script` can be used to generate a daz script that will add the virtual folder as a base directory and load the daz file.
+This script can be used to open 1 click load the scene. 
+By default, the virtual folder is simply to the base directories list, 
+all currently added base directories would still be visible to Daz Studio and any morphs in it will be loaded. 
+Check `Clear Base Directories` to include a step that will clearing all base directories before adding virtual folder.
 
 ## Background Info
-The approach taken is to create a virtual folder containing Symlink references to all the files needed in a scene.
+The approach taken is to create a virtual folder containing Symlink references to all the files needed by a scene.
 By using the virtual folder as Daz base folder,
 only morphs needed are visible to Daz, 
 making the character load much faster.
@@ -92,6 +135,16 @@ After opening a scene using Virtual folder, texture images might be resolved usi
 ## Version Log
 Change Log:
 
+V1.10.0
+* More error handling around file IO.
+* Exporting product ID, package ID, and product name when saving selection.
+* Bulk processing now recursively scan scene folder
+
+V1.9.0
+* Add handling more types of Daz files.
+* Add ability to handle uncompressed Daz file.
+* Find uv_set files.
+* 
 V1.8.1
 * Fix 3rd party crash
 
